@@ -26,7 +26,7 @@ public class FastMap<Value> {
             valuesList.add(null);
         }
         for (Map.Entry<Map<Property<?>, Comparable<?>>, Value> state : valuesMap.entrySet()) {
-            valuesList.set(indexOf(state.getKey()), state.getValue());
+            valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
         this.values = valuesList;
         this.rawKeys = new ArrayList<>(properties);
@@ -35,7 +35,7 @@ public class FastMap<Value> {
     @Nullable
     public <T extends Comparable<T>>
     Value with(int last, Property<T> prop, T value) {
-        final Key<T> keyToChange = indexOf(prop);
+        final Key<T> keyToChange = getKeyFor(prop);
         if (keyToChange == null) {
             return null;
         }
@@ -48,7 +48,9 @@ public class FastMap<Value> {
 
     @Nullable
     private <T extends Comparable<T>>
-    Key<T> indexOf(Property<T> prop) {
+    Key<T> getKeyFor(Property<T> prop) {
+        // It might be possible to speed this up by sorting the keys by their hash code and using a binary search,
+        // however I do not think that it would actually be faster in practice.
         for (Key<?> key : keys) {
             if (key.getProperty() == prop) {
                 return (Key<T>) key;
@@ -57,7 +59,7 @@ public class FastMap<Value> {
         return null;
     }
 
-    public int indexOf(Map<Property<?>, Comparable<?>> state) {
+    public int getIndexOf(Map<Property<?>, Comparable<?>> state) {
         int id = 0;
         for (Key<?> k : keys) {
             id += k.toPartialMapIndex(state.get(k.getProperty()));
@@ -68,7 +70,7 @@ public class FastMap<Value> {
     @Nullable
     public <T extends Comparable<T>>
     T getValue(int stateIndex, Property<T> property) {
-        final Key<T> propId = indexOf(property);
+        final Key<T> propId = getKeyFor(property);
         if (propId == null) {
             return null;
         }

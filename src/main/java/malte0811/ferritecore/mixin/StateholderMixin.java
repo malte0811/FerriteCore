@@ -37,15 +37,15 @@ public abstract class StateholderMixin<O, S> {
     public void func_235899_a_(Map<Map<Property<?>, Comparable<?>>, S> states) {
         if (globalTable != null) {
             throw new IllegalStateException();
-        } else if (states == HackyGlobalState.lastStateMap) {
+        } else if (states == HackyGlobalState.lastStateMap.get()) {
             // Use "hacky global state" to use the same fast map for all states of one block
-            this.globalTable = (FastMap<S>) HackyGlobalState.lastFastStateMap;
+            this.globalTable = (FastMap<S>) HackyGlobalState.lastFastStateMap.get();
         } else {
-            HackyGlobalState.lastStateMap = states;
+            HackyGlobalState.lastStateMap.set(states);
             this.globalTable = new FastMap<>(getProperties(), states);
-            HackyGlobalState.lastFastStateMap = this.globalTable;
+            HackyGlobalState.lastFastStateMap.set(this.globalTable);
         }
-        this.globalTableIndex = this.globalTable.indexOf(properties);
+        this.globalTableIndex = this.globalTable.getIndexOf(properties);
         properties = null;
     }
 
@@ -68,7 +68,7 @@ public abstract class StateholderMixin<O, S> {
         }
     }
 
-    // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors wasn't
+    // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors didn't
     // run yet) use the vanilla code using `properties`
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
     public <T extends Comparable<T>>
@@ -97,7 +97,10 @@ public abstract class StateholderMixin<O, S> {
         }
     }
 
-    //TODO speed up in some way?
+    // TODO speed up in some way?
+    // The cleanest (lowest-impact) approach would be to use a custom implementation of ImmutableMap (based on a FastMap
+    // and an index), but that whole class hierarchy is a very "closed" (many essential methods/classes are
+    // package-private)
     @Inject(method = "getValues", at = @At("HEAD"), cancellable = true)
     public void getValuesHead(CallbackInfoReturnable<ImmutableMap<Property<?>, Comparable<?>>> cir) {
         if (globalTable != null) {
