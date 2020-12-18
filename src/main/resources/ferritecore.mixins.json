@@ -6,6 +6,9 @@
   "mixins": [
     "StateholderMixin"
   ],
+  "client": [
+    "MixinPropertyValueCondition"
+  ],
   "injectors": {
     "defaultRequire": 1
   },
