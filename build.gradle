@@ -39,6 +39,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
             arg "-mixin.config="+archivesBaseName+".mixins.json"
+            property 'mixin.env.disableRefMap', 'true'
 
 
             // Recommended logging level for the console
@@ -55,6 +56,7 @@ minecraft {
             workingDirectory project.file('run')
             arg "-mixin.config="+archivesBaseName+".mixins.json"
             arg "-nogui"
+            property 'mixin.env.disableRefMap', 'true'
 
 
             // Recommended logging level for the console

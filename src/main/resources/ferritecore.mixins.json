@@ -7,7 +7,9 @@
     "StateholderMixin"
   ],
   "client": [
-    "MixinPropertyValueCondition"
+    "OrConditionMixin",
+    "AndConditionMixin",
+    "PropertyValueConditionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

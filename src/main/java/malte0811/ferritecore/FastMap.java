@@ -52,7 +52,7 @@ public class FastMap<Value> {
         // It might be possible to speed this up by sorting the keys by their hash code and using a binary search,
         // however I do not think that it would actually be faster in practice.
         for (Key<?> key : keys) {
-            if (key.getProperty() == prop) {
+            if (key.getProperty().equals(prop)) {
                 return (Key<T>) key;
             }
         }
