@@ -5,6 +5,6 @@ import net.minecraft.state.Property;
 import java.util.Map;
 
 public class HackyGlobalState {
-    public static ThreadLocal<Map<Map<Property<?>, Comparable<?>>, ?>> lastStateMap;
-    public static ThreadLocal<FastMap<?>> lastFastStateMap;
+    public static final ThreadLocal<Map<Map<Property<?>, Comparable<?>>, ?>> LAST_STATE_MAP = new ThreadLocal<>();
+    public static final ThreadLocal<FastMap<?>> LAST_FAST_STATE_MAP = new ThreadLocal<>();
 }

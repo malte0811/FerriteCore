@@ -37,13 +37,13 @@ public abstract class StateholderMixin<O, S> {
     public void func_235899_a_(Map<Map<Property<?>, Comparable<?>>, S> states) {
         if (globalTable != null) {
             throw new IllegalStateException();
-        } else if (states == HackyGlobalState.lastStateMap.get()) {
+        } else if (states == HackyGlobalState.LAST_STATE_MAP.get()) {
             // Use "hacky global state" to use the same fast map for all states of one block
-            this.globalTable = (FastMap<S>) HackyGlobalState.lastFastStateMap.get();
+            this.globalTable = (FastMap<S>) HackyGlobalState.LAST_FAST_STATE_MAP.get();
         } else {
-            HackyGlobalState.lastStateMap.set(states);
+            HackyGlobalState.LAST_STATE_MAP.set(states);
             this.globalTable = new FastMap<>(getProperties(), states);
-            HackyGlobalState.lastFastStateMap.set(this.globalTable);
+            HackyGlobalState.LAST_FAST_STATE_MAP.set(this.globalTable);
         }
         this.globalTableIndex = this.globalTable.getIndexOf(properties);
         properties = null;
