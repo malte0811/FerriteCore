@@ -24,6 +24,7 @@ the `Optional`s can be GCd right away.
 Saved memory: 100 MB  
 CPU impact: zero or negative (one less pointer to follow)  
 Side: client  
+Patches: One small patch in `PropertyValueCondition`  
 Notes: The last point makes this change essentially unnecessary
 
 ### BlockState neighbors
@@ -41,6 +42,8 @@ multiplication and addition operations.
 Saved memory: Around 600 MB (the `FastMap`s are around 4 MB total)  
 CPU impact: hard to prove, but most likely near zero  
 Side: both  
+Patches: Practically complete replacement of `StateHolder#func_235899_a_` and a small
+patch in `StateHolder#with`  
 Notes: There is a chance that this is slower for blocks with a very high number of
 properties, as the property to be modified is found using a linear search. This could be
 improved by using a binary search (probably sorted by hash), but it is not clear that this
@@ -60,7 +63,9 @@ calls to the old one where the performance is problematic (this is not yet imple
 
 Saved memory: Around 170 MB  
 CPU impact: unclear (see second paragraph)  
-Side: both
+Side: both  
+Patches: Relatively small patches in all methods using the private field
+`StateHolder#properties` (most methods in `StateHolder`)
 
 ### Multipart model predicate caching
 Each multipart model stores a number of predicates to determine which parts to show under
@@ -80,4 +85,11 @@ is reduced from between 10s of thousands and millions to a few ten or hundred in
 
 Saved memory: 300-400 MB  
 CPU impact: Some impact in model loading (but less allocations), zero while playing  
-Side: client
+Side: client  
+Patches:
+ - `PropertyValueCondition#makePropertyPredicate` (a few lines)
+ - `PropertyValueCondition#getPredicate` (roughly one line)
+ - `AndCondition#getPredicate` (close to full replacement)
+ - `OrCondition#getPredicate` (same)
+Alternatively `Selector#getOrAndCondition` could be patched to return different
+`And/OrCondition` implementations.
