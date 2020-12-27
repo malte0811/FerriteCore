@@ -7,7 +7,9 @@ import net.minecraft.state.Property;
 import net.minecraft.state.StateHolder;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
@@ -23,8 +25,13 @@ public abstract class StateholderMixin<O, S> {
     @Shadow
     @Final
     protected O instance;
-    @Shadow public abstract Collection<Property<?>> getProperties();
-    @Shadow public abstract <T extends Comparable<T>> T get(Property<T> property);
+
+    @Shadow
+    public abstract Collection<Property<?>> getProperties();
+
+    @Shadow
+    public abstract <T extends Comparable<T>> T get(Property<T> property);
+
     private int globalTableIndex;
     private FastMap<S> globalTable;
 
@@ -70,30 +77,19 @@ public abstract class StateholderMixin<O, S> {
 
     // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors didn't
     // run yet) use the vanilla code using `properties`
-    @Inject(method = "get", at = @At("HEAD"), cancellable = true)
-    public <T extends Comparable<T>>
-    void get(Property<T> property, CallbackInfoReturnable<T> cir) {
+    @Redirect(
+            method = {"get", "func_235903_d_"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/google/common/collect/ImmutableMap;get(Ljava/lang/Object;)Ljava/lang/Object;"
+            )
+    )
+    @Coerce
+    public Object getValueOfProperty(ImmutableMap<?, ?> vanillaMap, Object key) {
         if (globalTable != null) {
-            T result = globalTable.getValue(globalTableIndex, property);
-            if (result == null) {
-                throw new IllegalArgumentException("Cannot get property " + property + " as it does not exist in " + this.instance);
-            }
-            cir.setReturnValue(result);
-            cir.cancel();
-        }
-    }
-
-    @Inject(method = "func_235903_d_", at = @At("HEAD"), cancellable = true)
-    public <T extends Comparable<T>>
-    void getOptionalHead(Property<T> property, CallbackInfoReturnable<Optional<T>> cir) {
-        if (globalTable != null) {
-            T result = globalTable.getValue(globalTableIndex, property);
-            if (result == null) {
-                cir.setReturnValue(Optional.empty());
-            } else {
-                cir.setReturnValue(Optional.of(result));
-            }
-            cir.cancel();
+            return globalTable.getValue(globalTableIndex, (Property<?>) key);
+        } else {
+            return vanillaMap.get(key);
         }
     }
 

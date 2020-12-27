@@ -1,5 +1,6 @@
 package malte0811.ferritecore;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.state.Property;
 
 import javax.annotation.Nullable;
@@ -29,7 +30,7 @@ public class FastMap<Value> {
             valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
         this.values = valuesList;
-        this.rawKeys = new ArrayList<>(properties);
+        this.rawKeys = ImmutableList.copyOf(properties);
     }
 
     @Nullable

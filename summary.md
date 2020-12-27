@@ -83,7 +83,8 @@ useful as one of the most common usages of multipart models is pipes, where the 
 nearly always boolean properties named `north` etc. As a result the number of predicates
 is reduced from between 10s of thousands and millions to a few ten or hundred instances.
 
-Saved memory: 300-400 MB  
+Saved memory: 300-400 MB (relative to the state after the first change, so 100 MB more
+compared to a "clean" instance)  
 CPU impact: Some impact in model loading (but less allocations), zero while playing  
 Side: client  
 Patches:

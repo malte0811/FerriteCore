@@ -1,5 +1,6 @@
 package malte0811.ferritecore.mixin;
 
+import com.google.common.base.Splitter;
 import malte0811.ferritecore.CachedOrPredicates;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -11,16 +12,13 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
- 
-import com.google.common.base.Splitter;
+
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-
-import malte0811.ferritecore.HackyGlobalState;
+import java.util.stream.Collectors;
 
 @Mixin(PropertyValueCondition.class)
 public class PropertyValueConditionMixin {
@@ -38,7 +36,9 @@ public class PropertyValueConditionMixin {
 
    /**
     * @reason Use cached predicates in the case of multiple specified values
-    * TODO this should be possible with a less invasive mixin?
+    * A less invasive Mixin would be preferable (especially since only one line really changes), but that would involve
+    * redirecting a lambda creation (not currently possible as far as I can tell) and capturing locals (possible, but
+    * annoying)
     * @author malte0811
     */
    @Overwrite
