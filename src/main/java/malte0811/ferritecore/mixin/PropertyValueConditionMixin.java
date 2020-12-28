@@ -34,43 +34,50 @@ public class PropertyValueConditionMixin {
     @Final
     private static Splitter SPLITTER;
 
-   /**
-    * @reason Use cached predicates in the case of multiple specified values
-    * A less invasive Mixin would be preferable (especially since only one line really changes), but that would involve
-    * redirecting a lambda creation (not currently possible as far as I can tell) and capturing locals (possible, but
-    * annoying)
-    * @author malte0811
-    */
-   @Overwrite
-   public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
-      Property<?> property = stateContainer.getProperty(this.key);
-      if (property == null) {
-         throw new RuntimeException(String.format("Unknown property '%s' on '%s'", this.key, stateContainer.getOwner().toString()));
-      } else {
-         String valueNoInvert = this.value;
-         boolean invert = !valueNoInvert.isEmpty() && valueNoInvert.charAt(0) == '!';
-         if (invert) {
-            valueNoInvert = valueNoInvert.substring(1);
-         }
-
-         List<String> matchedStates = SPLITTER.splitToList(valueNoInvert);
-         if (matchedStates.isEmpty()) {
-            throw new RuntimeException(String.format("Empty value '%s' for property '%s' on '%s'", this.value, this.key, stateContainer.getOwner().toString()));
-         } else {
-            Predicate<BlockState> isMatchedState;
-            if (matchedStates.size() == 1) {
-               isMatchedState = this.makePropertyPredicate(stateContainer, property, valueNoInvert);
-            } else {
-               List<Predicate<BlockState>> subPredicates = matchedStates.stream()
-                       .map(subValue -> this.makePropertyPredicate(stateContainer, property, subValue))
-                       .collect(Collectors.toList());
-               isMatchedState = CachedOrPredicates.or(subPredicates);
+    /**
+     * @reason Use cached predicates in the case of multiple specified values
+     * A less invasive Mixin would be preferable (especially since only one line really changes), but that would involve
+     * redirecting a lambda creation (not currently possible as far as I can tell) and capturing locals (possible, but
+     * annoying)
+     * @author malte0811
+     */
+    @Overwrite
+    public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
+        Property<?> property = stateContainer.getProperty(this.key);
+        if (property == null) {
+            throw new RuntimeException(String.format(
+                    "Unknown property '%s' on '%s'", this.key, stateContainer.getOwner().toString()
+            ));
+        } else {
+            String valueNoInvert = this.value;
+            boolean invert = !valueNoInvert.isEmpty() && valueNoInvert.charAt(0) == '!';
+            if (invert) {
+                valueNoInvert = valueNoInvert.substring(1);
             }
 
-            return invert ? isMatchedState.negate() : isMatchedState;
-         }
-      }
-   }
+            List<String> matchedStates = SPLITTER.splitToList(valueNoInvert);
+            if (matchedStates.isEmpty()) {
+                throw new RuntimeException(String.format(
+                        "Empty value '%s' for property '%s' on '%s'",
+                        this.value, this.key, stateContainer.getOwner().toString()
+                ));
+            } else {
+                Predicate<BlockState> isMatchedState;
+                if (matchedStates.size() == 1) {
+                    isMatchedState = this.makePropertyPredicate(stateContainer, property, valueNoInvert);
+                } else {
+                    List<Predicate<BlockState>> subPredicates = matchedStates.stream()
+                            .map(subValue -> this.makePropertyPredicate(stateContainer, property, subValue))
+                            .collect(Collectors.toList());
+                    // This line is the only functional change, but targeting it with anything but Overwrite appears to
+                    // be impossible
+                    isMatchedState = CachedOrPredicates.or(subPredicates);
+                }
+
+                return invert ? isMatchedState.negate() : isMatchedState;
+            }
+        }
+    }
 
     /**
      * @reason The vanilla implementation captures an Optional in the resulting lambda, which eats a lot of memory. A
@@ -86,7 +93,10 @@ public class PropertyValueConditionMixin {
     ) {
         Optional<T> optional = property.parseValue(value);
         if (!optional.isPresent()) {
-            throw new RuntimeException(String.format("Unknown value '%s' for property '%s' on '%s' in '%s'", value, this.key, container.getOwner().toString(), this.value));
+            throw new RuntimeException(String.format(
+                    "Unknown value '%s' for property '%s' on '%s' in '%s'",
+                    value, this.key, container.getOwner().toString(), this.value
+            ));
         } else {
             T unwrapped = optional.get();
             Pair<Property<?>, Comparable<?>> key = Pair.of(property, unwrapped);

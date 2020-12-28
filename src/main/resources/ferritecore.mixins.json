@@ -4,15 +4,17 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "ferritecore.refmap.json",
   "mixins": [
-    "StateholderMixin"
+    "FastMapStateHolderMixin",
+    "NoPropertyStateHolderMixin"
   ],
   "client": [
-    "OrConditionMixin",
     "AndConditionMixin",
+    "OrConditionMixin",
     "PropertyValueConditionMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "minVersion": "0.8"
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.config.FerriteMixinConfig"
 }

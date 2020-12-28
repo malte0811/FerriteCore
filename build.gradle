@@ -40,6 +40,7 @@ minecraft {
             workingDirectory project.file('run')
             arg "-mixin.config="+archivesBaseName+".mixins.json"
             property 'mixin.env.disableRefMap', 'true'
+            property 'mixin.debug.export', 'true'
 
 
             // Recommended logging level for the console

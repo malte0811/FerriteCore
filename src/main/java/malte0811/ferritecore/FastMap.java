@@ -1,13 +1,11 @@
 package malte0811.ferritecore;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.state.Property;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FastMap<Value> {
     private final List<Key<?>> keys;
@@ -80,6 +78,14 @@ public class FastMap<Value> {
 
     public Collection<Property<?>> getProperties() {
         return rawKeys;
+    }
+
+    public ImmutableMap<Property<?>, Comparable<?>> makeValuesFor(int index) {
+        ImmutableMap.Builder<Property<?>, Comparable<?>> result = ImmutableMap.builder();
+        for (Property<?> p : getProperties()) {
+            result.put(p, Objects.requireNonNull(getValue(index, p)));
+        }
+        return result.build();
     }
 
     private static class Key<T extends Comparable<T>> {
