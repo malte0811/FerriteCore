@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin;
+package malte0811.ferritecore.mixin.predicates;
 
 import com.google.common.base.Splitter;
 import malte0811.ferritecore.CachedOrPredicates;

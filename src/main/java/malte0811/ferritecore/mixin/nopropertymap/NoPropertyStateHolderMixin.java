@@ -1,7 +1,8 @@
-package malte0811.ferritecore.mixin;
+package malte0811.ferritecore.mixin.nopropertymap;
 
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.FastMap;
+import malte0811.ferritecore.FastMapEntry;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.ducks.NoPropertyStateHolder;
 import net.minecraft.state.Property;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
+import java.util.Map;
 
 @Mixin(StateHolder.class)
 public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolder {
@@ -24,11 +26,12 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
     // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors didn't
     // run yet) use the vanilla code using `properties`
     @Redirect(
-            method = {"get", "func_235903_d_"}, at = @At(
-            value = "INVOKE",
-            target = "Lcom/google/common/collect/ImmutableMap;get(Ljava/lang/Object;)Ljava/lang/Object;",
-            remap = false
-    )
+            method = {"get", "func_235903_d_"},
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/google/common/collect/ImmutableMap;get(Ljava/lang/Object;)Ljava/lang/Object;",
+                    remap = false
+            )
     )
     @Coerce
     public Object getValueOfProperty(ImmutableMap<?, ?> vanillaMap, Object key) {
@@ -70,6 +73,17 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
         if (globalTable != null) {
             cir.setReturnValue(globalTable.getProperties());
             cir.cancel();
+        }
+    }
+
+    // Used by JS coremod
+    public Map<Property<?>, Comparable<?>> getValues_Ferrite() {
+        final FastMap<?> globalTable = ((FastMapStateHolder<?>) this).getStateMap();
+        if (globalTable != null) {
+            final int globalIndex = ((FastMapStateHolder<?>) this).getStateIndex();
+            return new FastMapEntry(globalTable, globalIndex);
+        } else {
+            return getValues();
         }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.fastmap",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "ferritecore.refmap.json",
+  "mixins": [
+    "FastMapStateHolderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.fastmap.Config"
+}

@@ -1,29 +1,25 @@
-package malte0811.ferritecore.mixin;
+package malte0811.ferritecore.mixin.predicates;
 
-import malte0811.ferritecore.CachedOrPredicates;
 import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.multipart.AndCondition;
 import net.minecraft.client.renderer.model.multipart.ICondition;
-import net.minecraft.client.renderer.model.multipart.OrCondition;
 import net.minecraft.state.StateContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import malte0811.ferritecore.HackyGlobalState;
+@Mixin(AndCondition.class)
+public class AndConditionMixin {
+    private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> COMBINED_PREDICATE_CACHE = new ConcurrentHashMap<>();
 
-@Mixin(OrCondition.class)
-public class OrConditionMixin {
     @Shadow @Final private Iterable<? extends ICondition> conditions;
 
     /**
@@ -32,6 +28,9 @@ public class OrConditionMixin {
      */
     @Overwrite
     public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
-        return CachedOrPredicates.or(PredicateHelper.toCanonicalList(conditions, stateContainer));
+        return COMBINED_PREDICATE_CACHE.computeIfAbsent(
+                PredicateHelper.toCanonicalList(conditions, stateContainer),
+                listInt -> state -> listInt.stream().allMatch((predicate) -> predicate.test(state))
+        );
     }
 }

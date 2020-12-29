@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin;
+package malte0811.ferritecore.mixin.fastmap;
 
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.FastMap;

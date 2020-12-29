@@ -1,12 +1,8 @@
 {
   "required": true,
-  "package": "malte0811.ferritecore.mixin",
+  "package": "malte0811.ferritecore.mixin.predicates",
   "compatibilityLevel": "JAVA_8",
   "refmap": "ferritecore.refmap.json",
-  "mixins": [
-    "FastMapStateHolderMixin",
-    "NoPropertyStateHolderMixin"
-  ],
   "client": [
     "AndConditionMixin",
     "OrConditionMixin",
@@ -16,5 +12,5 @@
     "defaultRequire": 1
   },
   "minVersion": "0.8",
-  "plugin": "malte0811.ferritecore.mixin.config.FerriteMixinConfig"
+  "plugin": "malte0811.ferritecore.mixin.predicates.Config"
 }
