@@ -2,6 +2,9 @@ This file tries to explain the changes done in FerriteCore, and how much memory 
 The saved memory refers to a ForgeCraft 1 instance around 19th December 2020.
 
 ### Optionals in `PropertyValueCondition`
+This change is irrelevant with the last point, it is only included in this list for
+completeness.
+
 The vanilla implementation contains code along these lines:
 ```java
 Optional<T> opt = newlyCreatedOptional();
@@ -24,11 +27,8 @@ the `Optional`s can be GCd right away.
 Saved memory: 100 MB  
 CPU impact: zero or negative (one less pointer to follow)  
 Side: client  
-Patches: One small patch in `PropertyValueCondition`  
-Notes: The last point makes this change essentially unnecessary
 
 ### BlockState neighbors
-
 To implement `StateHolder#with` (mostly seen as `BlockState#with`) a state needs to be
 able to quickly find its "neighbor states". In vanilla this is implemented using a
 `Table<Property<?>, Comparable<?>, S>` for each state. In total these tables use about 600
@@ -42,8 +42,7 @@ multiplication and addition operations.
 Saved memory: Around 600 MB (the `FastMap`s are around 4 MB total)  
 CPU impact: hard to prove, but most likely near zero  
 Side: both  
-Patches: Practically complete replacement of `StateHolder#func_235899_a_` and a small
-patch in `StateHolder#with`  
+Mixin folder: `fastmap`  
 Notes: There is a chance that this is slower for blocks with a very high number of
 properties, as the property to be modified is found using a linear search. This could be
 improved by using a binary search (probably sorted by hash), but it is not clear that this
@@ -52,20 +51,19 @@ will ever be faster in practice.
 ### BlockState property storage
 Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`,
 which takes around 170 MB in total. Most operations do not actually require this map, they
-can be implemented with similar speed using the `FastMap` from the previous point.  
-There is one problematic exception: `getValues`. This is a simple getter for the property
-map in vanilla, if the map is no longer stored it needs to be created on the fly. The
-method returns an `ImmutableMap`, which can't be easily extended due to package-private
-methods. Otherwise it would be possible to return a `Map`-implementation that only
-requires a `FastMap` and the index in that `FastMap`. The cleanest approach to this would
-probably be a second version of `getValues` which returns such a custom map, and replacing
-calls to the old one where the performance is problematic (this is not yet implemented).
+can be implemented with similar speed using the `FastMap` from the previous point.  There
+is one problematic exception: `getValues`. This is a simple getter for the property map in
+vanilla, if the map is no longer stored it needs to be created on the fly. The method
+returns an `ImmutableMap`, which can't be easily extended due to package-private methods.
+Otherwise it would be possible to return a `Map`-implementation that only requires a
+`FastMap` and the index in that `FastMap`. The current approach to this is to implement a
+second version of `getValues` which returns such a custom map, and to replace calls to the
+old one with the new implementation where possible.
 
 Saved memory: Around 170 MB  
 CPU impact: unclear (see second paragraph)  
 Side: both  
-Patches: Relatively small patches in all methods using the private field
-`StateHolder#properties` (most methods in `StateHolder`)
+Mixin folder: `nopropertymap`  
 
 ### Multipart model predicate caching
 Each multipart model stores a number of predicates to determine which parts to show under
@@ -87,10 +85,4 @@ Saved memory: 300-400 MB (relative to the state after the first change, so 100 M
 compared to a "clean" instance)  
 CPU impact: Some impact in model loading (but less allocations), zero while playing  
 Side: client  
-Patches:
- - `PropertyValueCondition#makePropertyPredicate` (a few lines)
- - `PropertyValueCondition#getPredicate` (roughly one line)
- - `AndCondition#getPredicate` (close to full replacement)
- - `OrCondition#getPredicate` (same)
-Alternatively `Selector#getOrAndCondition` could be patched to return different
-`And/OrCondition` implementations.
+Mixin folder: `predicates`  
