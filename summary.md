@@ -39,14 +39,10 @@ with a similar coefficient. A `FastMap` in this case is simply an `ArrayList` us
 multi-dimensional array. Finding a neighbor state can be done by a few integer modulo,
 multiplication and addition operations.
 
-Saved memory: Around 600 MB (the `FastMap`s are around 4 MB total)  
+Saved memory: Around 600 MB (the `FastMap`s are around 7 MB total)  
 CPU impact: hard to prove, but most likely near zero  
 Side: both  
-Mixin folder: `fastmap`  
-Notes: There is a chance that this is slower for blocks with a very high number of
-properties, as the property to be modified is found using a linear search. This could be
-improved by using a binary search (probably sorted by hash), but it is not clear that this
-will ever be faster in practice.
+Mixin subpackage: `fastmap`  
 
 ### BlockState property storage
 Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`,
@@ -63,7 +59,7 @@ old one with the new implementation where possible.
 Saved memory: Around 170 MB  
 CPU impact: unclear (see second paragraph)  
 Side: both  
-Mixin folder: `nopropertymap`  
+Mixin subpackage: `nopropertymap`  
 
 ### Multipart model predicate caching
 Each multipart model stores a number of predicates to determine which parts to show under
@@ -85,4 +81,4 @@ Saved memory: 300-400 MB (relative to the state after the first change, so 100 M
 compared to a "clean" instance)  
 CPU impact: Some impact in model loading (but less allocations), zero while playing  
 Side: client  
-Mixin folder: `predicates`  
+Mixin subpackage: `predicates`  

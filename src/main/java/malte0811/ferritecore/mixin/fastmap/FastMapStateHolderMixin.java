@@ -27,7 +27,8 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
             method = "with",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/google/common/collect/Table;get(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+                    target = "Lcom/google/common/collect/Table;get(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+                    remap = false
             )
     )
     public Object getNeighborFromFastMap(Table<?, ?, ?> ignore, Object rowKey, Object columnKey) {
