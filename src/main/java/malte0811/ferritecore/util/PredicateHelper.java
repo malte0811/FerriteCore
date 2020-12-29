@@ -18,8 +18,14 @@ public class PredicateHelper {
         for (ICondition cond : conditions) {
             list.add(cond.getPredicate(stateContainer));
         }
-        list.sort(Comparator.comparingInt(Predicate::hashCode));
-        list.trimToSize();
-        return list;
+        return canonize(list);
+    }
+
+    public static <T> List<Predicate<T>> canonize(List<Predicate<T>> input) {
+        input.sort(Comparator.comparingInt(Predicate::hashCode));
+        if (input instanceof ArrayList) {
+            ((ArrayList<Predicate<T>>) input).trimToSize();
+        }
+        return input;
     }
 }

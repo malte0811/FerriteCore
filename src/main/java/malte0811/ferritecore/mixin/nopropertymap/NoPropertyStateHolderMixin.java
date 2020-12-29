@@ -26,7 +26,7 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
     // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors didn't
     // run yet) use the vanilla code using `properties`
     @Redirect(
-            method = {"get", "func_235903_d_"},
+            method = {"get", "func_235903_d_", "with"},
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/google/common/collect/ImmutableMap;get(Ljava/lang/Object;)Ljava/lang/Object;",

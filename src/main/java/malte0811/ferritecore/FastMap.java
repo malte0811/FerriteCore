@@ -88,6 +88,11 @@ public class FastMap<Value> {
         return result.build();
     }
 
+    public <T extends Comparable<T>>
+    Value withUnsafe(int globalTableIndex, Property<T> rowKey, Object columnKey) {
+        return with(globalTableIndex, rowKey, (T) columnKey);
+    }
+
     private static class Key<T extends Comparable<T>> {
         private final Property<T> property;
         private final List<T> values;

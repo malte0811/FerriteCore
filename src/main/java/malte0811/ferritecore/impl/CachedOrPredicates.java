@@ -1,4 +1,4 @@
-package malte0811.ferritecore;
+package malte0811.ferritecore.impl;
 
 import net.minecraft.block.BlockState;
 

@@ -1,6 +1,6 @@
 package malte0811.ferritecore.mixin.predicates;
 
-import malte0811.ferritecore.CachedOrPredicates;
+import malte0811.ferritecore.impl.CachedOrPredicates;
 import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
