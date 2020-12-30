@@ -1,10 +1,10 @@
 package malte0811.ferritecore.mixin.nopropertymap;
 
 import com.google.common.collect.ImmutableMap;
-import malte0811.ferritecore.FastMap;
-import malte0811.ferritecore.FastMapEntry;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.ducks.NoPropertyStateHolder;
+import malte0811.ferritecore.fastmap.FastMap;
+import malte0811.ferritecore.fastmap.FastSubMap;
 import net.minecraft.state.Property;
 import net.minecraft.state.StateHolder;
 import org.spongepowered.asm.mixin.Mixin;
@@ -81,7 +81,7 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
         final FastMap<?> globalTable = ((FastMapStateHolder<?>) this).getStateMap();
         if (globalTable != null) {
             final int globalIndex = ((FastMapStateHolder<?>) this).getStateIndex();
-            return new FastMapEntry(globalTable, globalIndex);
+            return new FastSubMap(globalTable, globalIndex);
         } else {
             return getValues();
         }

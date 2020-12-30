@@ -2,8 +2,8 @@ package malte0811.ferritecore.mixin.fastmap;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
-import malte0811.ferritecore.FastMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
+import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.impl.StateHolderImpl;
 import net.minecraft.state.Property;
 import net.minecraft.state.StateHolder;

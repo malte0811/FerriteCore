@@ -1,4 +1,4 @@
-package malte0811.ferritecore;
+package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -8,19 +8,22 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class FastMap<Value> {
-    private final List<Key<?>> keys;
+    private final List<FastMapKey<?>> keys;
     private final List<Property<?>> rawKeys;
     private final List<Value> values;
+    // It might be possible to get rid of this (and the equivalent map for values) by sorting the key vectors by
+    // property name (natural order for values) and using a binary search above a given size, but choosing that size
+    // would likely be more effort than it's worth
     private final Map<Property<?>, Integer> toKeyIndex;
 
     public FastMap(Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap) {
         this.rawKeys = ImmutableList.copyOf(properties);
-        List<Key<?>> keys = new ArrayList<>(rawKeys.size());
+        List<FastMapKey<?>> keys = new ArrayList<>(rawKeys.size());
         int factorUpTo = 1;
         ImmutableMap.Builder<Property<?>, Integer> toKeyIndex = ImmutableMap.builder();
         for (Property<?> prop : rawKeys) {
             toKeyIndex.put(prop, keys.size());
-            keys.add(new Key<>(prop, factorUpTo));
+            keys.add(new FastMapKey<>(prop, factorUpTo));
             factorUpTo *= prop.getAllowedValues().size();
         }
         this.keys = ImmutableList.copyOf(keys);
@@ -39,7 +42,7 @@ public class FastMap<Value> {
     @Nullable
     public <T extends Comparable<T>>
     Value with(int last, Property<T> prop, T value) {
-        final Key<T> keyToChange = getKeyFor(prop);
+        final FastMapKey<T> keyToChange = getKeyFor(prop);
         if (keyToChange == null) {
             return null;
         }
@@ -50,20 +53,9 @@ public class FastMap<Value> {
         return values.get(newIndex);
     }
 
-    @Nullable
-    private <T extends Comparable<T>>
-    Key<T> getKeyFor(Property<T> prop) {
-        Integer index = toKeyIndex.get(prop);
-        if (index == null) {
-            return null;
-        } else {
-            return (Key<T>) keys.get(index);
-        }
-    }
-
     public int getIndexOf(Map<Property<?>, Comparable<?>> state) {
         int id = 0;
-        for (Key<?> k : keys) {
+        for (FastMapKey<?> k : keys) {
             id += k.toPartialMapIndex(state.get(k.getProperty()));
         }
         return id;
@@ -72,14 +64,14 @@ public class FastMap<Value> {
     @Nullable
     public <T extends Comparable<T>>
     T getValue(int stateIndex, Property<T> property) {
-        final Key<T> propId = getKeyFor(property);
+        final FastMapKey<T> propId = getKeyFor(property);
         if (propId == null) {
             return null;
         }
         return propId.getValue(stateIndex);
     }
 
-    public Collection<Property<?>> getProperties() {
+    public List<Property<?>> getProperties() {
         return rawKeys;
     }
 
@@ -96,55 +88,22 @@ public class FastMap<Value> {
         return with(globalTableIndex, rowKey, (T) columnKey);
     }
 
-    private static class Key<T extends Comparable<T>> {
-        private final Property<T> property;
-        private final List<T> values;
-        private final int mapFactor;
-        private final Map<Comparable<?>, Integer> toValueIndex;
+    public int numProperties() {
+        return keys.size();
+    }
 
-        private Key(Property<T> property, int mapFactor) {
-            this.property = property;
-            this.values = ImmutableList.copyOf(property.getAllowedValues());
-            this.mapFactor = mapFactor;
-            ImmutableMap.Builder<Comparable<?>, Integer> toValueIndex = ImmutableMap.builder();
-            for (int i = 0; i < this.values.size(); i++) {
-                toValueIndex.put(this.values.get(i), i);
-            }
-            this.toValueIndex = toValueIndex.build();
-        }
+    FastMapKey<?> getKey(int keyIndex) {
+        return keys.get(keyIndex);
+    }
 
-        public int toPartialMapIndex(Comparable<?> value) {
-            return mapFactor * getInternalIndex(value);
-        }
-
-        private int getInternalIndex(Comparable<?> value) {
-            Integer result = toValueIndex.get(value);
-            if (result != null) {
-                return result;
-            } else {
-                throw new IllegalStateException("Unknown value: "+value+" in "+property);
-            }
-        }
-
-        public T getValue(int mapIndex) {
-            int index = (mapIndex / mapFactor) % values.size();
-            return values.get(index);
-        }
-
-        public int replaceIn(int mapIndex, T newValue) {
-            final int lowerData = mapIndex % mapFactor;
-            final int upperFactor = mapFactor * values.size();
-            final int upperData = mapIndex - mapIndex % upperFactor;
-            int internalIndex = getInternalIndex(newValue);
-            if (internalIndex < 0) {
-                return -1;
-            } else {
-                return lowerData + mapFactor * internalIndex + upperData;
-            }
-        }
-
-        public Property<T> getProperty() {
-            return property;
+    @Nullable
+    private <T extends Comparable<T>>
+    FastMapKey<T> getKeyFor(Property<T> prop) {
+        Integer index = toKeyIndex.get(prop);
+        if (index == null) {
+            return null;
+        } else {
+            return (FastMapKey<T>) getKey(index);
         }
     }
 }

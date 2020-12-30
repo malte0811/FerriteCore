@@ -1,7 +1,7 @@
 package malte0811.ferritecore.ducks;
 
 import com.google.common.collect.ImmutableMap;
-import malte0811.ferritecore.FastMap;
+import malte0811.ferritecore.fastmap.FastMap;
 import net.minecraft.state.Property;
 
 public interface FastMapStateHolder<S> {
