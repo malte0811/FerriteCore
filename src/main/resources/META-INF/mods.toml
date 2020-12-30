@@ -5,7 +5,7 @@ license="MIT"
 [[mods]]
 modId="ferritecore"
 version="${file.jarVersion}"
-displayName="Recipe Buffers"
+displayName="Ferrite Core"
 authors="malte0811"
 description='''
 Reduces memory usage. These changes will probably be PRd to Forge soon.
