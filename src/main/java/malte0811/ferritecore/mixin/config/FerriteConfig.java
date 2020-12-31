@@ -10,9 +10,9 @@ import java.nio.file.Paths;
 
 public class FerriteConfig {
     private static final String NEIGHBOR_LOOKUP = "replaceNeighborLookup";
-    //TODO actually split
     private static final String PROPERTY_MAP = "replacePropertyMap";
     private static final String PREDICATES = "cacheMultipartPredicates";
+    private static final String MRL_CACHE = "modelResourceLocations";
     private static final Config CONFIG;
 
     static {
@@ -20,11 +20,13 @@ public class FerriteConfig {
         spec.define(NEIGHBOR_LOOKUP, true);
         spec.define(PROPERTY_MAP, true);
         spec.define(PREDICATES, true);
+        spec.define(MRL_CACHE, true);
         CommentedFileConfig configData = read(Paths.get("config", "ferritecore-mixin.toml"));
         configData.setComment(NEIGHBOR_LOOKUP, "Replace the blockstate neighbor table");
         configData.setComment(PROPERTY_MAP, "Do not store the properties of a state explicitly and read them" +
                 "from the replace neighbor table instead. Requires " + NEIGHBOR_LOOKUP + " to be enabled");
         configData.setComment(PREDICATES, "Cache the predicate instances used in multipart models");
+        configData.setComment(MRL_CACHE, "Avoid creation of new strings when creating ModelResourceLocations");
         spec.correct(configData);
         configData.save();
         CONFIG = configData;
@@ -53,5 +55,9 @@ public class FerriteConfig {
 
     public static boolean noPropertyState() {
         return CONFIG.<Boolean>get(PROPERTY_MAP) && CONFIG.<Boolean>get(NEIGHBOR_LOOKUP);
+    }
+
+    public static boolean optimizeMRL() {
+        return CONFIG.get(MRL_CACHE);
     }
 }
