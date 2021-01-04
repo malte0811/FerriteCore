@@ -28,6 +28,8 @@ public class Deduplicator {
     private static final Map<String, String> VARIANT_IDENTITIES = new ConcurrentHashMap<>();
     // Typedefs would be a nice thing to have
     private static final Map<List<Pair<Predicate<BlockState>, IBakedModel>>, MultipartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
+    private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
+    private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
 
     public static String deduplicateVariant(String variant) {
         return VARIANT_IDENTITIES.computeIfAbsent(variant, Function.identity());
@@ -35,6 +37,20 @@ public class Deduplicator {
 
     public static MultipartBakedModel makeMultipartModel(List<Pair<Predicate<BlockState>, IBakedModel>> selectors) {
         return KNOWN_MULTIPART_MODELS.computeIfAbsent(selectors, MultipartBakedModel::new);
+    }
+
+    public static Predicate<BlockState> or(List<Predicate<BlockState>> list) {
+        return OR_PREDICATE_CACHE.computeIfAbsent(
+                list,
+                listInt -> state -> listInt.stream().anyMatch((predicate) -> predicate.test(state))
+        );
+    }
+
+    public static Predicate<BlockState> and(List<Predicate<BlockState>> list) {
+        return AND_PREDICATE_CACHE.computeIfAbsent(
+                list,
+                listInt -> state -> listInt.stream().allMatch((predicate) -> predicate.test(state))
+        );
     }
 
     @SubscribeEvent
@@ -53,6 +69,8 @@ public class Deduplicator {
             ) {
                 VARIANT_IDENTITIES.clear();
                 KNOWN_MULTIPART_MODELS.clear();
+                OR_PREDICATE_CACHE.clear();
+                AND_PREDICATE_CACHE.clear();
             }
         });
     }

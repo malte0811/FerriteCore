@@ -1,6 +1,7 @@
 package malte0811.ferritecore.mixin.predicates;
 
-import malte0811.ferritecore.impl.AndConditionImpl;
+import malte0811.ferritecore.impl.Deduplicator;
+import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.multipart.AndCondition;
@@ -23,6 +24,6 @@ public class AndConditionMixin {
      */
     @Overwrite
     public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
-        return AndConditionImpl.getPredicate(stateContainer, conditions);
+        return Deduplicator.and(PredicateHelper.toCanonicalList(conditions, stateContainer));
     }
 }

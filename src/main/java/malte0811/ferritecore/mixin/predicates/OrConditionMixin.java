@@ -1,6 +1,6 @@
 package malte0811.ferritecore.mixin.predicates;
 
-import malte0811.ferritecore.impl.CachedOrPredicates;
+import malte0811.ferritecore.impl.Deduplicator;
 import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -24,6 +24,6 @@ public class OrConditionMixin {
      */
     @Overwrite
     public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
-        return CachedOrPredicates.or(PredicateHelper.toCanonicalList(conditions, stateContainer));
+        return Deduplicator.or(PredicateHelper.toCanonicalList(conditions, stateContainer));
     }
 }

@@ -49,7 +49,7 @@ public class PropertyValueConditionImpl {
                             .collect(Collectors.toList());
                     // This line is the only functional change, but targeting it with anything but Overwrite appears to
                     // be impossible
-                    isMatchedState = CachedOrPredicates.or(PredicateHelper.canonize(subPredicates));
+                    isMatchedState = Deduplicator.or(PredicateHelper.canonize(subPredicates));
                 }
 
                 return invert ? isMatchedState.negate() : isMatchedState;
