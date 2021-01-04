@@ -18,7 +18,7 @@ public class Config extends FerriteMixinConfig {
 
     @Override
     protected boolean isEnabled(String mixin) {
-        return FerriteConfig.noPropertyState() != DUMMY_MIXIN.equals(mixin);
+        return FerriteConfig.PROPERTY_MAP.isEnabled() != DUMMY_MIXIN.equals(mixin);
     }
 
     @Override

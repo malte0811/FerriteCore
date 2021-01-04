@@ -14,6 +14,6 @@ public class Config extends FerriteMixinConfig {
 
     @Override
     protected boolean isEnabled(String mixin) {
-        return FerriteConfig.cachePredicates();
+        return FerriteConfig.PREDICATES.isEnabled();
     }
 }

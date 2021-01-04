@@ -14,6 +14,6 @@ public class Config extends FerriteMixinConfig {
 
     @Override
     protected boolean isEnabled(String mixin) {
-        return FerriteConfig.optimizeMRL();
+        return FerriteConfig.MRL_CACHE.isEnabled();
     }
 }
