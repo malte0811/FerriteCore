@@ -8,14 +8,17 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class FerriteConfig {
     public static final Option NEIGHBOR_LOOKUP;
     public static final Option PROPERTY_MAP;
     public static final Option PREDICATES;
     public static final Option MRL_CACHE;
+    public static final Option DEDUP_MULTIPART;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -23,7 +26,8 @@ public class FerriteConfig {
         PROPERTY_MAP = builder.createOption(
                 "replacePropertyMap",
                 "Do not store the properties of a state explicitly and read them" +
-                        "from the replace neighbor table instead. Requires " + NEIGHBOR_LOOKUP.getName() + " to be enabled"
+                        "from the replace neighbor table instead. Requires " + NEIGHBOR_LOOKUP.getName() + " to be enabled",
+                NEIGHBOR_LOOKUP
         );
         PREDICATES = builder.createOption(
                 "cacheMultipartPredicates",
@@ -33,13 +37,13 @@ public class FerriteConfig {
                 "modelResourceLocations",
                 "Avoid creation of new strings when creating ModelResourceLocations"
         );
+        DEDUP_MULTIPART = builder.createOption(
+                "multipartDeduplication",
+                "Do not create a new MultipartBakedModel instance for each block state using the same multipart" +
+                        "model. Requires " + PREDICATES.getName() + " to be enabled",
+                PREDICATES
+        );
         builder.finish();
-        if (PROPERTY_MAP.isEnabled() && !NEIGHBOR_LOOKUP.isEnabled()) {
-            throw new IllegalStateException(
-                    PROPERTY_MAP.getName() + " is enabled in the FerriteCore config, but " +
-                            NEIGHBOR_LOOKUP.getName() + " is not. This is not supported!"
-            );
-        }
     }
 
     private static CommentedFileConfig read(Path configPath) {
@@ -58,8 +62,8 @@ public class FerriteConfig {
     public static class ConfigBuilder {
         private final List<Option> options = new ArrayList<>();
 
-        public Option createOption(String name, String comment) {
-            Option result = new Option(name, comment);
+        public Option createOption(String name, String comment, Option... dependencies) {
+            Option result = new Option(name, comment, dependencies);
             options.add(result);
             return result;
         }
@@ -76,7 +80,7 @@ public class FerriteConfig {
             spec.correct(configData);
             configData.save();
             for (Option o : options) {
-                o.value = configData.get(o.getName());
+                o.set(configData::get);
             }
         }
     }
@@ -84,12 +88,29 @@ public class FerriteConfig {
     public static class Option {
         private final String name;
         private final String comment;
+        private final List<Option> dependencies;
         @Nullable
         private Boolean value;
 
-        public Option(String name, String comment) {
+        public Option(String name, String comment, Option... dependencies) {
             this.name = name;
             this.comment = comment;
+            this.dependencies = Arrays.asList(dependencies);
+        }
+
+        void set(Predicate<String> isEnabled) {
+            final boolean enabled = isEnabled.test(getName());
+            if (enabled) {
+                for (Option dep : dependencies) {
+                    if (!isEnabled.test(dep.getName())) {
+                        throw new IllegalStateException(
+                                getName() + " is enabled in the FerriteCore config, but " + dep.getName()
+                                        + " is not. This is not supported!"
+                        );
+                    }
+                }
+            }
+            this.value = enabled;
         }
 
         public String getName() {

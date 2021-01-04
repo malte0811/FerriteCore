@@ -11,11 +11,11 @@ The vanilla implementation contains code along these lines:
 
 ```java
 Optional<T> opt=newlyCreatedOptional();
-        if(!opt.isPresent()){
-        // Something
-        }else{
-        return()->doThing(opt.get());
-        }
+if(!opt.isPresent()){
+    // Something
+}else{
+    return()->doThing(opt.get());
+}
 ```
 
 The created lambda is kept around for a long time, and there are a few million of them. In
@@ -99,3 +99,15 @@ Side: client
 Mixin subpackage: `mrl`  
 Note: The CPU impact of the current Mixin implementation is positive for both parts, because a negative impact for the
 first part would require changing what constructor the constructor in question redirects to.
+
+### 6. Multipart model instances
+By default every blockstate using a multipart model gets its own instance of that multipart model. Since multipart
+models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory.
+The only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is
+already deduplicated by point 4, so it is very easy to use the same instance for equivalent lists. This reduces the
+number of instance from about 200k to 1.5k (DW20 1.2.0).
+
+Saved memory: Close to 200 MB  
+CPU impact: Slight during loading, zero at runtime  
+Side: client  
+Mixin subpackage: `dedupmultipart`

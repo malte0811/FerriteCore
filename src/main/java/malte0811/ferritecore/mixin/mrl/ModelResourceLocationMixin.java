@@ -1,6 +1,6 @@
 package malte0811.ferritecore.mixin.mrl;
 
-import malte0811.ferritecore.impl.ModelResourceLocationImpl;
+import malte0811.ferritecore.impl.Deduplicator;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
@@ -26,6 +26,6 @@ public class ModelResourceLocationMixin {
         // Do not use new strings for path and namespace, and deduplicate the variant string
         ((ResourceLocationAccess) this).setPath(location.getPath());
         ((ResourceLocationAccess) this).setNamespace(location.getNamespace());
-        this.variant = ModelResourceLocationImpl.deduplicateVariant(variantIn);
+        this.variant = Deduplicator.deduplicateVariant(variantIn);
     }
 }

@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.dedupmultipart",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "ferritecore.refmap.json",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.dedupmultipart.Config",
+  "client": [
+    "MixinMultipartBuilder"
+  ],
+  "mixins": [
+  ]
+}

@@ -23,7 +23,7 @@ version = "${mod_version}"
 group = "malte0811.${modid}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "${modid}"
 
-def mixinConfigs = ["predicates", "fastmap", "nopropertymap", "mrl"].stream()
+def mixinConfigs = ["predicates", "fastmap", "nopropertymap", "mrl", "dedupmultipart"].stream()
         .map({s -> archivesBaseName+"."+s+".mixin.json"})
         .collect(Collectors.toList())
 

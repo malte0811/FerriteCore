@@ -2,7 +2,10 @@ package malte0811.ferritecore.impl;
 
 import com.mojang.datafixers.util.Unit;
 import malte0811.ferritecore.ModMain;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.MultipartBakedModel;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IReloadableResourceManager;
@@ -11,18 +14,27 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ModMain.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ModelResourceLocationImpl {
+public class Deduplicator {
     private static final Map<String, String> VARIANT_IDENTITIES = new ConcurrentHashMap<>();
+    // Typedefs would be a nice thing to have
+    private static final Map<List<Pair<Predicate<BlockState>, IBakedModel>>, MultipartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
 
     public static String deduplicateVariant(String variant) {
         return VARIANT_IDENTITIES.computeIfAbsent(variant, Function.identity());
+    }
+
+    public static MultipartBakedModel makeMultipartModel(List<Pair<Predicate<BlockState>, IBakedModel>> selectors) {
+        return KNOWN_MULTIPART_MODELS.computeIfAbsent(selectors, MultipartBakedModel::new);
     }
 
     @SubscribeEvent
@@ -31,9 +43,7 @@ public class ModelResourceLocationImpl {
         ((IReloadableResourceManager) Minecraft.getInstance().getResourceManager()).addReloadListener(new ReloadListener<Unit>() {
             @Nonnull
             @Override
-            protected Unit prepare(
-                    @Nonnull IResourceManager resourceManagerIn, @Nonnull IProfiler profilerIn
-            ) {
+            protected Unit prepare(@Nonnull IResourceManager resourceManagerIn, @Nonnull IProfiler profilerIn) {
                 return Unit.INSTANCE;
             }
 
@@ -42,6 +52,7 @@ public class ModelResourceLocationImpl {
                     @Nonnull Unit objectIn, @Nonnull IResourceManager resourceManagerIn, @Nonnull IProfiler profilerIn
             ) {
                 VARIANT_IDENTITIES.clear();
+                KNOWN_MULTIPART_MODELS.clear();
             }
         });
     }
