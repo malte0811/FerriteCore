@@ -5,26 +5,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.MultipartBakedModel;
 import org.apache.commons.lang3.tuple.Pair;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 @Mixin(MultipartBakedModel.Builder.class)
 public class MixinMultipartBuilder {
-    @Shadow
-    @Final
-    private List<Pair<Predicate<BlockState>, IBakedModel>> selectors;
-
-    /**
-     * @reason Cache/deduplicate returned model
-     * @author malte0811
-     */
-    @Overwrite
-    public IBakedModel build() {
+    @Redirect(
+            method = "build",
+            at = @At(value = "NEW", target = "net/minecraft/client/renderer/model/MultipartBakedModel")
+    )
+    public MultipartBakedModel build(List<Pair<Predicate<BlockState>, IBakedModel>> selectors) {
         return Deduplicator.makeMultipartModel(selectors);
     }
 }
