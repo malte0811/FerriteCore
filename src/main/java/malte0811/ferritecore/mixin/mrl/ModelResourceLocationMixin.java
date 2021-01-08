@@ -26,6 +26,6 @@ public class ModelResourceLocationMixin {
         // Do not use new strings for path and namespace, and deduplicate the variant string
         ((ResourceLocationAccess) this).setPath(location.getPath());
         ((ResourceLocationAccess) this).setNamespace(location.getNamespace());
-        this.variant = Deduplicator.deduplicateVariant(variantIn);
+        this.variant = Deduplicator.deduplicateVariant(this.variant);
     }
 }
