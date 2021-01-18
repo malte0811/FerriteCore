@@ -19,6 +19,7 @@ public class FerriteConfig {
     public static final Option PREDICATES;
     public static final Option MRL_CACHE;
     public static final Option DEDUP_MULTIPART;
+    public static final Option DEDUP_BLOCKSTATE_CACHE;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -42,6 +43,10 @@ public class FerriteConfig {
                 "Do not create a new MultipartBakedModel instance for each block state using the same multipart" +
                         "model. Requires " + PREDICATES.getName() + " to be enabled",
                 PREDICATES
+        );
+        DEDUP_BLOCKSTATE_CACHE = builder.createOption(
+                "blockstateCacheDeduplication",
+                "Deduplicate cached data for blockstates, most importantly collision and render shapes"
         );
         builder.finish();
     }
