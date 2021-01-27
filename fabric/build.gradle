@@ -17,9 +17,6 @@ dependencies {
     mappings(minecraft.officialMojangMappings())
     modCompile("net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}")
     modCompile("net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}")
-    //TODO this is a hack, needs a Fabric alternative
-    compile 'com.electronwill.night-config:core:3.6.2'
-    compile 'com.electronwill.night-config:toml:3.6.2'
 
     compileOnly(project(path: ":common")) {
         transitive = false
