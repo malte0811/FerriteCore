@@ -1,28 +1,19 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
+build/
+*.ipr
+run/
+*.iws
+out/
+*.iml
+.gradle/
+output/
+bin/
+libs/
+
 .classpath
 .project
-
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
-
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
-classes
-
-# Files from Forge MDK
-forge*changelog.txt
-
-custom.gradle
+.idea/
+classes/
+.metadata
+.vscode
+.settings
+*.launch

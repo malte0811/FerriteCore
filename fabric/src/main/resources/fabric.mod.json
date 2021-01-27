@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "ferritecore",
+  "version": "${version}",
+  "name": "FerriteCore",
+  "description": "Reduces memory usage",
+  "authors": [
+    "malte0811"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": ">=1.16.4"
+  },
+  "mixins": [
+    "ferritecore.blockstatecache.mixin.json",
+    "ferritecore.dedupmultipart.mixin.json",
+    "ferritecore.fastmap.mixin.json",
+    "ferritecore.mrl.mixin.json",
+    "ferritecore.nopropertymap.mixin.json",
+    "ferritecore.predicates.mixin.json"
+  ]
+}

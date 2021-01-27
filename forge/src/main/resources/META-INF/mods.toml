@@ -1,0 +1,24 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+
+license="MIT"
+[[mods]]
+modId="ferritecore"
+version="${file.jarVersion}"
+displayName="Ferrite Core"
+authors="malte0811"
+description='''
+Reduces memory usage. These changes will probably be PRd to Forge soon.
+'''
+[[dependencies.ferritecore]]
+    modId="forge"
+    mandatory=true
+    versionRange="[35.1.0,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.ferritecore]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.4,)"
+    ordering="NONE"
+    side="BOTH"
