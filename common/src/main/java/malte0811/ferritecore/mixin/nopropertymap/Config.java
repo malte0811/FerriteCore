@@ -9,20 +9,16 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 
 public class Config extends FerriteMixinConfig {
-    private static final String DUMMY_MIXIN = "DummyFerriteValuesMixin";
-
     @Override
     protected List<String> getAllMixins() {
-        return ImmutableList.of("NoPropertyStateHolderMixin", DUMMY_MIXIN);
+        return ImmutableList.of("NoPropertyStateHolderMixin");
     }
 
     @Override
     protected boolean isEnabled(String mixin) {
-        return FerriteConfig.PROPERTY_MAP.isEnabled() != DUMMY_MIXIN.equals(mixin);
+        return FerriteConfig.PROPERTY_MAP.isEnabled();
     }
 
     @Override
-    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        //TODO replace JS coremod with this?
-    }
+    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
 }

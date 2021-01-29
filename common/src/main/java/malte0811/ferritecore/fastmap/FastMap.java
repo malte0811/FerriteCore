@@ -2,10 +2,13 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import malte0811.ferritecore.classloading.ClassDefiner;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class FastMap<Value> {
     private final List<FastMapKey<?>> keys;
@@ -76,11 +79,29 @@ public class FastMap<Value> {
     }
 
     public ImmutableMap<Property<?>, Comparable<?>> makeValuesFor(int index) {
-        ImmutableMap.Builder<Property<?>, Comparable<?>> result = ImmutableMap.builder();
-        for (Property<?> p : getProperties()) {
-            result.put(p, Objects.requireNonNull(getValue(index, p)));
+        try {
+            class MapAccessor implements Function<Object, Comparable<?>>, IntFunction<Map.Entry<Property<?>, Comparable<?>>> {
+                @Override
+                public Comparable<?> apply(Object obj) {
+                    if (obj instanceof Property<?>) {
+                        return getValue(index, (Property<?>) obj);
+                    } else {
+                        return null;
+                    }
+                }
+
+                @Override
+                public Map.Entry<Property<?>, Comparable<?>> apply(int subIndex) {
+                    return new AbstractMap.SimpleImmutableEntry<>(
+                            getKey(subIndex).getProperty(), getKey(subIndex).getValue(index)
+                    );
+                }
+            }
+            MapAccessor func = new MapAccessor();
+            return ClassDefiner.makeMap(numProperties(), func, func);
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
         }
-        return result.build();
     }
 
     public <T extends Comparable<T>>

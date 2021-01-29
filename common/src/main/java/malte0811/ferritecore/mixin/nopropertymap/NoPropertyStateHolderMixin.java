@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.ducks.NoPropertyStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import malte0811.ferritecore.fastmap.FastSubMap;
 import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
-import java.util.Map;
 
 @Mixin(StateHolder.class)
 public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolder {
@@ -73,17 +71,6 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
         if (globalTable != null) {
             cir.setReturnValue(globalTable.getProperties());
             cir.cancel();
-        }
-    }
-
-    // Used by JS coremod
-    public Map<Property<?>, Comparable<?>> getValues_Ferrite() {
-        final FastMap<?> globalTable = ((FastMapStateHolder<?>) this).getStateMap();
-        if (globalTable != null) {
-            final int globalIndex = ((FastMapStateHolder<?>) this).getStateIndex();
-            return new FastSubMap(globalTable, globalIndex);
-        } else {
-            return getValues();
         }
     }
 }
