@@ -1,15 +1,12 @@
 package malte0811.ferritecore.mixin.config;
 
-import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.ParsingException;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import malte0811.ferritecore.ModMain;
-import me.shedaniel.architectury.annotations.ExpectPlatform;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,37 +62,10 @@ public class FerriteConfig {
 
         private void finish() {
             try {
-                Path config = Paths.get("config", ModMain.MODID+".mixin.properties");
-                if (!Files.exists(config))
-                    Files.createFile(config);
-                List<String> lines = Files.readAllLines(config);
-                Object2BooleanMap<String> existingOptions = new Object2BooleanOpenHashMap<>();
-                for (String line : lines) {
-                    line = line.trim();
-                    if (line.isEmpty() || line.charAt(0) == '#') {
-                        continue;
-                    }
-                    final int indexOfEq = line.indexOf('=');
-                    if (indexOfEq < 0) {
-                        throw new RuntimeException("Invalid line "+line);
-                    }
-                    final String key = line.substring(0, indexOfEq).trim();
-                    final String value = line.substring(indexOfEq + 1).trim();
-                    existingOptions.put(key, Boolean.parseBoolean(value));
-                }
-                List<String> newLines = new ArrayList<>();
-                Object2BooleanMap<String> actualOptions = new Object2BooleanOpenHashMap<>();
-                for (Option o : options) {
-                    final boolean value = existingOptions.getOrDefault(o.getName(), true);
-                    actualOptions.put(o.getName(), value);
-                    newLines.add("# "+o.getComment());
-                    newLines.add(o.getName()+" = "+value);
-                }
-                for (Option o : options) {
-                    o.set(actualOptions::getBoolean);
-                }
-                Files.write(config, newLines);
-            } catch (IOException e) {
+                Class<?> handler = Class.forName("malte0811.ferritecore.mixin.config.ConfigFileHandler");
+                Method finish = handler.getMethod("finish", List.class);
+                finish.invoke(null, options);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

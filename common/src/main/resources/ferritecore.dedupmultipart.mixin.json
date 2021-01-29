@@ -2,7 +2,7 @@
   "required": true,
   "package": "malte0811.ferritecore.mixin.dedupmultipart",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "ferritecore.refmap.json",
+  "refmap": "ferritecore-common-refmap.json",
   "injectors": {
     "defaultRequire": 1
   },
