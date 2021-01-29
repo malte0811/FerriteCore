@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public class FerriteCoreEntrySet<K, V> extends ImmutableSet<Map.Entry<K, V>> {
-    //TODO tie together properly
     private final int numProperties;
     private final Function<Object, V> getValue;
     private final IntFunction<Map.Entry<K, V>> getIth;

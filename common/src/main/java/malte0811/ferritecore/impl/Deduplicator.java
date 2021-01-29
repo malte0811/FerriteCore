@@ -1,7 +1,6 @@
 package malte0811.ferritecore.impl;
 
 import com.mojang.datafixers.util.Unit;
-import malte0811.ferritecore.ModMain;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
@@ -12,14 +11,12 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-//TODO @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ModMain.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Deduplicator {
     private static final Map<String, String> VARIANT_IDENTITIES = new ConcurrentHashMap<>();
     // Typedefs would be a nice thing to have
@@ -49,7 +46,6 @@ public class Deduplicator {
         );
     }
 
-    //TODO @SubscribeEvent
     public static void registerReloadListener() {
         // Register the reload listener s.t. its "sync" part runs after the model loader reload
         ((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new SimplePreparableReloadListener<Unit>() {

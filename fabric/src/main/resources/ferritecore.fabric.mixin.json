@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.fabric",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "ferritecore-fabric-refmap.json",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "mixins": [
+    "CacheCallbackMixin",
+    "MinecraftMixin"
+  ]
+}

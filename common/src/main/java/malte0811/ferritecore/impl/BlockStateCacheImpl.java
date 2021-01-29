@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Function;
 
-//TODO @Mod.EventBusSubscriber(modid = ModMain.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BlockStateCacheImpl {
     private static final Direction[] DIRECTIONS = Direction.values();
     public static final Object2ObjectOpenCustomHashMap<ArrayVoxelShape, ArrayVoxelShape> CACHE_COLLIDE =
@@ -38,19 +37,7 @@ public class BlockStateCacheImpl {
     public static int collideCalls = 0;
     public static int projectCalls = 0;
 
-    //TODO
-    // Caches are populated in two places: a) In ITagCollectionSupplier#updateTags (which triggers this event)
-    //@SubscribeEvent
-    //public static void onTagReloadVanilla(TagsUpdatedEvent.VanillaTagTypes ignored) {
-    //    resetCaches();
-    //}
-    // b) Via ForgeRegistry#bake, which usually triggers this event
-    //@SubscribeEvent
-    //public static void onModIdMapping(FMLModIdMappingEvent ignored) {
-    //    resetCaches();
-    //}
-
-    private static void resetCaches() {
+    public static void resetCaches() {
         //TODO remove
         Logger logger = LogManager.getLogger();
         logger.info("Collide stats: Cache size: {}, calls: {}", CACHE_COLLIDE.size(), collideCalls);

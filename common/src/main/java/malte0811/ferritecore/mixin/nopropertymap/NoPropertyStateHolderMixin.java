@@ -42,10 +42,6 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
         }
     }
 
-    // TODO speed up in some way?
-    // The cleanest (lowest-impact) approach would be to use a custom implementation of ImmutableMap (based on a FastMap
-    // and an index), but that whole class hierarchy is a very "closed" (many essential methods/classes are
-    // package-private)
     @Inject(method = "getValues", at = @At("HEAD"), cancellable = true)
     public void getValuesHead(CallbackInfoReturnable<ImmutableMap<Property<?>, Comparable<?>>> cir) {
         final FastMap<?> globalTable = ((FastMapStateHolder<?>) this).getStateMap();

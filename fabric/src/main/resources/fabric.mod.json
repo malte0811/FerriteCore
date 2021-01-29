@@ -9,10 +9,7 @@
   ],
   "license": "MIT",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-    ]
-  },
+  "entrypoints": {},
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
@@ -24,6 +21,7 @@
     "ferritecore.fastmap.mixin.json",
     "ferritecore.mrl.mixin.json",
     "ferritecore.nopropertymap.mixin.json",
-    "ferritecore.predicates.mixin.json"
+    "ferritecore.predicates.mixin.json",
+    "ferritecore.fabric.mixin.json"
   ]
 }

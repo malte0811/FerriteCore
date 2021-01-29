@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public class FerriteCoreImmutableMap<K, V> extends ImmutableMap<K, V> {
-    //TODO tie together properly
     // This is a quite inconvenient "handle" on a FastMap, but we need classloader separation
     private final int numProperties;
     private final Function<Object, V> getValue;
