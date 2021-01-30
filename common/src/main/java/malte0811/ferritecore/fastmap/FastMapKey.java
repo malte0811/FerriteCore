@@ -2,7 +2,7 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.state.Property;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ class FastMapKey<T extends Comparable<T>> {
 
     FastMapKey(Property<T> property, int mapFactor) {
         this.property = property;
-        this.values = ImmutableList.copyOf(property.getPossibleValues());
+        this.values = ImmutableList.copyOf(property.getAllowedValues());
         this.mapFactor = mapFactor;
         ImmutableMap.Builder<Comparable<?>, Integer> toValueIndex = ImmutableMap.builder();
         for (int i = 0; i < this.values.size(); i++) {

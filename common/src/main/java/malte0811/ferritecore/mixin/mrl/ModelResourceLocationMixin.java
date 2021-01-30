@@ -1,8 +1,8 @@
 package malte0811.ferritecore.mixin.mrl;
 
 import malte0811.ferritecore.impl.Deduplicator;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -19,7 +19,7 @@ public class ModelResourceLocationMixin {
     private String variant;
 
     @Inject(
-            method = "<init>(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)V",
+            method = "<init>(Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;)V",
             at = @At("TAIL")
     )
     private void constructTail(ResourceLocation location, String variantIn, CallbackInfo ci) {

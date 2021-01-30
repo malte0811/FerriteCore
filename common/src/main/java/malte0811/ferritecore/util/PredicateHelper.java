@@ -1,9 +1,9 @@
 package malte0811.ferritecore.util;
 
-import net.minecraft.client.renderer.block.model.multipart.Condition;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.multipart.ICondition;
+import net.minecraft.state.StateContainer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,10 +12,10 @@ import java.util.function.Predicate;
 
 public class PredicateHelper {
     public static List<Predicate<BlockState>> toCanonicalList(
-            Iterable<? extends Condition> conditions, StateDefinition<Block, BlockState> stateContainer
+            Iterable<? extends ICondition> conditions, StateContainer<Block, BlockState> stateContainer
     ) {
         ArrayList<Predicate<BlockState>> list = new ArrayList<>();
-        for (Condition cond : conditions) {
+        for (ICondition cond : conditions) {
             list.add(cond.getPredicate(stateContainer));
         }
         return canonize(list);

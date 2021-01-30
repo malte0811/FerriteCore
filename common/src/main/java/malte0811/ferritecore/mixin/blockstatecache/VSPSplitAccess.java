@@ -1,14 +1,14 @@
 package malte0811.ferritecore.mixin.blockstatecache;
 
-import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
-import net.minecraft.world.phys.shapes.SubShape;
+import net.minecraft.util.math.shapes.PartSplitVoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapePart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(SubShape.class)
+@Mixin(PartSplitVoxelShape.class)
 public interface VSPSplitAccess {
     @Accessor
-    DiscreteVoxelShape getParent();
+    VoxelShapePart getPart();
 
     @Accessor
     int getStartX();

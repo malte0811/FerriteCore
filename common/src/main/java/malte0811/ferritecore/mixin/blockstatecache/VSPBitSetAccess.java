@@ -1,31 +1,31 @@
 package malte0811.ferritecore.mixin.blockstatecache;
 
-import net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape;
+import net.minecraft.util.math.shapes.BitSetVoxelShapePart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.BitSet;
 
-@Mixin(BitSetDiscreteVoxelShape.class)
+@Mixin(BitSetVoxelShapePart.class)
 public interface VSPBitSetAccess {
     @Accessor
-    BitSet getStorage();
+    BitSet getBitSet();
 
     @Accessor
-    int getXMin();
+    int getStartX();
 
     @Accessor
-    int getYMin();
+    int getStartY();
 
     @Accessor
-    int getZMin();
+    int getStartZ();
 
     @Accessor
-    int getXMax();
+    int getEndX();
 
     @Accessor
-    int getYMax();
+    int getEndY();
 
     @Accessor
-    int getZMax();
+    int getEndZ();
 }

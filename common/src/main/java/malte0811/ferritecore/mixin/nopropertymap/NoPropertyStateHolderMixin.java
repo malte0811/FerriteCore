@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.ducks.NoPropertyStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import net.minecraft.world.level.block.state.StateHolder;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.state.Property;
+import net.minecraft.state.StateHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +24,7 @@ public abstract class NoPropertyStateHolderMixin implements NoPropertyStateHolde
     // All other Mixins: If the new data structures are initialized, use those. Otherwise (if populateNeighbors didn't
     // run yet) use the vanilla code using `properties`
     @Redirect(
-            method = {"getValue", "getOptionalValue", "setValue"},
+            method = {"get", "func_235903_d_", "with"},
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/google/common/collect/ImmutableMap;get(Ljava/lang/Object;)Ljava/lang/Object;",

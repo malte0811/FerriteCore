@@ -2,7 +2,7 @@ import java.util.stream.Collectors
 
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings minecraft.officialMojangMappings()
+    mappings "de.oceanlabs.mcp:mcp_snapshot:20201028-1.16.3"
     compileOnly "com.google.code.findbugs:jsr305:3.+"
     // We depend on fabric loader here to use the fabric @Environment annotations
     // Do NOT use other classes from fabric loader

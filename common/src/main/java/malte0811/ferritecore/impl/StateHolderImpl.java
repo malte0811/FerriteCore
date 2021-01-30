@@ -3,7 +3,7 @@ package malte0811.ferritecore.impl;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.ducks.NoPropertyStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.state.Property;
 
 import java.util.Map;
 

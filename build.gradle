@@ -1,6 +1,6 @@
 plugins {
     id "architectury-plugin" version "2.0.65"
-    id "forgified-fabric-loom" version "0.6.55" apply false
+    id "forgified-fabric-loom" version "0.6.59" apply false
 }
 
 architectury {
@@ -9,6 +9,10 @@ architectury {
 
 subprojects {
     apply plugin: "forgified-fabric-loom"
+
+    loom {
+        silentMojangMappingsLicense()
+    }
 }
 
 allprojects {

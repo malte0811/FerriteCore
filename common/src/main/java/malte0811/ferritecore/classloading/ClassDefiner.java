@@ -2,7 +2,7 @@ package malte0811.ferritecore.classloading;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.util.LazyLoadedValue;
+import net.minecraft.util.LazyValue;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public class ClassDefiner {
-    private static final LazyLoadedValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyLoadedValue<>(() -> {
+    private static final LazyValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyValue<>(() -> {
         try {
             define("com.google.common.collect.FerriteCoreIterator");
             define("com.google.common.collect.FerriteCoreEntrySet");
@@ -32,7 +32,7 @@ public class ClassDefiner {
     public static <K, V> ImmutableMap<K, V> makeMap(
             int numProperties, Function<Object, V> getValue, IntFunction<Map.Entry<K, V>> getIth
     ) throws Throwable {
-        return (ImmutableMap<K, V>) MAKE_IMMUTABLE_FAST_MAP.get().invoke(numProperties, getValue, getIth);
+        return (ImmutableMap<K, V>) MAKE_IMMUTABLE_FAST_MAP.getValue().invoke(numProperties, getValue, getIth);
     }
 
     private static Class<?> define(String name) throws Exception {

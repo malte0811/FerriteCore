@@ -7,15 +7,15 @@ import malte0811.ferritecore.hash.VoxelShapeHash;
 import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
 import malte0811.ferritecore.util.LastAccessedCache;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.ArrayVoxelShape;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapeArray;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,13 +23,13 @@ import java.util.function.Function;
 
 public class BlockStateCacheImpl {
     private static final Direction[] DIRECTIONS = Direction.values();
-    public static final Object2ObjectOpenCustomHashMap<ArrayVoxelShape, ArrayVoxelShape> CACHE_COLLIDE =
+    public static final Object2ObjectOpenCustomHashMap<VoxelShapeArray, VoxelShapeArray> CACHE_COLLIDE =
             new Object2ObjectOpenCustomHashMap<>(VoxelShapeArrayHash.INSTANCE);
     public static final LastAccessedCache<VoxelShape, VoxelShape[]> CACHE_PROJECT = new LastAccessedCache<>(
             VoxelShapeHash.INSTANCE, vs -> {
         VoxelShape[] result = new VoxelShape[DIRECTIONS.length];
         for (Direction d : DIRECTIONS) {
-            result[d.ordinal()] = Shapes.getFaceShape(vs, d);
+            result[d.ordinal()] = VoxelShapes.getFaceShape(vs, d);
         }
         return result;
     }
@@ -51,15 +51,15 @@ public class BlockStateCacheImpl {
     }
 
     public static VoxelShape redirectGetCollisionShape(
-            BlockBehaviour block, BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context
+            AbstractBlock block, BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context
     ) {
         VoxelShape baseResult = block.getCollisionShape(state, worldIn, pos, context);
-        if (!(baseResult instanceof ArrayVoxelShape)) {
+        if (!(baseResult instanceof VoxelShapeArray)) {
             return baseResult;
         }
-        ArrayVoxelShape baseArray = (ArrayVoxelShape) baseResult;
+        VoxelShapeArray baseArray = (VoxelShapeArray) baseResult;
         ++collideCalls;
-        ArrayVoxelShape resultArray = CACHE_COLLIDE.computeIfAbsent(baseArray, Function.identity());
+        VoxelShapeArray resultArray = CACHE_COLLIDE.computeIfAbsent(baseArray, Function.identity());
         replaceInternals(resultArray, baseArray);
         return resultArray;
     }
@@ -67,13 +67,13 @@ public class BlockStateCacheImpl {
     public static VoxelShape redirectFaceShape(VoxelShape shape, Direction face) {
         ++projectCalls;
         Pair<VoxelShape, VoxelShape[]> sides = CACHE_PROJECT.get(shape);
-        if (sides.getFirst() instanceof ArrayVoxelShape && shape instanceof ArrayVoxelShape) {
-            replaceInternals((ArrayVoxelShape) sides.getFirst(), (ArrayVoxelShape) shape);
+        if (sides.getFirst() instanceof VoxelShapeArray && shape instanceof VoxelShapeArray) {
+            replaceInternals((VoxelShapeArray) sides.getFirst(), (VoxelShapeArray) shape);
         }
         return sides.getSecond()[face.ordinal()];
     }
 
-    public static void replaceInternals(ArrayVoxelShape toKeep, ArrayVoxelShape toReplace) {
+    public static void replaceInternals(VoxelShapeArray toKeep, VoxelShapeArray toReplace) {
         if (toKeep == toReplace) {
             return;
         }
@@ -83,15 +83,15 @@ public class BlockStateCacheImpl {
         // that we can't do anything about shallow size and replace the internals with those used in the cache. This is
         // not theoretically 100% safe since VSs can technically be modified after they are created, but handing out VSs
         // that will be modified is unsafe in any case since a lot of vanilla code relies on VSs being immutable.
-        access(toReplace).setXs(access(toKeep).getXs());
-        access(toReplace).setYs(access(toKeep).getYs());
-        access(toReplace).setZs(access(toKeep).getZs());
-        accessVS(toReplace).setFaces(accessVS(toKeep).getFaces());
-        accessVS(toReplace).setShape(accessVS(toKeep).getShape());
+        access(toReplace).setXPoints(access(toKeep).getXPoints());
+        access(toReplace).setYPoints(access(toKeep).getYPoints());
+        access(toReplace).setZPoints(access(toKeep).getZPoints());
+        accessVS(toReplace).setProjectionCache(accessVS(toKeep).getProjectionCache());
+        accessVS(toReplace).setPart(accessVS(toKeep).getPart());
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static VSArrayAccess access(ArrayVoxelShape a) {
+    private static VSArrayAccess access(VoxelShapeArray a) {
         return (VSArrayAccess) (Object) a;
     }
 

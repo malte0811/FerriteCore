@@ -3,7 +3,7 @@ package malte0811.ferritecore.fastmap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.classloading.ClassDefiner;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.state.Property;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -27,7 +27,7 @@ public class FastMap<Value> {
         for (Property<?> prop : rawKeys) {
             toKeyIndex.put(prop, keys.size());
             keys.add(new FastMapKey<>(prop, factorUpTo));
-            factorUpTo *= prop.getPossibleValues().size();
+            factorUpTo *= prop.getAllowedValues().size();
         }
         this.keys = ImmutableList.copyOf(keys);
         this.toKeyIndex = toKeyIndex.build();

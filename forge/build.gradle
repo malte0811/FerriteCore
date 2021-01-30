@@ -12,13 +12,9 @@ architectury {
     platformSetupLoomIde()
 }
 
-loom {
-     useFabricMixin = true
-}
-
 dependencies {
     minecraft("com.mojang:minecraft:${rootProject.minecraft_version}")
-    mappings(minecraft.officialMojangMappings())
+    mappings "de.oceanlabs.mcp:mcp_snapshot:20201028-1.16.3"
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
 
     compileOnly(project(path: ":common")) {

@@ -2,22 +2,22 @@ package malte0811.ferritecore.hash;
 
 import it.unimi.dsi.fastutil.Hash;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
-import net.minecraft.world.phys.shapes.ArrayVoxelShape;
-import net.minecraft.world.phys.shapes.CubeVoxelShape;
-import net.minecraft.world.phys.shapes.SliceShape;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.SplitVoxelShape;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapeArray;
+import net.minecraft.util.math.shapes.VoxelShapeCube;
 
 public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
     public static final VoxelShapeHash INSTANCE = new VoxelShapeHash();
 
     @Override
     public int hashCode(VoxelShape o) {
-        if (o instanceof SliceShape) {
-            return VoxelShapeSplitHash.INSTANCE.hashCode((SliceShape) o);
-        } else if (o instanceof ArrayVoxelShape) {
-            return VoxelShapeArrayHash.INSTANCE.hashCode((ArrayVoxelShape) o);
-        } else if (o instanceof CubeVoxelShape) {
-            return VoxelShapePartHash.INSTANCE.hashCode(((VoxelShapeAccess) o).getShape());
+        if (o instanceof SplitVoxelShape) {
+            return VoxelShapeSplitHash.INSTANCE.hashCode((SplitVoxelShape) o);
+        } else if (o instanceof VoxelShapeArray) {
+            return VoxelShapeArrayHash.INSTANCE.hashCode((VoxelShapeArray) o);
+        } else if (o instanceof VoxelShapeCube) {
+            return VoxelShapePartHash.INSTANCE.hashCode(((VoxelShapeAccess) o).getPart());
         } else {
             //TODO VSCube?
             return o.hashCode();
@@ -32,13 +32,13 @@ public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
             return false;
         } else if (a.getClass() != b.getClass()) {
             return false;
-        } else if (a instanceof SliceShape) {
-            return VoxelShapeSplitHash.INSTANCE.equals((SliceShape) a, (SliceShape) b);
-        } else if (a instanceof ArrayVoxelShape) {
-            return VoxelShapeArrayHash.INSTANCE.equals((ArrayVoxelShape) a, (ArrayVoxelShape) b);
-        } else if (a instanceof CubeVoxelShape) {
+        } else if (a instanceof SplitVoxelShape) {
+            return VoxelShapeSplitHash.INSTANCE.equals((SplitVoxelShape) a, (SplitVoxelShape) b);
+        } else if (a instanceof VoxelShapeArray) {
+            return VoxelShapeArrayHash.INSTANCE.equals((VoxelShapeArray) a, (VoxelShapeArray) b);
+        } else if (a instanceof VoxelShapeCube) {
             return VoxelShapePartHash.INSTANCE.equals(
-                    ((VoxelShapeAccess) a).getShape(), ((VoxelShapeAccess) b).getShape()
+                    ((VoxelShapeAccess) a).getPart(), ((VoxelShapeAccess) b).getPart()
             );
         } else {
             return a.equals(b);

@@ -3,36 +3,36 @@ package malte0811.ferritecore.hash;
 import it.unimi.dsi.fastutil.Hash;
 import malte0811.ferritecore.mixin.blockstatecache.VSPBitSetAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSPSplitAccess;
-import net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape;
-import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
-import net.minecraft.world.phys.shapes.SubShape;
+import net.minecraft.util.math.shapes.BitSetVoxelShapePart;
+import net.minecraft.util.math.shapes.PartSplitVoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapePart;
 
 import java.util.Objects;
 
-public class VoxelShapePartHash implements Hash.Strategy<DiscreteVoxelShape> {
+public class VoxelShapePartHash implements Hash.Strategy<VoxelShapePart> {
     public static final VoxelShapePartHash INSTANCE = new VoxelShapePartHash();
 
     @Override
-    public int hashCode(DiscreteVoxelShape o) {
-        if (o instanceof SubShape) {
-            VSPSplitAccess access = access((SubShape) o);
+    public int hashCode(VoxelShapePart o) {
+        if (o instanceof PartSplitVoxelShape) {
+            VSPSplitAccess access = access((PartSplitVoxelShape) o);
             int result = access.getStartX();
             result = 31 * result + access.getStartY();
             result = 31 * result + access.getStartZ();
             result = 31 * result + access.getEndX();
             result = 31 * result + access.getEndY();
             result = 31 * result + access.getEndZ();
-            result = 31 * result + hashCode(access.getParent());
+            result = 31 * result + hashCode(access.getPart());
             return result;
-        } else if (o instanceof BitSetDiscreteVoxelShape) {
-            VSPBitSetAccess access = access((BitSetDiscreteVoxelShape) o);
-            int result = access.getXMin();
-            result = 31 * result + access.getYMin();
-            result = 31 * result + access.getZMin();
-            result = 31 * result + access.getXMax();
-            result = 31 * result + access.getYMax();
-            result = 31 * result + access.getZMax();
-            result = 31 * result + Objects.hashCode(access.getStorage());
+        } else if (o instanceof BitSetVoxelShapePart) {
+            VSPBitSetAccess access = access((BitSetVoxelShapePart) o);
+            int result = access.getStartX();
+            result = 31 * result + access.getStartY();
+            result = 31 * result + access.getStartZ();
+            result = 31 * result + access.getEndX();
+            result = 31 * result + access.getEndY();
+            result = 31 * result + access.getEndZ();
+            result = 31 * result + Objects.hashCode(access.getBitSet());
             return result;
         } else {
             return Objects.hashCode(o);
@@ -40,45 +40,45 @@ public class VoxelShapePartHash implements Hash.Strategy<DiscreteVoxelShape> {
     }
 
     @Override
-    public boolean equals(DiscreteVoxelShape a, DiscreteVoxelShape b) {
+    public boolean equals(VoxelShapePart a, VoxelShapePart b) {
         if (a == b) {
             return true;
         } else if (a == null || b == null) {
             return false;
         } else if (a.getClass() != b.getClass()) {
             return false;
-        } else if (a instanceof SubShape) {
-            VSPSplitAccess accessA = access((SubShape) a);
-            VSPSplitAccess accessB = access((SubShape) b);
+        } else if (a instanceof PartSplitVoxelShape) {
+            VSPSplitAccess accessA = access((PartSplitVoxelShape) a);
+            VSPSplitAccess accessB = access((PartSplitVoxelShape) b);
             return accessA.getEndX() == accessB.getEndX() &&
                     accessA.getEndY() == accessB.getEndY() &&
                     accessA.getEndZ() == accessB.getEndZ() &&
                     accessA.getStartX() == accessB.getStartX() &&
                     accessA.getStartY() == accessB.getStartY() &&
                     accessA.getStartZ() == accessB.getStartZ() &&
-                    equals(accessA.getParent(), accessB.getParent());
-        } else if (a instanceof BitSetDiscreteVoxelShape) {
-            VSPBitSetAccess accessA = access((BitSetDiscreteVoxelShape) a);
-            VSPBitSetAccess accessB = access((BitSetDiscreteVoxelShape) b);
-            return accessA.getXMax() == accessB.getXMax() &&
-                    accessA.getYMax() == accessB.getYMax() &&
-                    accessA.getZMax() == accessB.getZMax() &&
-                    accessA.getXMin() == accessB.getXMin() &&
-                    accessA.getYMin() == accessB.getYMin() &&
-                    accessA.getZMin() == accessB.getZMin() &&
-                    accessA.getStorage().equals(accessB.getStorage());
+                    equals(accessA.getPart(), accessB.getPart());
+        } else if (a instanceof BitSetVoxelShapePart) {
+            VSPBitSetAccess accessA = access((BitSetVoxelShapePart) a);
+            VSPBitSetAccess accessB = access((BitSetVoxelShapePart) b);
+            return accessA.getEndX() == accessB.getEndX() &&
+                    accessA.getEndY() == accessB.getEndY() &&
+                    accessA.getEndZ() == accessB.getEndZ() &&
+                    accessA.getStartX() == accessB.getStartX() &&
+                    accessA.getStartY() == accessB.getStartY() &&
+                    accessA.getStartZ() == accessB.getStartZ() &&
+                    accessA.getBitSet().equals(accessB.getBitSet());
         } else {
             return a.equals(b);
         }
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static VSPSplitAccess access(SubShape part) {
+    private static VSPSplitAccess access(PartSplitVoxelShape part) {
         return (VSPSplitAccess) (Object) part;
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static VSPBitSetAccess access(BitSetDiscreteVoxelShape part) {
+    private static VSPBitSetAccess access(BitSetVoxelShapePart part) {
         return (VSPBitSetAccess) (Object) part;
     }
 }

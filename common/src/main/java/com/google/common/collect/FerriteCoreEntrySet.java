@@ -1,6 +1,6 @@
 package com.google.common.collect;
 
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.state.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
