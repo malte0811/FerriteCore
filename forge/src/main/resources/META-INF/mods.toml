@@ -3,9 +3,9 @@ loaderVersion="[28,)"
 
 license="MIT"
 [[mods]]
-modId="ferritecore"
-version="${file.jarVersion}"
-displayName="Ferrite Core"
+modId = "ferritecore"
+version = "${version}"
+displayName = "Ferrite Core"
 authors="malte0811"
 description='''
 Reduces memory usage. These changes will probably be PRd to Forge soon.
