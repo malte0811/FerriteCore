@@ -10,5 +10,6 @@ dependencies {
 }
 
 architectury {
+    injectInjectables = false
     common()
 }

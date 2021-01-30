@@ -1,5 +1,3 @@
-import java.util.stream.Collectors
-
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
 }
@@ -47,13 +45,4 @@ remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archivePath)
     classifier "forge"
-}
-
-//TODO this is also in the other build.gradle…
-def fcMixinConfigs = ["predicates", "fastmap", "nopropertymap", "mrl", "dedupmultipart", "blockstatecache"].stream()
-        .map({s -> archivesBaseName+"."+s+".mixin.json"})
-        .collect(Collectors.toList())
-
-loom {
-    mixinConfigs = fcMixinConfigs
 }

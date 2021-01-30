@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 plugins {
     id "architectury-plugin" version "2.0.65"
     id "forgified-fabric-loom" version "0.6.59" apply false
@@ -10,8 +12,19 @@ architectury {
 subprojects {
     apply plugin: "forgified-fabric-loom"
 
+    def fcMixinConfigs = [
+            "predicates",
+            "fastmap",
+            "nopropertymap",
+            "mrl",
+            "dedupmultipart",
+            "blockstatecache",
+        ].stream()
+        .map({s -> rootProject.archives_base_name+"."+s+".mixin.json"})
+        .collect(Collectors.toList())
     loom {
         silentMojangMappingsLicense()
+        mixinConfigs += fcMixinConfigs
     }
 }
 
@@ -26,12 +39,8 @@ allprojects {
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
 
-        // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
-        // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
-        // We'll use that if it's available, but otherwise we'll use the older option.
-        def targetVersion = 8
         if (JavaVersion.current().isJava9Compatible()) {
-            options.release = targetVersion
+            options.release = 8
         }
     }
 
