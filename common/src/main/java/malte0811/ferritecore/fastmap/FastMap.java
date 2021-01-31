@@ -9,22 +9,21 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.IntSupplier;
 
 public class FastMap<Value> {
     private final List<FastMapKey<?>> keys;
-    private final List<Property<?>> rawKeys;
-    private final List<Value> values;
+    private final List<Value> valueMatrix;
     // It might be possible to get rid of this (and the equivalent map for values) by sorting the key vectors by
     // property name (natural order for values) and using a binary search above a given size, but choosing that size
     // would likely be more effort than it's worth
     private final Map<Property<?>, Integer> toKeyIndex;
 
     public FastMap(Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap) {
-        this.rawKeys = ImmutableList.copyOf(properties);
-        List<FastMapKey<?>> keys = new ArrayList<>(rawKeys.size());
+        List<FastMapKey<?>> keys = new ArrayList<>(properties.size());
         int factorUpTo = 1;
         ImmutableMap.Builder<Property<?>, Integer> toKeyIndex = ImmutableMap.builder();
-        for (Property<?> prop : rawKeys) {
+        for (Property<?> prop : properties) {
             toKeyIndex.put(prop, keys.size());
             keys.add(new FastMapKey<>(prop, factorUpTo));
             factorUpTo *= prop.getAllowedValues().size();
@@ -39,7 +38,7 @@ public class FastMap<Value> {
         for (Map.Entry<Map<Property<?>, Comparable<?>>, Value> state : valuesMap.entrySet()) {
             valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
-        this.values = ImmutableList.copyOf(valuesList);
+        this.valueMatrix = ImmutableList.copyOf(valuesList);
     }
 
     @Nullable
@@ -53,7 +52,7 @@ public class FastMap<Value> {
         if (newIndex < 0) {
             return null;
         }
-        return values.get(newIndex);
+        return valueMatrix.get(newIndex);
     }
 
     public int getIndexOf(Map<Property<?>, Comparable<?>> state) {
@@ -74,13 +73,10 @@ public class FastMap<Value> {
         return propId.getValue(stateIndex);
     }
 
-    public List<Property<?>> getProperties() {
-        return rawKeys;
-    }
-
     public ImmutableMap<Property<?>, Comparable<?>> makeValuesFor(int index) {
         try {
-            class MapAccessor implements Function<Object, Comparable<?>>, IntFunction<Map.Entry<Property<?>, Comparable<?>>> {
+            class MapAccessor implements Function<Object, Comparable<?>>,
+                    IntFunction<Map.Entry<Property<?>, Comparable<?>>>, IntSupplier {
                 @Override
                 public Comparable<?> apply(Object obj) {
                     if (obj instanceof Property<?>) {
@@ -96,9 +92,14 @@ public class FastMap<Value> {
                             getKey(subIndex).getProperty(), getKey(subIndex).getValue(index)
                     );
                 }
+
+                @Override
+                public int getAsInt() {
+                    return numProperties();
+                }
             }
             MapAccessor func = new MapAccessor();
-            return ClassDefiner.makeMap(numProperties(), func, func);
+            return ClassDefiner.makeMap(func);
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         }

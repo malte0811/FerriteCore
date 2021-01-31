@@ -1,8 +1,8 @@
 package malte0811.ferritecore.impl;
 
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import malte0811.ferritecore.ducks.NoPropertyStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
+import malte0811.ferritecore.mixin.config.FerriteConfig;
 import net.minecraft.state.Property;
 
 import java.util.Map;
@@ -26,8 +26,8 @@ public class StateHolderImpl {
         }
         int index = holder.getStateMap().getIndexOf(holder.getVanillaPropertyMap());
         holder.setStateIndex(index);
-        if (holder instanceof NoPropertyStateHolder) {
-            holder.deleteVanillaPropertyMap();
+        if (FerriteConfig.PROPERTY_MAP.isEnabled()) {
+            holder.replacePropertyMap(holder.getStateMap().makeValuesFor(holder.getStateIndex()));
         }
     }
 }

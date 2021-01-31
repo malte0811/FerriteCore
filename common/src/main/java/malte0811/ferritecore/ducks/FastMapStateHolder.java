@@ -15,5 +15,5 @@ public interface FastMapStateHolder<S> {
 
     ImmutableMap<Property<?>, Comparable<?>> getVanillaPropertyMap();
 
-    void deleteVanillaPropertyMap();
+    void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap);
 }

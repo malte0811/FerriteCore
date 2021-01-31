@@ -20,7 +20,6 @@
     "ferritecore.dedupmultipart.mixin.json",
     "ferritecore.fastmap.mixin.json",
     "ferritecore.mrl.mixin.json",
-    "ferritecore.nopropertymap.mixin.json",
     "ferritecore.predicates.mixin.json",
     "ferritecore.fabric.mixin.json"
   ]

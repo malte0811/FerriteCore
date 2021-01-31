@@ -61,8 +61,8 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     }
 
     @Override
-    public void deleteVanillaPropertyMap() {
-        properties = null;
+    public void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap) {
+        properties = newMap;
     }
 
     @Override

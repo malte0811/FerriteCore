@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.IntSupplier;
 
 public class ClassDefiner {
     private static final LazyValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyValue<>(() -> {
@@ -20,19 +21,21 @@ public class ClassDefiner {
             define("com.google.common.collect.FerriteCoreEntrySet");
             Class<?> map = define("com.google.common.collect.FerriteCoreImmutableMap");
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            //int numProperties, Function<Object, V> getValue, IntFunction<Entry<K, V>> getIth
+            // Function is:
+            // Function<Object, V>: Map#get
+            // IntFunction<Entry<K, V>>: get i-th entry of the map
+            // IntSupplier: Map#size
             return lookup.findConstructor(map, MethodType.methodType(
-                    void.class, int.class, Function.class, IntFunction.class
+                    void.class, Function.class
             ));
         } catch (Exception x) {
             throw new RuntimeException(x);
         }
     });
 
-    public static <K, V> ImmutableMap<K, V> makeMap(
-            int numProperties, Function<Object, V> getValue, IntFunction<Map.Entry<K, V>> getIth
-    ) throws Throwable {
-        return (ImmutableMap<K, V>) MAKE_IMMUTABLE_FAST_MAP.getValue().invoke(numProperties, getValue, getIth);
+    public static <K, V, F extends Function<Object, V> & IntFunction<Map.Entry<K, V>> & IntSupplier>
+    ImmutableMap<K, V> makeMap(F mapAccess) throws Throwable {
+        return (ImmutableMap<K, V>) MAKE_IMMUTABLE_FAST_MAP.getValue().invoke(mapAccess);
     }
 
     private static Class<?> define(String name) throws Exception {
