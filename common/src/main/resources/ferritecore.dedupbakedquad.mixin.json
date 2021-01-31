@@ -1,15 +1,16 @@
 {
   "required": true,
-  "package": "malte0811.ferritecore.mixin.dedupmultipart",
+  "package": "malte0811.ferritecore.mixin.dedupbakedquad",
   "compatibilityLevel": "JAVA_8",
   "refmap": "ferritecore-common-refmap.json",
   "injectors": {
     "defaultRequire": 1
   },
   "minVersion": "0.8",
-  "plugin": "malte0811.ferritecore.mixin.dedupmultipart.Config",
+  "plugin": "malte0811.ferritecore.mixin.dedupbakedquad.Config",
   "client": [
-    "MixinMultipartBuilder"
+    "BakedQuadAccess",
+    "SimpleModelBuilderMixin"
   ],
   "mixins": []
 }

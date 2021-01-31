@@ -1,8 +1,12 @@
 package malte0811.ferritecore.impl;
 
 import com.mojang.datafixers.util.Unit;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import malte0811.ferritecore.hash.LambdaBasedHash;
+import malte0811.ferritecore.mixin.dedupbakedquad.BakedQuadAccess;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.MultipartBakedModel;
 import net.minecraft.client.resources.ReloadListener;
@@ -11,6 +15,7 @@ import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.resources.IResourceManager;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +28,9 @@ public class Deduplicator {
     private static final Map<List<Pair<Predicate<BlockState>, IBakedModel>>, MultipartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
+    private static final Object2ObjectOpenCustomHashMap<int[], int[]> BAKED_QUAD_CACHE = new Object2ObjectOpenCustomHashMap<>(
+            new LambdaBasedHash<>(Arrays::hashCode, Arrays::equals)
+    );
 
     public static String deduplicateVariant(String variant) {
         return VARIANT_IDENTITIES.computeIfAbsent(variant, Function.identity());
@@ -46,6 +54,13 @@ public class Deduplicator {
         );
     }
 
+    public static void deduplicate(BakedQuad bq) {
+        synchronized (BAKED_QUAD_CACHE) {
+            int[] deduped = BAKED_QUAD_CACHE.computeIfAbsent(bq.getVertexData(), Function.identity());
+            ((BakedQuadAccess) bq).setVertexData(deduped);
+        }
+    }
+
     public static void registerReloadListener() {
         // Register the reload listener s.t. its "sync" part runs after the model loader reload
         ((IReloadableResourceManager) Minecraft.getInstance().getResourceManager()).addReloadListener(new ReloadListener<Unit>() {
@@ -60,6 +75,8 @@ public class Deduplicator {
                 KNOWN_MULTIPART_MODELS.clear();
                 OR_PREDICATE_CACHE.clear();
                 AND_PREDICATE_CACHE.clear();
+                BAKED_QUAD_CACHE.clear();
+                BAKED_QUAD_CACHE.trim();
             }
         });
     }

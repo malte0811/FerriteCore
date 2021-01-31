@@ -1,16 +1,11 @@
 package malte0811.ferritecore.mixin.config;
 
-import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
-import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import malte0811.ferritecore.ModMain;
-
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class FerriteConfig {
@@ -20,6 +15,7 @@ public class FerriteConfig {
     public static final Option MRL_CACHE;
     public static final Option DEDUP_MULTIPART;
     public static final Option DEDUP_BLOCKSTATE_CACHE;
+    public static final Option DEDUP_QUADS;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -47,6 +43,10 @@ public class FerriteConfig {
         DEDUP_BLOCKSTATE_CACHE = builder.createOption(
                 "blockstateCacheDeduplication",
                 "Deduplicate cached data for blockstates, most importantly collision and render shapes"
+        );
+        DEDUP_QUADS = builder.createOption(
+                "bakedQuadDeduplication",
+                "Deduplicate vertex data of baked quads in the basic model implementations"
         );
         builder.finish();
     }
