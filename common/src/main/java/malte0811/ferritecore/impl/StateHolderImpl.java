@@ -1,5 +1,6 @@
 package malte0811.ferritecore.impl;
 
+import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
@@ -27,7 +28,7 @@ public class StateHolderImpl {
         int index = holder.getStateMap().getIndexOf(holder.getVanillaPropertyMap());
         holder.setStateIndex(index);
         if (FerriteConfig.PROPERTY_MAP.isEnabled()) {
-            holder.replacePropertyMap(holder.getStateMap().makeValuesFor(holder.getStateIndex()));
+            holder.replacePropertyMap(FastImmutableMapDefiner.makeMap(holder));
         }
     }
 }

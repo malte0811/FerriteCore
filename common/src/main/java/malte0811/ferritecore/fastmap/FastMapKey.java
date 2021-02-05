@@ -1,47 +1,35 @@
 package malte0811.ferritecore.fastmap;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.state.Property;
 
-import java.util.List;
-import java.util.Map;
-
-class FastMapKey<T extends Comparable<T>> {
-    private final int mapFactor;
+public abstract class FastMapKey<T extends Comparable<T>> {
     private final PropertyIndexer<T> indexer;
 
-    FastMapKey(Property<T> property, int mapFactor) {
+    protected FastMapKey(Property<T> property) {
         this.indexer = PropertyIndexer.makeIndexer(property);
-        this.mapFactor = mapFactor;
     }
 
-    T getValue(int mapIndex) {
-        int index = (mapIndex / mapFactor) % indexer.size();
-        return indexer.byIndex(index);
+    abstract T getValue(int mapIndex);
+
+    abstract int replaceIn(int mapIndex, T newValue);
+
+    abstract int toPartialMapIndex(Comparable<?> value);
+
+    abstract int getFactorToNext();
+
+    protected final int numValues() {
+        return indexer.numValues();
     }
 
-    int replaceIn(int mapIndex, T newValue) {
-        final int lowerData = mapIndex % mapFactor;
-        final int upperFactor = mapFactor * indexer.size();
-        final int upperData = mapIndex - mapIndex % upperFactor;
-        int internalIndex = getInternalIndex(newValue);
-        if (internalIndex < 0) {
-            return -1;
-        } else {
-            return lowerData + mapFactor * internalIndex + upperData;
-        }
-    }
-
-    Property<T> getProperty() {
+    protected final Property<T> getProperty() {
         return indexer.getProperty();
     }
 
-    int toPartialMapIndex(Comparable<?> value) {
-        return mapFactor * getInternalIndex(value);
+    protected final int getInternalIndex(Comparable<?> value) {
+        return indexer.toIndex((T) value);
     }
 
-    private int getInternalIndex(Comparable<?> value) {
-        return indexer.toIndex((T) value);
+    protected final T byInternalIndex(int internalIndex) {
+        return indexer.byIndex(internalIndex);
     }
 }

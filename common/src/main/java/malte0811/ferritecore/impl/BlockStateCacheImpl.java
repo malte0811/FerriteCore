@@ -16,8 +16,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapeArray;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.function.Function;
 
@@ -38,11 +36,6 @@ public class BlockStateCacheImpl {
     public static int projectCalls = 0;
 
     public static void resetCaches() {
-        //TODO remove
-        Logger logger = LogManager.getLogger();
-        logger.info("Collide stats: Cache size: {}, calls: {}", CACHE_COLLIDE.size(), collideCalls);
-        logger.info("Project stats: Cache size: {}, calls: {}", CACHE_PROJECT.size(), projectCalls);
-
         CACHE_COLLIDE.clear();
         CACHE_COLLIDE.trim();
         collideCalls = 0;

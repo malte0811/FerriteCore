@@ -48,21 +48,16 @@ Side: both
 Mixin subpackage: `fastmap`  
 
 ### 3. BlockState property storage
-Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`,
-which takes around 170 MB in total. Most operations do not actually require this map, they
-can be implemented with similar speed using the `FastMap` from the previous point.  There
-is one problematic exception: `getValues`. This is a simple getter for the property map in
-vanilla, if the map is no longer stored it needs to be created on the fly. The method
-returns an `ImmutableMap`, which can't be easily extended due to package-private methods.
-Otherwise it would be possible to return a `Map`-implementation that only requires a
-`FastMap` and the index in that `FastMap`. The current approach to this is to implement a
-second version of `getValues` which returns such a custom map, and to replace calls to the
-old one with the new implementation where possible.
+Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`, which takes around 170 MB in
+total. Replacing this `ImmutableMap` by a custom implementation based on the `FastMap` from the previous point (loaded
+with some classloader trickery) removes most of that memory usage.
 
 Saved memory: Around 170 MB  
-CPU impact: unclear (see second paragraph)  
+CPU impact: probably around zero  
 Side: both  
-Mixin subpackage: `nopropertymap`  
+Mixin subpackage: None (implemented as part of the `fastmap` code)  
+Notes: If this is ever included in Forge the custom `ImmutableMap` should probably be replaced by a regular map, and a
+new `getValues` method returning a `map` rather than an `ImmutableMap` should be added
 
 ### 4. Multipart model predicate caching
 Each multipart model stores a number of predicates to determine which parts to show under
@@ -102,12 +97,39 @@ first part would require changing what constructor the constructor in question r
 
 ### 6. Multipart model instances
 By default every blockstate using a multipart model gets its own instance of that multipart model. Since multipart
-models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory.
-The only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is
-already deduplicated by point 4, so it is very easy to use the same instance for equivalent lists. This reduces the
-number of instance from about 200k to 1.5k (DW20 1.2.0).
+models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory. The
+only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is already
+deduplicated by point 4, so it is very easy to use the same instance for equivalent lists. This reduces the number of
+instance from about 200k to 1.5k (DW20 1.2.0).
 
 Saved memory: Close to 200 MB  
 CPU impact: Slight during loading, zero at runtime  
 Side: client  
 Mixin subpackage: `dedupmultipart`
+
+### 7. Blockstate cache deduplication
+
+Blockstates that are not marked as "variable opacity" cache their collision and render shapes. This uses around 200 MB,
+mostly just because there are a lot of blockstates. Many blocks have the same shapes, so in a lot of cases the existing
+instances can be reused. There is an additional problem with this: Many mods cache their own render/collision shapes
+internally, even if they're cached by the vanilla cache. This can be worked around by replacing the "internals" of the
+voxel shape returned by the block with the internals of the "canonical" instance of that shape. Vanilla assumes that
+shapes are immutable once created, so this should be safe.
+
+Saved memory: Around 200 MB  
+CPU impact: Some during loading and joining (<1 second with the DW20 pack), none afterwards  
+Side: both  
+Mixin subpackage: `blockstatecache`
+
+### 8. Quad deduplication
+
+Baked quads (especially their `int[]`s storing vertex data) account for around 340 MB in total, a lot of which is just
+necessary to store the models. But it is also common for multiple quads to have the same data. Using the same `int[]`
+instance for quads with the same data reduces the amount of memory used by quads to around 195 MB. This is not
+technically 100% safe to do, since the `int[]` can theoretically be modified at any time. Only applying the optimization
+to quads used in `SimpleBakedModel`s is probably a good compromise for this.
+
+Saved memory: Close to 150 MB  
+CPU impact: Some during model loading, none afterwards  
+Side: client  
+Mixin subpackage: `bakedquad`

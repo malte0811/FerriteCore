@@ -1,37 +1,46 @@
 package com.google.common.collect;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.IntSupplier;
+import java.util.function.BiFunction;
+import java.util.function.ToIntFunction;
 
-public class FerriteCoreImmutableMap<K, V, F extends Function<Object, V> & IntFunction<Map.Entry<K, V>> & IntSupplier>
-        extends ImmutableMap<K, V> {
-    // This is a quite inconvenient "handle" on a FastMap, but we need classloader separation
-    // Function<Object, V>: Map#get
-    // IntFunction<Entry<K, V>>: get i-th entry of the map
-    // IntSupplier: Map#size
-    private final F access;
+public class FerriteCoreImmutableMap<K> extends ImmutableMap<K, Comparable<?>> {
+    // This is a very inconvenient "handle" on a FastMap, but
+    // a) we need classloader separation
+    // b) by keeping the functions static we can keep the size of the object down
+    public static ToIntFunction<Object> numProperties;
+    public static BiFunction<Object, Object, Comparable<?>> getByStateAndKey;
+    public static BiFunction<Object, Integer, Entry<?, Comparable<?>>> entryByStateAndIndex;
 
-    public FerriteCoreImmutableMap(F access) {
-        this.access = access;
+    // Actually a FastMapStateHolder, but classloader separation…
+    private final Object viewedState;
+
+    public FerriteCoreImmutableMap(Object viewedState) {
+        this.viewedState = viewedState;
     }
 
     @Override
     public int size() {
-        return access.getAsInt();
+        return numProperties.applyAsInt(viewedState);
     }
 
     @Override
-    public V get(@Nullable Object key) {
-        return access.apply(key);
+    public Comparable<?> get(@Nullable Object key) {
+        return getByStateAndKey.apply(viewedState, key);
     }
 
     @Override
-    ImmutableSet<Map.Entry<K, V>> createEntrySet() {
-        return new FerriteCoreEntrySet<>(access);
+    ImmutableSet<Map.Entry<K, Comparable<?>>> createEntrySet() {
+        return new FerriteCoreEntrySet<>(viewedState);
+    }
+
+    @Override
+    @NotNull
+    public ImmutableSet<Entry<K, Comparable<?>>> entrySet() {
+        return new FerriteCoreEntrySet<>(viewedState);
     }
 
     @Override

@@ -2,14 +2,10 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import malte0811.ferritecore.classloading.ClassDefiner;
 import net.minecraft.state.Property;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.IntSupplier;
 
 public class FastMap<Value> {
     private final List<FastMapKey<?>> keys;
@@ -25,8 +21,9 @@ public class FastMap<Value> {
         ImmutableMap.Builder<Property<?>, Integer> toKeyIndex = ImmutableMap.builder();
         for (Property<?> prop : properties) {
             toKeyIndex.put(prop, keys.size());
-            keys.add(new FastMapKey<>(prop, factorUpTo));
-            factorUpTo *= prop.getAllowedValues().size();
+            FastMapKey<?> nextKey = new CompactFastMapKey<>(prop, factorUpTo);
+            keys.add(nextKey);
+            factorUpTo *= nextKey.getFactorToNext();
         }
         this.keys = ImmutableList.copyOf(keys);
         this.toKeyIndex = toKeyIndex.build();
@@ -73,36 +70,10 @@ public class FastMap<Value> {
         return propId.getValue(stateIndex);
     }
 
-    public ImmutableMap<Property<?>, Comparable<?>> makeValuesFor(int index) {
-        try {
-            class MapAccessor implements Function<Object, Comparable<?>>,
-                    IntFunction<Map.Entry<Property<?>, Comparable<?>>>, IntSupplier {
-                @Override
-                public Comparable<?> apply(Object obj) {
-                    if (obj instanceof Property<?>) {
-                        return getValue(index, (Property<?>) obj);
-                    } else {
-                        return null;
-                    }
-                }
-
-                @Override
-                public Map.Entry<Property<?>, Comparable<?>> apply(int subIndex) {
-                    return new AbstractMap.SimpleImmutableEntry<>(
-                            getKey(subIndex).getProperty(), getKey(subIndex).getValue(index)
-                    );
-                }
-
-                @Override
-                public int getAsInt() {
-                    return numProperties();
-                }
-            }
-            MapAccessor func = new MapAccessor();
-            return ClassDefiner.makeMap(func);
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
-        }
+    public Map.Entry<Property<?>, Comparable<?>> getEntry(int propertyIndex, int stateIndex) {
+        return new AbstractMap.SimpleImmutableEntry<>(
+                getKey(propertyIndex).getProperty(), getKey(propertyIndex).getValue(stateIndex)
+        );
     }
 
     public <T extends Comparable<T>>

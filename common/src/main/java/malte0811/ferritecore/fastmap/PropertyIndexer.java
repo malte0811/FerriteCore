@@ -3,6 +3,7 @@ package malte0811.ferritecore.fastmap;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
@@ -10,7 +11,6 @@ import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,36 +18,45 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class PropertyIndexer<T extends Comparable<T>> {
+    private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenHashMap<>();
+
     private final Property<T> property;
+    private final int numValues;
 
     public static <T extends Comparable<T>> PropertyIndexer<T> makeIndexer(Property<T> prop) {
-        PropertyIndexer<?> result = null;
-        if (prop instanceof BooleanProperty) {
-            result = new BoolIndexer((BooleanProperty) prop);
-        } else if (prop instanceof IntegerProperty) {
-            result = new IntIndexer((IntegerProperty) prop);
-        } else if (prop == BlockStateProperties.FACING) {
-            result = new WeirdVanillaDirectionIndexer();
-        } else if (prop instanceof EnumProperty<?>) {
-            result = new EnumIndexer<>((EnumProperty<?>) prop);
-        }
-        if (result == null || !result.isValid()) {
-            return new GenericIndexer<>(prop);
-        } else {
-            return (PropertyIndexer<T>) result;
+        synchronized (KNOWN_INDEXERS) {
+            PropertyIndexer<?> unchecked = KNOWN_INDEXERS.computeIfAbsent(prop, propInner -> {
+                PropertyIndexer<?> result = null;
+                if (propInner instanceof BooleanProperty) {
+                    result = new BoolIndexer((BooleanProperty) propInner);
+                } else if (propInner instanceof IntegerProperty) {
+                    result = new IntIndexer((IntegerProperty) propInner);
+                } else if (propInner == BlockStateProperties.FACING) {
+                    result = new WeirdVanillaDirectionIndexer();
+                } else if (propInner instanceof EnumProperty<?>) {
+                    result = new EnumIndexer<>((EnumProperty<?>) propInner);
+                }
+                if (result == null || !result.isValid()) {
+                    return new GenericIndexer<>(propInner);
+                } else {
+                    return result;
+                }
+            });
+            return (PropertyIndexer<T>) unchecked;
         }
     }
 
     protected PropertyIndexer(Property<T> property) {
         this.property = property;
+        this.numValues = property.getAllowedValues().size();
     }
 
     public Property<T> getProperty() {
         return property;
     }
 
-    public int size() {
-        return property.getAllowedValues().size();
+    public int numValues() {
+        return numValues;
     }
 
     public abstract T byIndex(int index);
@@ -59,11 +68,6 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         int index = 0;
         for (T val : allowed) {
             if (toIndex(val) != index || !val.equals(byIndex(index))) {
-                //TODO remove
-                LogManager.getLogger().info(
-                        "Property {} will use generic indexer, specialized is inconsistent at {}, {}",
-                        getProperty(), val, index
-                );
                 return false;
             }
             ++index;

@@ -5,30 +5,26 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.IntSupplier;
 
-public class FerriteCoreEntrySet<K, V, F extends Function<Object, V> & IntFunction<Map.Entry<K, V>> & IntSupplier>
-        extends ImmutableSet<Map.Entry<K, V>> {
-    // Function<Object, V>: Map#get
-    // IntFunction<Entry<K, V>>: get i-th entry of the map
-    // IntSupplier: Map#size
-    private final F access;
+public class FerriteCoreEntrySet<K> extends ImmutableSet<Map.Entry<K, Comparable<?>>> {
+    private final Object viewedState;
 
-    public FerriteCoreEntrySet(F access) {
-        this.access = access;
+    public FerriteCoreEntrySet(Object viewedState) {
+        this.viewedState = viewedState;
     }
 
     @Override
     @NotNull
-    public UnmodifiableIterator<Map.Entry<K, V>> iterator() {
-        return new FerriteCoreIterator<>(access, size());
+    public UnmodifiableIterator<Map.Entry<K, Comparable<?>>> iterator() {
+        return new FerriteCoreIterator<>(
+                i -> (Map.Entry<K, Comparable<?>>) FerriteCoreImmutableMap.entryByStateAndIndex.apply(viewedState, i),
+                size()
+        );
     }
 
     @Override
     public int size() {
-        return access.getAsInt();
+        return FerriteCoreImmutableMap.numProperties.applyAsInt(viewedState);
     }
 
     @Override
@@ -40,7 +36,7 @@ public class FerriteCoreEntrySet<K, V, F extends Function<Object, V> & IntFuncti
         if (!(entry.getKey() instanceof Property<?>)) {
             return false;
         }
-        Object valueInMap = access.apply(entry.getKey());
+        Object valueInMap = FerriteCoreImmutableMap.getByStateAndKey.apply(viewedState, entry.getKey());
         return valueInMap != null && valueInMap.equals(((Map.Entry<?, ?>) object).getValue());
     }
 
