@@ -24,7 +24,7 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
 
     @Override
     public T getValue(int mapIndex) {
-        final int clearAbove = mapIndex & ~lowestNBits(firstBitAfterValue);
+        final int clearAbove = mapIndex & lowestNBits(firstBitAfterValue);
         return byInternalIndex(clearAbove >>> firstBitInValue);
     }
 

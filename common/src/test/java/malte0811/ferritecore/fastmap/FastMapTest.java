@@ -1,0 +1,95 @@
+package malte0811.ferritecore.fastmap;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
+import it.unimi.dsi.fastutil.booleans.BooleanList;
+import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
+import malte0811.ferritecore.ducks.FastMapStateHolder;
+import net.minecraft.state.*;
+import net.minecraft.util.Direction;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class FastMapTest {
+    private static final BooleanProperty BOOL = BooleanProperty.create("A");
+    private static final IntegerProperty INT = IntegerProperty.create("B", 0, 7);
+    private static final EnumProperty<Direction> DIR = DirectionProperty.create("C", Direction.class);
+    private static final BooleanList BOOLS = new BooleanArrayList(new boolean[]{false, true});
+
+    @TestFactory
+    public Stream<DynamicTest> basicMapping() {
+        return BOOLS.stream().map(b -> DynamicTest.dynamicTest("Compact: " + b, new TestData(b)::testBasic));
+    }
+
+    @TestFactory
+    public Stream<DynamicTest> testWith() {
+        return BOOLS.stream().map(b -> DynamicTest.dynamicTest("Compact: " + b, new TestData(b)::testWith));
+    }
+
+    private static class TestData {
+        private final FastMap<Map<Property<?>, Comparable<?>>> map;
+        private final ImmutableMap<Map<Property<?>, Comparable<?>>, Map<Property<?>, Comparable<?>>> values;
+
+        public TestData(boolean compact) {
+            List<Property<?>> properties = ImmutableList.of(BOOL, INT, DIR);
+            ImmutableMap.Builder<Map<Property<?>, Comparable<?>>, Map<Property<?>, Comparable<?>>> values = ImmutableMap.builder();
+            Stream<List<Pair<Property<?>, Comparable<?>>>> stream = Stream.of(Collections.emptyList());
+
+            for (Property<?> property : properties) {
+                stream = stream.flatMap(baseList -> property.getAllowedValues().stream().map(value -> {
+                    List<Pair<Property<?>, Comparable<?>>> withAdded = Lists.newArrayList(baseList);
+                    withAdded.add(Pair.of(property, value));
+                    return withAdded;
+                }));
+            }
+            stream.forEach(l -> {
+                Map<Property<?>, Comparable<?>> entry = l.stream().collect(Collectors.toMap(
+                        Pair::getFirst,
+                        Pair::getSecond
+                ));
+                values.put(entry, entry);
+            });
+            this.values = values.build();
+            map = new FastMap<>(properties, this.values, compact);
+        }
+
+        private void testBasic() {
+            for (Map<Property<?>, Comparable<?>> e : values.keySet()) {
+                int index = map.getIndexOf(e);
+                FastMapStateHolder<Map<Property<?>, Comparable<?>>> holder = new MockFMStateHolder<>(map, index);
+                Map<Property<?>, Comparable<?>> map = FastImmutableMapDefiner.makeMap(holder);
+                Assertions.assertEquals(new HashMap<>(e), new HashMap<>(map));
+            }
+        }
+
+        private void testWith() {
+            for (Map<Property<?>, Comparable<?>> baseMap : values.keySet()) {
+                final int baseIndex = map.getIndexOf(baseMap);
+                for (Property<?> toSwap : baseMap.keySet()) {
+                    testSwaps(baseIndex, toSwap, baseMap);
+                }
+            }
+        }
+
+        private <T extends Comparable<T>>
+        void testSwaps(int baseIndex, Property<T> toSwap, Map<Property<?>, Comparable<?>> baseMap) {
+            Map<Property<?>, Comparable<?>> expected = new HashMap<>(baseMap);
+            for (T newValue : toSwap.getAllowedValues()) {
+                Map<Property<?>, Comparable<?>> newMap = map.with(baseIndex, toSwap, newValue);
+                expected.put(toSwap, newValue);
+                Assertions.assertEquals(expected, newMap);
+            }
+        }
+    }
+}

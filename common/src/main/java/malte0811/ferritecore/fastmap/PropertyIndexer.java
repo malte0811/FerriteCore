@@ -12,10 +12,7 @@ import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class PropertyIndexer<T extends Comparable<T>> {
     private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenHashMap<>();
@@ -31,7 +28,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
                     result = new BoolIndexer((BooleanProperty) propInner);
                 } else if (propInner instanceof IntegerProperty) {
                     result = new IntIndexer((IntegerProperty) propInner);
-                } else if (propInner == BlockStateProperties.FACING) {
+                } else if (WeirdVanillaDirectionIndexer.isApplicable(propInner)) {
                     result = new WeirdVanillaDirectionIndexer();
                 } else if (propInner instanceof EnumProperty<?>) {
                     result = new EnumIndexer<>((EnumProperty<?>) propInner);
@@ -150,6 +147,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         public WeirdVanillaDirectionIndexer() {
             super(BlockStateProperties.FACING);
             Preconditions.checkState(isValid());
+        }
+
+        static boolean isApplicable(Property<?> prop) {
+            Collection<?> values = prop.getAllowedValues();
+            if (values.size() != ORDER.length) {
+                return false;
+            }
+            return Arrays.equals(ORDER, values.toArray());
         }
 
         @Override

@@ -15,13 +15,20 @@ public class FastMap<Value> {
     // would likely be more effort than it's worth
     private final Map<Property<?>, Integer> toKeyIndex;
 
-    public FastMap(Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap) {
+    public FastMap(
+            Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap, boolean compact
+    ) {
         List<FastMapKey<?>> keys = new ArrayList<>(properties.size());
         int factorUpTo = 1;
         ImmutableMap.Builder<Property<?>, Integer> toKeyIndex = ImmutableMap.builder();
         for (Property<?> prop : properties) {
             toKeyIndex.put(prop, keys.size());
-            FastMapKey<?> nextKey = new CompactFastMapKey<>(prop, factorUpTo);
+            FastMapKey<?> nextKey;
+            if (compact) {
+                nextKey = new CompactFastMapKey<>(prop, factorUpTo);
+            } else {
+                nextKey = new BinaryFastMapKey<>(prop, factorUpTo);
+            }
             keys.add(nextKey);
             factorUpTo *= nextKey.getFactorToNext();
         }
@@ -35,7 +42,7 @@ public class FastMap<Value> {
         for (Map.Entry<Map<Property<?>, Comparable<?>>, Value> state : valuesMap.entrySet()) {
             valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
-        this.valueMatrix = ImmutableList.copyOf(valuesList);
+        this.valueMatrix = Collections.unmodifiableList(valuesList);
     }
 
     @Nullable
