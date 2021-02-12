@@ -12,12 +12,14 @@ import net.minecraft.state.*;
 import net.minecraft.util.Direction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,12 +31,53 @@ public class FastMapTest {
 
     @TestFactory
     public Stream<DynamicTest> basicMapping() {
-        return BOOLS.stream().map(b -> DynamicTest.dynamicTest("Compact: " + b, new TestData(b)::testBasic));
+        return forEachType(TestData::testBasic);
     }
 
     @TestFactory
     public Stream<DynamicTest> testWith() {
-        return BOOLS.stream().map(b -> DynamicTest.dynamicTest("Compact: " + b, new TestData(b)::testWith));
+        return forEachType(TestData::testWith);
+    }
+
+    private Stream<DynamicTest> forEachType(Consumer<TestData> test) {
+        return BOOLS.stream().map(
+                b -> DynamicTest.dynamicTest("Compact: " + b, () -> test.accept(new TestData(b)))
+        );
+    }
+
+    private void assertBinaryKeySize(int numElements, int expectedFactor) {
+        Property<?> temp = IntegerProperty.create("", 1, numElements);
+        BinaryFastMapKey<?> key = new BinaryFastMapKey<>(temp, 1);
+        Assertions.assertEquals(expectedFactor, key.getFactorToNext());
+    }
+
+    @Test
+    public void testBinaryKeySizes() {
+        assertBinaryKeySize(2, 2);
+        assertBinaryKeySize(16, 16);
+        assertBinaryKeySize(15, 16);
+        assertBinaryKeySize(17, 32);
+    }
+
+    @Test
+    public void testOversizedBinaryKey() {
+        new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 30);
+        Assertions.assertThrows(
+                IllegalStateException.class,
+                () -> new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 31)
+        );
+    }
+
+    @Test
+    public void testBinaryKey32Bits() {
+        int factor = 1;
+        for (int i = 0; i < 32; ++i) {
+            BinaryFastMapKey<Boolean> k = new BinaryFastMapKey<>(BOOL, factor);
+            Assertions.assertEquals(true, k.getValue(factor >>> 2));
+            Assertions.assertEquals(false, k.getValue(factor));
+            Assertions.assertEquals(true, k.getValue(factor << 2));
+            factor *= k.getFactorToNext();
+        }
     }
 
     private static class TestData {

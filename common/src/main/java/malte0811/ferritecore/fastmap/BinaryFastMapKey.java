@@ -16,8 +16,7 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
         Preconditions.checkState(addedFactor < 2 * numValues());
         final int setBitInBaseFactor = MathHelper.log2(mapFactor);
         final int setBitInAddedFactor = MathHelper.log2(addedFactor);
-        //TODO off-by-one errors?
-        Preconditions.checkState(setBitInBaseFactor + setBitInAddedFactor < 32);
+        Preconditions.checkState(setBitInBaseFactor + setBitInAddedFactor <= 32);
         firstBitInValue = (byte) setBitInBaseFactor;
         firstBitAfterValue = (byte) (setBitInBaseFactor + setBitInAddedFactor);
     }
@@ -45,6 +44,10 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     }
 
     private int lowestNBits(byte n) {
-        return (1 << n) - 1;
+        if (n >= Integer.SIZE) {
+            return -1;
+        } else {
+            return (1 << n) - 1;
+        }
     }
 }
