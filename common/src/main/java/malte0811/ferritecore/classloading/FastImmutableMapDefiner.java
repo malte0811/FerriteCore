@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.state.Property;
 import net.minecraft.util.LazyValue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -16,15 +18,34 @@ import java.util.function.BiFunction;
 import java.util.function.ToIntFunction;
 
 public class FastImmutableMapDefiner {
-    private static final LazyValue<Method> DEFINE_CLASS = new LazyValue<>(() -> {
+    private static final Logger LOGGER = LogManager.getLogger("FerriteCore - class definer");
+    private static final LazyValue<Definer> DEFINE_CLASS = new LazyValue<>(() -> {
         try {
-            Method defineClass = ClassLoader.class.getDeclaredMethod(
-                    "defineClass", String.class, byte[].class, int.class, int.class
+            // Try to create a Java 9+ style class definer
+            // These are all public methods, but just don't exist in Java 8
+            Method makePrivateLookup = MethodHandles.class.getMethod(
+                    "privateLookupIn",
+                    Class.class,
+                    MethodHandles.Lookup.class
             );
-            defineClass.setAccessible(true);
-            return defineClass;
+            Object privateLookup = makePrivateLookup.invoke(null, ImmutableMap.class, MethodHandles.lookup());
+            Method defineClass = MethodHandles.Lookup.class.getMethod("defineClass", byte[].class);
+            LOGGER.info("Using Java 9+ class definer");
+            return (bytes, name) -> (Class<?>) defineClass.invoke(privateLookup, (Object) bytes);
         } catch (Exception x) {
-            throw new RuntimeException(x);
+            try {
+                // If that fails, try a Java 8 style definer
+                Method defineClass = ClassLoader.class.getDeclaredMethod(
+                        "defineClass", String.class, byte[].class, int.class, int.class
+                );
+                defineClass.setAccessible(true);
+                ClassLoader loader = ImmutableMap.class.getClassLoader();
+                LOGGER.info("Using Java 8 class definer");
+                return (bytes, name) -> (Class<?>) defineClass.invoke(loader, name, bytes, 0, bytes.length);
+            } catch (NoSuchMethodException e) {
+                // Fail if neither works
+                throw new RuntimeException(e);
+            }
         }
     });
     private static final LazyValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyValue<>(() -> {
@@ -68,13 +89,16 @@ public class FastImmutableMapDefiner {
 
     private static Class<?> define(String name) throws Exception {
         ClassLoader loaderToUse = ImmutableMap.class.getClassLoader();
-        InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream('/' + name.replace(
-                '.',
-                '/'
-        ) + ".class");
+        InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream(
+                '/' + name.replace('.', '/') + ".class"
+        );
         byte[] classBytes = new byte[byteInput.available()];
         final int bytesRead = byteInput.read(classBytes);
         Preconditions.checkState(bytesRead == classBytes.length);
-        return (Class<?>) DEFINE_CLASS.getValue().invoke(loaderToUse, name, classBytes, 0, classBytes.length);
+        return DEFINE_CLASS.getValue().define(classBytes, name);
+    }
+
+    private interface Definer {
+        Class<?> define(byte[] bytes, String name) throws Exception;
     }
 }
