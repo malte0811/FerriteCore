@@ -16,6 +16,7 @@ public class FerriteConfig {
     public static final Option DEDUP_MULTIPART;
     public static final Option DEDUP_BLOCKSTATE_CACHE;
     public static final Option DEDUP_QUADS;
+    public static final Option COMPACT_FAST_MAP;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -48,6 +49,10 @@ public class FerriteConfig {
                 "bakedQuadDeduplication",
                 "Deduplicate vertex data of baked quads in the basic model implementations"
         );
+        COMPACT_FAST_MAP = builder.createOptInOption(
+                "compactFastMap",
+                "Use a more compact, but slightly slower representation for block states"
+        );
         builder.finish();
     }
 
@@ -55,7 +60,13 @@ public class FerriteConfig {
         private final List<Option> options = new ArrayList<>();
 
         public Option createOption(String name, String comment, Option... dependencies) {
-            Option result = new Option(name, comment, dependencies);
+            Option result = new Option(name, comment, true, dependencies);
+            options.add(result);
+            return result;
+        }
+
+        public Option createOptInOption(String name, String comment, Option... dependencies) {
+            Option result = new Option(name, comment, false, dependencies);
             options.add(result);
             return result;
         }
@@ -74,13 +85,15 @@ public class FerriteConfig {
     public static class Option {
         private final String name;
         private final String comment;
+        private final boolean defaultValue;
         private final List<Option> dependencies;
         @Nullable
         private Boolean value;
 
-        public Option(String name, String comment, Option... dependencies) {
+        public Option(String name, String comment, boolean defaultValue, Option... dependencies) {
             this.name = name;
             this.comment = comment;
+            this.defaultValue = defaultValue;
             this.dependencies = Arrays.asList(dependencies);
         }
 
@@ -109,6 +122,10 @@ public class FerriteConfig {
 
         public boolean isEnabled() {
             return Objects.requireNonNull(value);
+        }
+
+        public boolean getDefaultValue() {
+            return defaultValue;
         }
     }
 }

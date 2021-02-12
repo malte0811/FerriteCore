@@ -2,7 +2,6 @@ package malte0811.ferritecore.mixin.config;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.ParsingException;
 import malte0811.ferritecore.ModMain;
 import malte0811.ferritecore.mixin.config.FerriteConfig.Option;
 
@@ -15,7 +14,7 @@ public class ConfigFileHandler {
     public static void finish(List<Option> options) {
         ConfigSpec spec = new ConfigSpec();
         for (Option o : options) {
-            spec.define(o.getName(), true);
+            spec.define(o.getName(), o.getDefaultValue());
         }
         CommentedFileConfig configData = read(Paths.get("config", ModMain.MODID+"-mixin.toml"));
         for (Option o : options) {

@@ -28,7 +28,7 @@ public class ConfigFileHandler {
         Object2BooleanMap<String> actualOptions = new Object2BooleanOpenHashMap<>();
         // Write data back manually, we can't put comments on individual values using Properties
         for (FerriteConfig.Option o : options) {
-            final boolean value = existingOptions.getOrDefault(o.getName(), true);
+            final boolean value = existingOptions.getOrDefault(o.getName(), o.getDefaultValue());
             actualOptions.put(o.getName(), value);
             newLines.add("# " + o.getComment());
             newLines.add(o.getName() + " = " + value);
