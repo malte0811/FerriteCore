@@ -51,7 +51,7 @@ public class FerriteConfig {
         );
         COMPACT_FAST_MAP = builder.createOptInOption(
                 "compactFastMap",
-                "Use a more compact, but slightly slower representation for block states"
+                "Use a slightly more compact, but also slightly slower representation for block states"
         );
         builder.finish();
     }

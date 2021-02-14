@@ -26,6 +26,24 @@ subprojects {
         silentMojangMappingsLicense()
         mixinConfigs += fcMixinConfigs
     }
+
+    task signJar(description: "Sign jar") {
+        doLast {
+            if (project.hasProperty('keyStore')) {
+                def path = remapJar.archivePath
+                logger.info("Signing " + path + "\n")
+                ant.signjar(jar: path,
+                        alias: project.storeAlias,
+                        keystore: project.keyStore,
+                        storepass: project.storePass,
+                        keypass: project.storePass
+                )
+            } else {
+                logger.warn("No key store found, not signing the output jar\n")
+            }
+        }
+    }
+    build.dependsOn signJar
 }
 
 allprojects {
