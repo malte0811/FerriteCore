@@ -18,14 +18,40 @@ public class PredicateHelper {
         for (ICondition cond : conditions) {
             list.add(cond.getPredicate(stateContainer));
         }
-        return canonize(list);
+        canonize(list);
+        return list;
     }
 
-    public static <T> List<Predicate<T>> canonize(List<Predicate<T>> input) {
+    /**
+     * Sorts the given list by hashcode. This means that passing in different permutations of the same predicates will
+     * usually result in the same list (ignoring hash collisions).
+     */
+    public static <T> void canonize(List<Predicate<T>> input) {
         input.sort(Comparator.comparingInt(Predicate::hashCode));
         if (input instanceof ArrayList) {
             ((ArrayList<Predicate<T>>) input).trimToSize();
         }
-        return input;
+    }
+
+    public static <T> Predicate<T> and(List<Predicate<T>> list) {
+        return state -> {
+            for (Predicate<T> predicate : list) {
+                if (!predicate.test(state)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
+    public static <T> Predicate<T> or(List<Predicate<T>> list) {
+        return state -> {
+            for (Predicate<T> predicate : list) {
+                if (predicate.test(state)) {
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 }

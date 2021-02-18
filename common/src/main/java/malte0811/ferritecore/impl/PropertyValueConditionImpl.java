@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 public class PropertyValueConditionImpl {
     private static final Map<Pair<Property<?>, Comparable<?>>, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE = new ConcurrentHashMap<>();
 
+    /**
+     * A copy of {@link net.minecraft.client.renderer.model.multipart.PropertyValueCondition#getPredicate(StateContainer)}
+     * since targeting the correct line is near impossible
+     */
     public static Predicate<BlockState> getPredicate(
             StateContainer<Block, BlockState> stateContainer, String key, String value, Splitter splitter
     ) {
@@ -49,7 +53,8 @@ public class PropertyValueConditionImpl {
                             .collect(Collectors.toList());
                     // This line is the only functional change, but targeting it with anything but Overwrite appears to
                     // be impossible
-                    isMatchedState = Deduplicator.or(PredicateHelper.canonize(subPredicates));
+                    PredicateHelper.canonize(subPredicates);
+                    isMatchedState = Deduplicator.or(subPredicates);
                 }
 
                 return invert ? isMatchedState.negate() : isMatchedState;

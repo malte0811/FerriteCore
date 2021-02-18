@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Unit;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.hash.LambdaBasedHash;
 import malte0811.ferritecore.mixin.dedupbakedquad.BakedQuadAccess;
+import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -41,17 +42,11 @@ public class Deduplicator {
     }
 
     public static Predicate<BlockState> or(List<Predicate<BlockState>> list) {
-        return OR_PREDICATE_CACHE.computeIfAbsent(
-                list,
-                listInt -> state -> listInt.stream().anyMatch((predicate) -> predicate.test(state))
-        );
+        return OR_PREDICATE_CACHE.computeIfAbsent(list, PredicateHelper::or);
     }
 
     public static Predicate<BlockState> and(List<Predicate<BlockState>> list) {
-        return AND_PREDICATE_CACHE.computeIfAbsent(
-                list,
-                listInt -> state -> listInt.stream().allMatch((predicate) -> predicate.test(state))
-        );
+        return AND_PREDICATE_CACHE.computeIfAbsent(list, PredicateHelper::and);
     }
 
     public static void deduplicate(BakedQuad bq) {

@@ -43,6 +43,11 @@ public class BlockStateCacheImpl {
         projectCalls = 0;
     }
 
+    /**
+     * Returns an interned/deduplicated version of the voxel shape returned by
+     * {@link AbstractBlock#getCollisionShape(BlockState, IBlockReader, BlockPos, ISelectionContext)}
+     * and replaces the internals of the original returned shape (see {@link BlockStateCacheImpl#replaceInternals(VoxelShapeArray, VoxelShapeArray)})
+     */
     public static VoxelShape redirectGetCollisionShape(
             AbstractBlock block, BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context
     ) {
@@ -57,6 +62,10 @@ public class BlockStateCacheImpl {
         return resultArray;
     }
 
+    /**
+     * Returns the interned/deduplicated "face shape" of the given shape, and replaces the internals of the original
+     * shape if necessary/appropriate
+     */
     public static VoxelShape redirectFaceShape(VoxelShape shape, Direction face) {
         ++projectCalls;
         Pair<VoxelShape, VoxelShape[]> sides = CACHE_PROJECT.get(shape);

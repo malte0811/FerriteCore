@@ -2,7 +2,7 @@ package malte0811.ferritecore.mixin.config;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import malte0811.ferritecore.ModMain;
+import malte0811.ferritecore.util.Constants;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +15,7 @@ import java.util.Properties;
 public class ConfigFileHandler {
     // Called reflectively from FerriteConfig
     public static void finish(List<FerriteConfig.Option> options) throws IOException {
-        Path config = Paths.get("config", ModMain.MODID + ".mixin.properties");
+        Path config = Paths.get("config", Constants.MODID + ".mixin.properties");
         if (!Files.exists(config))
             Files.createFile(config);
         Properties propsInFile = new Properties();

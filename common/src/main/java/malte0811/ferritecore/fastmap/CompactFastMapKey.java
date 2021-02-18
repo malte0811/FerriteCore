@@ -2,6 +2,9 @@ package malte0811.ferritecore.fastmap;
 
 import net.minecraft.state.Property;
 
+/**
+ * A "compact" implementation of a FastMapKey, i.e. one which completely fills the value matrix
+ */
 public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     private final int mapFactor;
 
@@ -22,7 +25,7 @@ public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
         final int upperFactor = mapFactor * numValues();
         final int upperData = mapIndex - mapIndex % upperFactor;
         int internalIndex = getInternalIndex(newValue);
-        if (internalIndex < 0) {
+        if (internalIndex < 0 || internalIndex >= numValues()) {
             return -1;
         } else {
             return lowerData + mapFactor * internalIndex + upperData;

@@ -6,6 +6,12 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 
 import java.util.function.Function;
 
+/**
+ * A cache which checks if the last accessed value is being accessed again before checking the main map
+ *
+ * @param <K> Key type
+ * @param <V> Value type
+ */
 public class LastAccessedCache<K, V> {
     private final Object2ObjectOpenCustomHashMap<K, V> mainMap;
     private final Function<K, V> createValue;

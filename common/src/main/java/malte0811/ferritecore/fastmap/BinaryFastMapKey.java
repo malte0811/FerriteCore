@@ -4,6 +4,10 @@ import com.google.common.base.Preconditions;
 import net.minecraft.state.Property;
 import net.minecraft.util.math.MathHelper;
 
+/**
+ * A bitmask-based implementation of a FastMapKey. This reduces the density of data in the value matrix, but allows
+ * accessing values with only some bitwise operations, which are much faster than integer division
+ */
 public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     private final byte firstBitInValue;
     private final byte firstBitAfterValue;
@@ -16,7 +20,7 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
         Preconditions.checkState(addedFactor < 2 * numValues());
         final int setBitInBaseFactor = MathHelper.log2(mapFactor);
         final int setBitInAddedFactor = MathHelper.log2(addedFactor);
-        Preconditions.checkState(setBitInBaseFactor + setBitInAddedFactor <= 32);
+        Preconditions.checkState(setBitInBaseFactor + setBitInAddedFactor <= 31);
         firstBitInValue = (byte) setBitInBaseFactor;
         firstBitAfterValue = (byte) (setBitInBaseFactor + setBitInAddedFactor);
     }

@@ -7,6 +7,9 @@ import net.minecraft.state.Property;
 import javax.annotation.Nullable;
 import java.util.*;
 
+/**
+ * Maps a Property->Value assignment to a value, while allowing fast access to "neighbor" states
+ */
 public class FastMap<Value> {
     private final List<FastMapKey<?>> keys;
     private final List<Value> valueMatrix;
@@ -45,20 +48,31 @@ public class FastMap<Value> {
         this.valueMatrix = Collections.unmodifiableList(valuesList);
     }
 
+    /**
+     * Computes the value for a neighbor state
+     *
+     * @param oldIndex The original state index
+     * @param prop     The property to be replaced
+     * @param value    The new value of this property
+     * @return The value corresponding to the specified neighbor, or null if value is not a valid value for prop
+     */
     @Nullable
     public <T extends Comparable<T>>
-    Value with(int last, Property<T> prop, T value) {
+    Value with(int oldIndex, Property<T> prop, T value) {
         final FastMapKey<T> keyToChange = getKeyFor(prop);
         if (keyToChange == null) {
             return null;
         }
-        int newIndex = keyToChange.replaceIn(last, value);
+        int newIndex = keyToChange.replaceIn(oldIndex, value);
         if (newIndex < 0) {
             return null;
         }
         return valueMatrix.get(newIndex);
     }
 
+    /**
+     * @return The map index corresponding to the given property-value assignment
+     */
     public int getIndexOf(Map<Property<?>, Comparable<?>> state) {
         int id = 0;
         for (FastMapKey<?> k : keys) {
@@ -67,6 +81,13 @@ public class FastMap<Value> {
         return id;
     }
 
+    /**
+     * Returns the value assigned to a property at a given map index
+     *
+     * @param stateIndex The map index for the assignment to check
+     * @param property   The property to retrieve
+     * @return The value of the property or null if the state if not present
+     */
     @Nullable
     public <T extends Comparable<T>>
     T getValue(int stateIndex, Property<T> property) {
@@ -77,15 +98,25 @@ public class FastMap<Value> {
         return propId.getValue(stateIndex);
     }
 
+    /**
+     * Returns the given property and its value in the given state
+     *
+     * @param propertyIndex The index of the property to retrieve
+     * @param stateIndex    The index of the state to use for the value
+     */
     public Map.Entry<Property<?>, Comparable<?>> getEntry(int propertyIndex, int stateIndex) {
         return new AbstractMap.SimpleImmutableEntry<>(
                 getKey(propertyIndex).getProperty(), getKey(propertyIndex).getValue(stateIndex)
         );
     }
 
+    /**
+     * Same as {@link FastMap#with(int, Property, Comparable)}, but usable when the type of the value to set is not
+     * correctly typed
+     */
     public <T extends Comparable<T>>
-    Value withUnsafe(int globalTableIndex, Property<T> rowKey, Object columnKey) {
-        return with(globalTableIndex, rowKey, (T) columnKey);
+    Value withUnsafe(int globalTableIndex, Property<T> property, Object newValue) {
+        return with(globalTableIndex, property, (T) newValue);
     }
 
     public int numProperties() {

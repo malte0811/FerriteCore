@@ -12,8 +12,13 @@ import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
+/**
+ * Provides a way of converting between values of a property and indices in [0, #values). Most properties are covered
+ * by one of the (faster) specific implementations, all other properties use the {@link GenericIndexer}
+ */
 public abstract class PropertyIndexer<T extends Comparable<T>> {
     private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenHashMap<>();
 
@@ -56,10 +61,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         return numValues;
     }
 
+    @Nullable
     public abstract T byIndex(int index);
 
     public abstract int toIndex(T value);
 
+    /**
+     * Checks if this indexer is valid, i.e. iterates over the correct set of values in the correct order
+     */
     protected boolean isValid() {
         Collection<T> allowed = getProperty().getAllowedValues();
         int index = 0;
@@ -79,8 +88,16 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
+        @Nullable
         public Boolean byIndex(int index) {
-            return index == 1 ? Boolean.FALSE : Boolean.TRUE;
+            switch (index) {
+                case 0:
+                    return Boolean.TRUE;
+                case 1:
+                    return Boolean.FALSE;
+                default:
+                    return null;
+            }
         }
 
         @Override
@@ -98,8 +115,13 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
+        @Nullable
         public Integer byIndex(int index) {
-            return index + min;
+            if (index >= 0 && index < numValues()) {
+                return index + min;
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -124,8 +146,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
+        @Nullable
         public E byIndex(int index) {
-            return enumValues[index + ordinalOffset];
+            final int arrayIndex = index + ordinalOffset;
+            if (arrayIndex < enumValues.length) {
+                return enumValues[arrayIndex];
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -158,8 +186,13 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
+        @Nullable
         public Direction byIndex(int index) {
-            return ORDER[index];
+            if (index >= 0 && index < ORDER.length) {
+                return ORDER[index];
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -178,7 +211,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
                 case DOWN:
                     return 5;
             }
-            throw new IllegalArgumentException("Invalid direction: "+value);
+            return -1;
         }
     }
 
@@ -197,13 +230,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
+        @Nullable
         public T byIndex(int index) {
             return values.get(index);
         }
 
         @Override
         public int toIndex(T value) {
-            return toValueIndex.get(value);
+            return toValueIndex.getOrDefault(value, -1);
         }
     }
 }

@@ -61,20 +61,21 @@ public class FastMapTest {
 
     @Test
     public void testOversizedBinaryKey() {
-        new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 30);
+        new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 29);
         Assertions.assertThrows(
                 IllegalStateException.class,
-                () -> new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 31)
+                () -> new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 30)
         );
     }
 
     @Test
     public void testBinaryKey32Bits() {
         int factor = 1;
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < 31; ++i) {
             BinaryFastMapKey<Boolean> k = new BinaryFastMapKey<>(BOOL, factor);
-            Assertions.assertEquals(true, k.getValue(factor >>> 2));
+            Assertions.assertEquals(true, k.getValue(factor / 2));
             Assertions.assertEquals(false, k.getValue(factor));
+            Assertions.assertTrue(factor > 0);
             Assertions.assertEquals(true, k.getValue(factor << 2));
             factor *= k.getFactorToNext();
         }

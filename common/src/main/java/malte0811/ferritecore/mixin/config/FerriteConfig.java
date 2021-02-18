@@ -73,6 +73,7 @@ public class FerriteConfig {
 
         private void finish() {
             try {
+                // This runs too early for arch's ExpectPlatform, so reflection it is
                 Class<?> handler = Class.forName("malte0811.ferritecore.mixin.config.ConfigFileHandler");
                 Method finish = handler.getMethod("finish", List.class);
                 finish.invoke(null, options);
