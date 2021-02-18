@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     # TODO this should probably be a matrix build, but gradle needs arguments to calm down 16-ea that don't work on 8
     steps:
+      - uses: actions/checkout@v2
       - name: Set up JDK 8
         uses: actions/setup-java@v1
         with:
