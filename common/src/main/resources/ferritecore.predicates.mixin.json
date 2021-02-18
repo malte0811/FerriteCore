@@ -2,7 +2,6 @@
   "required": true,
   "package": "malte0811.ferritecore.mixin.predicates",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "ferritecore-common-refmap.json",
   "client": [
     "AndConditionMixin",
     "OrConditionMixin",

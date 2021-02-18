@@ -8,6 +8,7 @@ configurations {
 
 architectury {
     platformSetupLoomIde()
+    forge()
 }
 
 dependencies {
@@ -15,10 +16,10 @@ dependencies {
     mappings "de.oceanlabs.mcp:mcp_snapshot:20201028-1.16.3"
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
 
-    compileOnly(project(path: ":common")) {
+    implementation(project(path: ":common")) {
         transitive = false
     }
-    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentForge")) {
+    developmentForge(project(path: ":common")) {
         transitive = false
     }
     shadow(project(path: ":common", configuration: "transformProductionForge")) {

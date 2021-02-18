@@ -2,7 +2,6 @@
   "required": true,
   "package": "malte0811.ferritecore.mixin.mrl",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "ferritecore-common-refmap.json",
   "client": [
     "ModelResourceLocationMixin",
     "ResourceLocationAccess"
