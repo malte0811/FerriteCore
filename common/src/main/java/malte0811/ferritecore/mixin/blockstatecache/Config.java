@@ -10,8 +10,8 @@ public class Config extends FerriteMixinConfig {
     @Override
     protected List<String> getAllMixins() {
         return ImmutableList.of(
-                "BlockStateCacheMixin", "VoxelShapeAccess", "VSArrayAccess", "VSPBitSetAccess", "VSPSplitAccess",
-                "VSSplitAccess"
+                "AbstractBlockStateMixin", "BlockStateCacheAccess", "VoxelShapeAccess", "VSArrayAccess",
+                "VSPBitSetAccess", "VSPSplitAccess", "VSSplitAccess"
         );
     }
 

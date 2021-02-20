@@ -1,78 +1,125 @@
 package malte0811.ferritecore.impl;
 
-import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.hash.VoxelShapeArrayHash;
 import malte0811.ferritecore.hash.VoxelShapeHash;
+import malte0811.ferritecore.mixin.blockstatecache.BlockStateCacheAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
+import malte0811.ferritecore.mixin.blockstatecache.VSSplitAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
-import malte0811.ferritecore.util.LastAccessedCache;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
+import malte0811.ferritecore.util.Constants;
+import net.minecraft.util.LazyValue;
+import net.minecraft.util.math.shapes.SplitVoxelShape;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapeArray;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
+import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.function.Function;
 
+import static net.minecraft.block.AbstractBlock.AbstractBlockState;
+
 public class BlockStateCacheImpl {
-    private static final Direction[] DIRECTIONS = Direction.values();
-    public static final Object2ObjectOpenCustomHashMap<VoxelShapeArray, VoxelShapeArray> CACHE_COLLIDE =
-            new Object2ObjectOpenCustomHashMap<>(VoxelShapeArrayHash.INSTANCE);
-    public static final LastAccessedCache<VoxelShape, VoxelShape[]> CACHE_PROJECT = new LastAccessedCache<>(
-            VoxelShapeHash.INSTANCE, vs -> {
-        VoxelShape[] result = new VoxelShape[DIRECTIONS.length];
-        for (Direction d : DIRECTIONS) {
-            result[d.ordinal()] = VoxelShapes.getFaceShape(vs, d);
-        }
-        return result;
-    }
+    public static final Map<VoxelShapeArray, VoxelShapeArray> CACHE_COLLIDE = new Object2ObjectOpenCustomHashMap<>(
+            VoxelShapeArrayHash.INSTANCE
     );
-    public static int collideCalls = 0;
-    public static int projectCalls = 0;
+    // Maps a shape to the "canonical instance" of that shape and its side projections
+    public static final Map<VoxelShape, Pair<VoxelShape, VoxelShape[]>> CACHE_PROJECT =
+            new Object2ObjectOpenCustomHashMap<>(VoxelShapeHash.INSTANCE);
 
-    public static void resetCaches() {
-        CACHE_COLLIDE.clear();
-        CACHE_COLLIDE.trim();
-        collideCalls = 0;
-        CACHE_PROJECT.clear();
-        projectCalls = 0;
+    // Get the cache from a blockstate. Mixin does not handle private inner classes too well, so method handles and
+    // manual remapping it is
+    private static final LazyValue<Function<AbstractBlockState, BlockStateCacheAccess>> GET_CACHE =
+            new LazyValue<>(() -> {
+                try {
+                    Field cacheField = AbstractBlockState.class.getDeclaredField(Constants.blockstateCacheFieldName);
+                    cacheField.setAccessible(true);
+                    MethodHandle getter = MethodHandles.lookup().unreflectGetter(cacheField);
+                    return state -> {
+                        try {
+                            return (BlockStateCacheAccess) getter.invoke(state);
+                        } catch (Throwable throwable) {
+                            throw new RuntimeException(throwable);
+                        }
+                    };
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+    // Is set to the previous cache used by a state before updating the cache. If the new cache has shapes equivalent to
+    // the ones in the old cache, we don't need to go through the map since the old one already had deduplicated shapes
+    private static final ThreadLocal<BlockStateCacheAccess> LAST_CACHE = new ThreadLocal<>();
+
+    // Calls before the cache for <code>state</code> is (re-)populated
+    public static void deduplicateCachePre(AbstractBlockState state) {
+        LAST_CACHE.set(GET_CACHE.getValue().apply(state));
     }
 
-    /**
-     * Returns an interned/deduplicated version of the voxel shape returned by
-     * {@link AbstractBlock#getCollisionShape(BlockState, IBlockReader, BlockPos, ISelectionContext)}
-     * and replaces the internals of the original returned shape (see {@link BlockStateCacheImpl#replaceInternals(VoxelShapeArray, VoxelShapeArray)})
-     */
-    public static VoxelShape redirectGetCollisionShape(
-            AbstractBlock block, BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context
+    // Calls after the cache for <code>state</code> is (re-)populated
+    public static void deduplicateCachePost(AbstractBlockState state) {
+        BlockStateCacheAccess newCache = GET_CACHE.getValue().apply(state);
+        if (newCache != null) {
+            final BlockStateCacheAccess oldCache = LAST_CACHE.get();
+            deduplicateCollisionShape(newCache, oldCache);
+            deduplicateRenderShapes(newCache, oldCache);
+            LAST_CACHE.set(null);
+        }
+    }
+
+    private static void deduplicateCollisionShape(
+            BlockStateCacheAccess newCache, @Nullable BlockStateCacheAccess oldCache
     ) {
-        VoxelShape baseResult = block.getCollisionShape(state, worldIn, pos, context);
-        if (!(baseResult instanceof VoxelShapeArray)) {
-            return baseResult;
+        VoxelShape dedupedCollisionShape;
+        if (oldCache != null && VoxelShapeHash.INSTANCE.equals(
+                oldCache.getCollisionShape(), newCache.getCollisionShape()
+        )) {
+            dedupedCollisionShape = oldCache.getCollisionShape();
+        } else {
+            dedupedCollisionShape = newCache.getCollisionShape();
+            if (dedupedCollisionShape instanceof VoxelShapeArray) {
+                dedupedCollisionShape = CACHE_COLLIDE.computeIfAbsent(
+                        (VoxelShapeArray) dedupedCollisionShape, Function.identity()
+                );
+            }
         }
-        VoxelShapeArray baseArray = (VoxelShapeArray) baseResult;
-        ++collideCalls;
-        VoxelShapeArray resultArray = CACHE_COLLIDE.computeIfAbsent(baseArray, Function.identity());
-        replaceInternals(resultArray, baseArray);
-        return resultArray;
+        replaceInternals(dedupedCollisionShape, newCache.getCollisionShape());
+        newCache.setCollisionShape(dedupedCollisionShape);
     }
 
-    /**
-     * Returns the interned/deduplicated "face shape" of the given shape, and replaces the internals of the original
-     * shape if necessary/appropriate
-     */
-    public static VoxelShape redirectFaceShape(VoxelShape shape, Direction face) {
-        ++projectCalls;
-        Pair<VoxelShape, VoxelShape[]> sides = CACHE_PROJECT.get(shape);
-        if (sides.getFirst() instanceof VoxelShapeArray && shape instanceof VoxelShapeArray) {
-            replaceInternals((VoxelShapeArray) sides.getFirst(), (VoxelShapeArray) shape);
+    private static void deduplicateRenderShapes(
+            BlockStateCacheAccess newCache, @Nullable BlockStateCacheAccess oldCache
+    ) {
+        final VoxelShape newRenderShape = getRenderShape(newCache.getRenderShapes());
+        if (newRenderShape == null) {
+            return;
         }
-        return sides.getSecond()[face.ordinal()];
+        Pair<VoxelShape, VoxelShape[]> dedupedRenderShapes = null;
+        if (oldCache != null) {
+            final VoxelShape oldRenderShape = getRenderShape(oldCache.getRenderShapes());
+            if (VoxelShapeHash.INSTANCE.equals(newRenderShape, oldRenderShape)) {
+                dedupedRenderShapes = Pair.of(oldRenderShape, oldCache.getRenderShapes());
+            }
+        }
+        if (dedupedRenderShapes == null) {
+            // Who thought that this was a good interface for putIfAbsent…
+            Pair<VoxelShape, VoxelShape[]> newPair = Pair.of(newRenderShape, newCache.getRenderShapes());
+            dedupedRenderShapes = CACHE_PROJECT.putIfAbsent(newRenderShape, newPair);
+            if (dedupedRenderShapes == null) {
+                dedupedRenderShapes = newPair;
+            }
+        }
+        replaceInternals(dedupedRenderShapes.getLeft(), newRenderShape);
+        newCache.setRenderShapes(dedupedRenderShapes.getRight());
+    }
+
+    private static void replaceInternals(VoxelShape toKeep, VoxelShape toReplace) {
+        if (toKeep instanceof VoxelShapeArray && toReplace instanceof VoxelShapeArray) {
+            replaceInternals((VoxelShapeArray) toKeep, (VoxelShapeArray) toReplace);
+        }
     }
 
     public static void replaceInternals(VoxelShapeArray toKeep, VoxelShapeArray toReplace) {
@@ -99,5 +146,17 @@ public class BlockStateCacheImpl {
 
     private static VoxelShapeAccess accessVS(VoxelShape a) {
         return (VoxelShapeAccess) a;
+    }
+
+    @Nullable
+    private static VoxelShape getRenderShape(@Nullable VoxelShape[] projected) {
+        if (projected != null) {
+            for (VoxelShape side : projected) {
+                if (side instanceof SplitVoxelShape) {
+                    return ((VSSplitAccess) side).getShape();
+                }
+            }
+        }
+        return null;
     }
 }

@@ -9,7 +9,11 @@
   ],
   "license": "MIT",
   "environment": "*",
-  "entrypoints": {},
+  "entrypoints": {
+    "main": [
+      "malte0811.ferritecore.ModMain"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric": "*",
