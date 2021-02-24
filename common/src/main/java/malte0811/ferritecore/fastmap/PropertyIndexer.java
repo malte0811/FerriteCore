@@ -8,7 +8,6 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 
@@ -34,7 +33,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
                 } else if (propInner instanceof IntegerProperty) {
                     result = new IntIndexer((IntegerProperty) propInner);
                 } else if (WeirdVanillaDirectionIndexer.isApplicable(propInner)) {
-                    result = new WeirdVanillaDirectionIndexer();
+                    result = new WeirdVanillaDirectionIndexer((Property<Direction>) propInner);
                 } else if (propInner instanceof EnumProperty<?>) {
                     result = new EnumIndexer<>((EnumProperty<?>) propInner);
                 }
@@ -172,8 +171,8 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
                 Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN
         };
 
-        public WeirdVanillaDirectionIndexer() {
-            super(BlockStateProperties.FACING);
+        public WeirdVanillaDirectionIndexer(Property<Direction> prop) {
+            super(prop);
             Preconditions.checkState(isValid());
         }
 
