@@ -1,7 +1,8 @@
 This file tries to explain the changes done in FerriteCore, and how much memory they save. The saved memory for the
 first 4 points refers to a ForgeCraft 1 instance around 19th December 2020, after that to version 1.2.0 of the (smaller)
 1.16.4 Direwolf20 pack. This is mostly because FC 1 uses [ServerPackLocator](https://github.com/cpw/serverpacklocator/),
-which makes reproducible tests near-impossible (and means that I can't test when the server is down :smile:)
+which is great for rapid mod updates, but also makes reproducible tests near-impossible (and means that I can't test
+when the server is down :smile:)
 
 ### 1. Optionals in `PropertyValueCondition`
 
@@ -32,20 +33,21 @@ CPU impact: zero or negative (one less pointer to follow)
 Side: client  
 
 ### 2. BlockState neighbors
-To implement `StateHolder#with` (mostly seen as `BlockState#with`) a state needs to be
-able to quickly find its "neighbor states". In vanilla this is implemented using a
-`Table<Property<?>, Comparable<?>, S>` for each state. In total these tables use about 600
-MB of memory. Asymptotically (which is relevant for complex blocks in practice) the memory
-usage for a block is `O((number of states) * sum(number of values per property))`. By
-replacing these with one `FastMap` per block this can be reduced to `O(number of states)`,
-with a similar coefficient. A `FastMap` in this case is simply an `ArrayList` used as a
-multi-dimensional array. Finding a neighbor state can be done by a few integer modulo,
-multiplication and addition operations.
+
+To implement `StateHolder#with` (mostly seen as `BlockState#with`) a state needs to be able to quickly find its "
+neighbor states". In vanilla this is implemented using a
+`Table<Property<?>, Comparable<?>, S>` for each state. In total these tables use about 600 MB of memory.
+Asymptotically (which is relevant for complex blocks in practice) the memory usage for a block
+is `O((number of states) * sum(number of values per property))`. By replacing these with one `FastMap` per block this
+can be reduced to `O(number of states)`, with a similar coefficient. A `FastMap` in this case is simply an `ArrayList`
+used as a multi-dimensional array. Finding a neighbor state can be done by a few integer modulo, multiplication and
+addition operations. Alternatively it can be implemented using bitmasks, for slightly improved performance at slightly
+higher memory usage (this is the default starting in version 2.0).
 
 Saved memory: Around 600 MB (the `FastMap`s are around 7 MB total)  
 CPU impact: hard to prove, but most likely near zero  
 Side: both  
-Mixin subpackage: `fastmap`  
+Mixin subpackage: `fastmap`
 
 ### 3. BlockState property storage
 Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`, which takes around 170 MB in
@@ -114,7 +116,9 @@ mostly just because there are a lot of blockstates. Many blocks have the same sh
 instances can be reused. There is an additional problem with this: Many mods cache their own render/collision shapes
 internally, even if they're cached by the vanilla cache. This can be worked around by replacing the "internals" of the
 voxel shape returned by the block with the internals of the "canonical" instance of that shape. Vanilla assumes that
-shapes are immutable once created, so this should be safe.
+shapes are immutable once created, so this should be safe. To slightly reduce the impact while joining the code first
+checks if the state already had an initialized cache and reuses shapes from that cache if they match. This saves a map
+lookup for virtually all states.
 
 Saved memory: Around 200 MB  
 CPU impact: Some during loading and joining (<1 second with the DW20 pack), none afterwards  
@@ -123,7 +127,7 @@ Mixin subpackage: `blockstatecache`
 
 ### 8. Quad deduplication
 
-Baked quads (especially their `int[]`s storing vertex data) account for around 340 MB in total, a lot of which is just
+Baked quads (especially their `int[]`s storing vertex data) account for around 340 MB in total, a lot of which is simply
 necessary to store the models. But it is also common for multiple quads to have the same data. Using the same `int[]`
 instance for quads with the same data reduces the amount of memory used by quads to around 195 MB. This is not
 technically 100% safe to do, since the `int[]` can theoretically be modified at any time. Only applying the optimization
