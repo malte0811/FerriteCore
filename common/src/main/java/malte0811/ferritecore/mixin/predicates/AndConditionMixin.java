@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.function.Predicate;
 
-@Mixin(AndCondition.class)
+@Mixin(value = AndCondition.class, priority = 2000)
 public class AndConditionMixin {
     @Shadow
     @Final

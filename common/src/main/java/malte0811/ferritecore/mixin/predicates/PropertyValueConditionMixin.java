@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.function.Predicate;
 
-@Mixin(PropertyValueCondition.class)
+@Mixin(value = PropertyValueCondition.class, priority = 2000)
 public class PropertyValueConditionMixin {
     @Shadow
     @Final

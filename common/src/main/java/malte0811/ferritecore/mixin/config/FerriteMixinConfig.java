@@ -6,38 +6,41 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.mixin.transformer.ClassInfo;
 
 import java.util.List;
 import java.util.Set;
 
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     private static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
+    private static final boolean HAS_HYDROGEN = ClassInfo.forName("me.jellysquid.mods.hydrogen.common.HydrogenMod") != null;
     private String prefix = null;
-    private List<String> providedMixins;
+    private final FerriteConfig.Option enableOption;
+    private final boolean disableWithHydrogen;
+
+    protected FerriteMixinConfig(FerriteConfig.Option enableOption, boolean disableWithHydrogen) {
+        this.enableOption = enableOption;
+        this.disableWithHydrogen = disableWithHydrogen;
+    }
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         Preconditions.checkState(mixinClassName.startsWith(prefix), "Unexpected prefix on " + mixinClassName);
         final String name = mixinClassName.substring(prefix.length());
-        Preconditions.checkState(
-                providedMixins.contains(name),
-                "Unexpected Mixin: " + name + " (" + mixinClassName + ")"
-        );
-        final boolean result = isEnabled(name);
-        if (!result) {
-            LOGGER.debug("Mixin " + mixinClassName + " is disabled by config");
+        if (!enableOption.isEnabled()) {
+            LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
+            return false;
+        } else if (HAS_HYDROGEN && disableWithHydrogen) {
+            LOGGER.warn("Mixin " + mixinClassName + " is disabled as Hydrogen is installed");
+            return false;
+        } else {
+            return true;
         }
-        return result;
     }
-
-    protected abstract List<String> getAllMixins();
-
-    protected abstract boolean isEnabled(String mixin);
 
     @Override
     public void onLoad(String mixinPackage) {
         prefix = mixinPackage + ".";
-        providedMixins = getAllMixins();
     }
 
     @Override

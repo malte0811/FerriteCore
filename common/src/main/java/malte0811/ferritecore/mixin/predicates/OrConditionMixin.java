@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.function.Predicate;
 
-@Mixin(OrCondition.class)
+@Mixin(value = OrCondition.class, priority = 2000)
 public class OrConditionMixin {
     @Shadow
     @Final
