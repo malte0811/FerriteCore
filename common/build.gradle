@@ -1,5 +1,16 @@
 apply plugin: 'java'
 
+sourceSets {
+    googleextension {
+        java
+    }
+    main {
+        java {
+            runtimeClasspath += googleextension.output
+        }
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
     mappings "de.oceanlabs.mcp:mcp_snapshot:20201028-1.16.3"
@@ -9,11 +20,17 @@ dependencies {
     modCompile "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
     testImplementation('org.junit.jupiter:junit-jupiter')
+    googleextensionCompileOnly('com.google.guava:guava:21.0')
+    googleextensionCompileOnly('org.jetbrains:annotations:19.0.0')
 }
 
 architectury {
     injectInjectables = false
     common()
+}
+
+jar {
+    from(sourceSets.googleextension.output)
 }
 
 test {

@@ -1,6 +1,5 @@
 package com.google.common.collect;
 
-import net.minecraft.state.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,9 +32,6 @@ public class FerriteCoreEntrySet<K> extends ImmutableSet<Map.Entry<K, Comparable
             return false;
         }
         Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
-        if (!(entry.getKey() instanceof Property<?>)) {
-            return false;
-        }
         Object valueInMap = FerriteCoreImmutableMap.getByStateAndKey.apply(viewedState, entry.getKey());
         return valueInMap != null && valueInMap.equals(((Map.Entry<?, ?>) object).getValue());
     }

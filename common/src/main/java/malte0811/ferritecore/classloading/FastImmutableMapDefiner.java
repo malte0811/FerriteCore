@@ -66,7 +66,11 @@ public class FastImmutableMapDefiner {
             map.getField("getByStateAndKey").set(
                     null, (BiFunction<Object, Object, Comparable<?>>) (o, key) -> {
                         FastMapStateHolder<?> stateHolder = (FastMapStateHolder<?>) o;
-                        return stateHolder.getStateMap().getValue(stateHolder.getStateIndex(), (Property<?>) key);
+                        if (key instanceof Property<?>) {
+                            return stateHolder.getStateMap().getValue(stateHolder.getStateIndex(), (Property<?>) key);
+                        } else {
+                            return null;
+                        }
                     }
             );
             map.getField("entryByStateAndIndex").set(
