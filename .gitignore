@@ -17,3 +17,7 @@ classes/
 .vscode
 .settings
 *.launch
+
+# For adding dependencies outside of the tracked files
+flatdir/
+custom.gradle

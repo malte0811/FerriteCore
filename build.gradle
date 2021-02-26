@@ -65,4 +65,9 @@ allprojects {
     java {
         withSourcesJar()
     }
+
+    def customGradle = project.file('custom.gradle');
+    if (customGradle.exists()) {
+        apply from: customGradle;
+    }
 }
