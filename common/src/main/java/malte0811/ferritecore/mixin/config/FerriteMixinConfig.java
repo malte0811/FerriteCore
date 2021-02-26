@@ -6,17 +6,31 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import org.spongepowered.asm.mixin.transformer.ClassInfo;
+import org.spongepowered.asm.service.MixinService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     private static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
-    private static final boolean HAS_HYDROGEN = ClassInfo.forName("me.jellysquid.mods.hydrogen.common.HydrogenMod") != null;
+    private static final boolean HAS_HYDROGEN;
     private String prefix = null;
     private final FerriteConfig.Option enableOption;
     private final boolean disableWithHydrogen;
+
+    static {
+        boolean hasHydrogen;
+        try {
+            // This does *not* load the class!
+            MixinService.getService().getBytecodeProvider().getClassNode(
+                    "me.jellysquid.mods.hydrogen.common.HydrogenMod");
+            hasHydrogen = true;
+        } catch (ClassNotFoundException | IOException e) {
+            hasHydrogen = false;
+        }
+        HAS_HYDROGEN = hasHydrogen;
+    }
 
     protected FerriteMixinConfig(FerriteConfig.Option enableOption, boolean disableWithHydrogen) {
         this.enableOption = enableOption;
