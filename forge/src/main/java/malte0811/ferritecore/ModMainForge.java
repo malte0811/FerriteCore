@@ -10,7 +10,6 @@ import net.minecraftforge.fml.network.FMLNetworkConstants;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Mod(Constants.MODID)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModMainForge {
 
     public ModMainForge() {

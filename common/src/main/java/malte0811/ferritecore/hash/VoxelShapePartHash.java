@@ -3,6 +3,7 @@ package malte0811.ferritecore.hash;
 import it.unimi.dsi.fastutil.Hash;
 import malte0811.ferritecore.mixin.blockstatecache.VSPBitSetAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSPSplitAccess;
+import malte0811.ferritecore.mixin.blockstatecache.VSPartAccess;
 import net.minecraft.util.math.shapes.BitSetVoxelShapePart;
 import net.minecraft.util.math.shapes.PartSplitVoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapePart;
@@ -14,9 +15,13 @@ public class VoxelShapePartHash implements Hash.Strategy<VoxelShapePart> {
 
     @Override
     public int hashCode(VoxelShapePart o) {
+        VSPartAccess generalAccess = (VSPartAccess) o;
+        int result = generalAccess.getXSize();
+        result = 31 * result + generalAccess.getYSize();
+        result = 31 * result + generalAccess.getZSize();
         if (o instanceof PartSplitVoxelShape) {
             VSPSplitAccess access = access((PartSplitVoxelShape) o);
-            int result = access.getStartX();
+            result = 31 * result + access.getStartX();
             result = 31 * result + access.getStartY();
             result = 31 * result + access.getStartZ();
             result = 31 * result + access.getEndX();
@@ -26,7 +31,7 @@ public class VoxelShapePartHash implements Hash.Strategy<VoxelShapePart> {
             return result;
         } else if (o instanceof BitSetVoxelShapePart) {
             VSPBitSetAccess access = access((BitSetVoxelShapePart) o);
-            int result = access.getStartX();
+            result = 31 * result + access.getStartX();
             result = 31 * result + access.getStartY();
             result = 31 * result + access.getStartZ();
             result = 31 * result + access.getEndX();
@@ -35,7 +40,7 @@ public class VoxelShapePartHash implements Hash.Strategy<VoxelShapePart> {
             result = 31 * result + Objects.hashCode(access.getBitSet());
             return result;
         } else {
-            return Objects.hashCode(o);
+            return 31 * result + Objects.hashCode(o);
         }
     }
 
@@ -47,7 +52,16 @@ public class VoxelShapePartHash implements Hash.Strategy<VoxelShapePart> {
             return false;
         } else if (a.getClass() != b.getClass()) {
             return false;
-        } else if (a instanceof PartSplitVoxelShape) {
+        }
+        VSPartAccess genAccessA = (VSPartAccess) a;
+        VSPartAccess genAccessB = (VSPartAccess) b;
+        if (genAccessA.getXSize() != genAccessB.getXSize() ||
+                genAccessA.getYSize() != genAccessB.getYSize() ||
+                genAccessA.getZSize() != genAccessB.getZSize()
+        ) {
+            return false;
+        }
+        if (a instanceof PartSplitVoxelShape) {
             VSPSplitAccess accessA = access((PartSplitVoxelShape) a);
             VSPSplitAccess accessB = access((PartSplitVoxelShape) b);
             return accessA.getEndX() == accessB.getEndX() &&
