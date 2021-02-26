@@ -9,6 +9,11 @@ sourceSets {
             runtimeClasspath += googleextension.output
         }
     }
+    test {
+        java {
+            runtimeClasspath += googleextension.output
+        }
+    }
 }
 
 dependencies {
