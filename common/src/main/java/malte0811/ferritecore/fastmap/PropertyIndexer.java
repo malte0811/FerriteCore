@@ -3,13 +3,14 @@ package malte0811.ferritecore.fastmap;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.Property;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.Util;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -19,7 +20,9 @@ import java.util.*;
  * by one of the (faster) specific implementations, all other properties use the {@link GenericIndexer}
  */
 public abstract class PropertyIndexer<T extends Comparable<T>> {
-    private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenHashMap<>();
+    private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenCustomHashMap<>(
+            Util.identityHashStrategy()
+    );
 
     private final Property<T> property;
     private final int numValues;
