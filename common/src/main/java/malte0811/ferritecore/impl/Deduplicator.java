@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Unit;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.hash.LambdaBasedHash;
 import malte0811.ferritecore.mixin.dedupbakedquad.BakedQuadAccess;
-import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -27,8 +26,8 @@ public class Deduplicator {
     private static final Map<String, String> VARIANT_IDENTITIES = new ConcurrentHashMap<>();
     // Typedefs would be a nice thing to have
     private static final Map<List<Pair<Predicate<BlockState>, IBakedModel>>, MultipartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
-    private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
-    private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
+    public static final PredicateCache<List<Predicate<BlockState>>> OR_PREDICATE_CACHE = new PredicateCache<>();
+    public static final PredicateCache<List<Predicate<BlockState>>> AND_PREDICATE_CACHE = new PredicateCache<>();
     private static final Object2ObjectOpenCustomHashMap<int[], int[]> BAKED_QUAD_CACHE = new Object2ObjectOpenCustomHashMap<>(
             new LambdaBasedHash<>(Arrays::hashCode, Arrays::equals)
     );
@@ -39,14 +38,6 @@ public class Deduplicator {
 
     public static MultipartBakedModel makeMultipartModel(List<Pair<Predicate<BlockState>, IBakedModel>> selectors) {
         return KNOWN_MULTIPART_MODELS.computeIfAbsent(selectors, MultipartBakedModel::new);
-    }
-
-    public static Predicate<BlockState> or(List<Predicate<BlockState>> list) {
-        return OR_PREDICATE_CACHE.computeIfAbsent(list, PredicateHelper::or);
-    }
-
-    public static Predicate<BlockState> and(List<Predicate<BlockState>> list) {
-        return AND_PREDICATE_CACHE.computeIfAbsent(list, PredicateHelper::and);
     }
 
     public static void deduplicate(BakedQuad bq) {

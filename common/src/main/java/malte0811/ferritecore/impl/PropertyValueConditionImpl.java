@@ -54,7 +54,7 @@ public class PropertyValueConditionImpl {
                     // This line is the only functional change, but targeting it with anything but Overwrite appears to
                     // be impossible
                     PredicateHelper.canonize(subPredicates);
-                    isMatchedState = Deduplicator.or(subPredicates);
+                    isMatchedState = Deduplicator.OR_PREDICATE_CACHE.get(subPredicates, PredicateHelper::or);
                 }
 
                 return invert ? isMatchedState.negate() : isMatchedState;
