@@ -61,6 +61,8 @@ public class Deduplicator {
                 KNOWN_MULTIPART_MODELS.clear();
                 OR_PREDICATE_CACHE.clear();
                 AND_PREDICATE_CACHE.clear();
+                PropertyValueConditionImpl.SINGLE_VALUE_CACHE.clear();
+                PropertyValueConditionImpl.FULL_PREDICATE_CACHE.clear();
                 BAKED_QUAD_CACHE.clear();
                 BAKED_QUAD_CACHE.trim();
             }
