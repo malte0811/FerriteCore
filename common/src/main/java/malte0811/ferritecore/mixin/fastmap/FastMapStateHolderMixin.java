@@ -7,19 +7,26 @@ import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.impl.StateHolderImpl;
 import net.minecraft.state.Property;
 import net.minecraft.state.StateHolder;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
 
-@Mixin(StateHolder.class)
+@Mixin(value = StateHolder.class, priority = 1100)
 public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolder<S> {
     @Mutable
     @Shadow
     @Final
     private ImmutableMap<Property<?>, Comparable<?>> properties;
 
+    @Shadow
+    private Table<Property<?>, Comparable<?>, S> field_235894_e_;
     private int globalTableIndex;
     private FastMap<S> globalTable;
 
@@ -35,14 +42,10 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
         return this.globalTable.withUnsafe(this.globalTableIndex, (Property<?>) rowKey, columnKey);
     }
 
-    /**
-     * @reason This Mixin completely replaces the data structures initialized by this method, as the original ones waste
-     * a lot of memory
-     * @author malte0811
-     */
-    @Overwrite
-    public void func_235899_a_(Map<Map<Property<?>, Comparable<?>>, S> states) {
+    @Inject(method = "func_235899_a_", at = @At("RETURN"))
+    public void func_235899_a_(Map<Map<Property<?>, Comparable<?>>, S> states, CallbackInfo ci) {
         StateHolderImpl.populateNeighbors(states, this);
+        this.field_235894_e_ = null;
     }
 
     @Override

@@ -5,7 +5,6 @@ import malte0811.ferritecore.mixin.config.FerriteMixinConfig;
 
 public class Config extends FerriteMixinConfig {
     public Config() {
-        // TODO make compatible
-        super(FerriteConfig.NEIGHBOR_LOOKUP, true);
+        super(FerriteConfig.NEIGHBOR_LOOKUP, false);
     }
 }
