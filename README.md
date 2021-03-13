@@ -1,3 +1,16 @@
+**Warning**: This branch is a demonstration of a) how much additional memory can be saved by combining FerriteCore and
+Hydrogen and b) how much additional complexity it adds to the Mixins. It is not intended for general use.  
+The answer to the first question is "some, but not a lot". Using All of Fabric 3 version 2.5.9 with just FerriteCore
+reduces memory usage from 1,792 MB to 984 MB. Adding Hydrogen to the mix reduces this to 958 MB (26 MB saved). Test
+setup: Generating a standard world on peaceful with a fixed seed and taking a heapdump after 2 minutes in world
+(according to the on-screen timer).  
+The answer to the second question is "quite a bit". One straight `Overwrite`s needs to be replaced by injections with
+captured locals that need to be able to target both the vanilla code and Hydrogens `Overwrite`. One `Overwrite` needs to
+be "enhanced" with a `RETURN`-injection that serves no purpose other than to stop Hydrogens `RETURN`-injection from
+running. Converting the `Overwrite` into a `RETURN`-injection injected after Hydrogen's code works in principle, but
+causes Hydrogen to keep 50 MB of useless cached data.  
+As a conclusion I do not consider it worth the effort to merge this into the main branch.
+
 A coremod to save a few of these:  
 <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/KL_CoreMemory.jpg" width="400"/>
 
