@@ -8,5 +8,6 @@
   "injectors": {
     "defaultRequire": 1
   },
+  "plugin": "malte0811.ferritecore.mixin.fabric.Config",
   "minVersion": "0.8"
 }

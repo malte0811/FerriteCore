@@ -8,14 +8,16 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.service.MixinService;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
-    private static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
-    private static final boolean HAS_HYDROGEN;
+    protected static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
+    protected static final boolean HAS_HYDROGEN;
     private String prefix = null;
+    @Nullable
     private final FerriteConfig.Option enableOption;
     private final boolean disableWithHydrogen;
 
@@ -32,7 +34,7 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
         HAS_HYDROGEN = hasHydrogen;
     }
 
-    protected FerriteMixinConfig(FerriteConfig.Option enableOption, boolean disableWithHydrogen) {
+    protected FerriteMixinConfig(@Nullable FerriteConfig.Option enableOption, boolean disableWithHydrogen) {
         this.enableOption = enableOption;
         this.disableWithHydrogen = disableWithHydrogen;
     }
@@ -40,8 +42,7 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         Preconditions.checkState(mixinClassName.startsWith(prefix), "Unexpected prefix on " + mixinClassName);
-        final String name = mixinClassName.substring(prefix.length());
-        if (!enableOption.isEnabled()) {
+        if (enableOption != null && !enableOption.isEnabled()) {
             LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
             return false;
         } else if (HAS_HYDROGEN && disableWithHydrogen) {
