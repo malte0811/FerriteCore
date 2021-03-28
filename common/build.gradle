@@ -20,7 +20,7 @@ dependencies {
     compileOnly "com.google.code.findbugs:jsr305:3.+"
     // We depend on fabric loader here to use the fabric @Environment annotations
     // Do NOT use other classes from fabric loader
-    modCompile "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
     testImplementation('org.junit.jupiter:junit-jupiter')
     googleextensionCompileOnly('com.google.guava:guava:21.0')
