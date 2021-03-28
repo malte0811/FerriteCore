@@ -12,8 +12,6 @@ architectury {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${rootProject.minecraft_version}")
-    mappings "de.oceanlabs.mcp:mcp_snapshot:20201028-1.16.3"
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
 
     implementation(project(path: ":common")) {
