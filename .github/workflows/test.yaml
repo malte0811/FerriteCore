@@ -18,5 +18,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 16
+      - name: Use gradle 7.0 pre 1 for Java 16 test
+        run: sed -i "s/6\.8/7.0-rc-1/" gradle/wrapper/gradle-wrapper.properties
       - name: Test on Java 16
-        run: ./gradlew common:test -Dorg.gradle.jvmargs=--illegal-access=warn --rerun-tasks
+        run: ./gradlew common:test --rerun-tasks
