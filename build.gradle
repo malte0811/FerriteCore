@@ -1,7 +1,7 @@
 import java.util.stream.Collectors
 
 plugins {
-    id "architectury-plugin" version "3.0.97"
+    id "architectury-plugin" version "3.1-SNAPSHOT"
     id "forgified-fabric-loom" version "0.6.78" apply false
 }
 
