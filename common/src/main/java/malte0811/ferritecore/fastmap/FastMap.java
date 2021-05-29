@@ -98,6 +98,15 @@ public class FastMap<Value> {
         return propId.getValue(stateIndex);
     }
 
+    @Nullable
+    public Comparable<?> getValue(int stateIndex, Object key) {
+        if (key instanceof Property<?>) {
+            return getValue(stateIndex, (Property<?>) key);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Returns the given property and its value in the given state
      *

@@ -13,9 +13,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.ToIntFunction;
 
 /**
  * Helper to define classes in the com.google.common.collect package without issues due to jar signing and classloaders
@@ -50,37 +47,21 @@ public class FastImmutableMapDefiner {
             }
         }
     });
+
     /**
-     * Creates a MethodHandle for the constructor of {@link com.google.common.collect.FerriteCoreImmutableMap} which
-     * takes one argument, which has to be an instance FastMapStateHolder. The Lazy also sets up the callbacks used by
-     * the map to get data out of the StateHolder
+     * Creates a MethodHandle for the constructor of FastMapEntryImmutableMap which takes one argument, which has to be
+     * an instance FastMapStateHolder. This also handles the necessary classloader acrobatics.
      */
     private static final LazyValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyValue<>(() -> {
         try {
-            define("com.google.common.collect.FerriteCoreIterator");
-            define("com.google.common.collect.FerriteCoreEntrySet");
-            Class<?> map = define("com.google.common.collect.FerriteCoreImmutableMap");
-            map.getField("numProperties").set(
-                    null, (ToIntFunction<Object>) o -> ((FastMapStateHolder<?>) o).getStateMap().numProperties()
-            );
-            map.getField("getByStateAndKey").set(
-                    null, (BiFunction<Object, Object, Comparable<?>>) (o, key) -> {
-                        FastMapStateHolder<?> stateHolder = (FastMapStateHolder<?>) o;
-                        if (key instanceof Property<?>) {
-                            return stateHolder.getStateMap().getValue(stateHolder.getStateIndex(), (Property<?>) key);
-                        } else {
-                            return null;
-                        }
-                    }
-            );
-            map.getField("entryByStateAndIndex").set(
-                    null, (BiFunction<Object, Integer, Map.Entry<?, Comparable<?>>>) (o, key) -> {
-                        FastMapStateHolder<?> stateHolder = (FastMapStateHolder<?>) o;
-                        return stateHolder.getStateMap().getEntry(key, stateHolder.getStateIndex());
-                    }
-            );
+            // Load these in the app classloader!
+            defineInAppClassloader("com.google.common.collect.FerriteCoreEntrySetAccess");
+            defineInAppClassloader("com.google.common.collect.FerriteCoreImmutableMapAccess");
+            // This lives in the transforming classloader, but must not be loaded before the previous classes are in
+            // the app classloader!
+            Class<?> map = Class.forName("malte0811.ferritecore.fastmap.immutable.FastMapEntryImmutableMap");
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            return lookup.findConstructor(map, MethodType.methodType(void.class, Object.class));
+            return lookup.findConstructor(map, MethodType.methodType(void.class, FastMapStateHolder.class));
         } catch (Exception x) {
             throw new RuntimeException(x);
         }
@@ -96,14 +77,15 @@ public class FastImmutableMapDefiner {
         }
     }
 
-    private static Class<?> define(String name) throws Exception {
+    private static void defineInAppClassloader(String name) throws Exception {
         InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream(
-                '/' + name.replace('.', '/') + ".class"
+                "/googleaccess/" + name.replace('.', '/') + ".class"
         );
         byte[] classBytes = new byte[byteInput.available()];
         final int bytesRead = byteInput.read(classBytes);
         Preconditions.checkState(bytesRead == classBytes.length);
-        return DEFINE_CLASS.getValue().define(classBytes, name);
+        Class<?> loaded = DEFINE_CLASS.getValue().define(classBytes, name);
+        Preconditions.checkState(loaded.getClassLoader() == ImmutableMap.class.getClassLoader());
     }
 
     private interface Definer {

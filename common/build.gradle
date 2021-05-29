@@ -1,17 +1,26 @@
 apply plugin: 'java'
 
 sourceSets {
-    googleextension {
+    // Only defines classes that override the package-private Google methods as public, to allow access from other
+    // packages. Loaded on the app classloader
+    googleaccess {
         java
+    }
+    // Defines custom implementations of ImmutableMap (and related classes). These classes live on the transforming/knot
+    // classloader, but need to be loaded after googleaccess
+    googleimpl {
+        java {
+            compileClasspath += googleaccess.output + main.compileClasspath + main.output
+        }
     }
     main {
         java {
-            runtimeClasspath += googleextension.output
+            runtimeClasspath += googleimpl.output
         }
     }
     test {
         java {
-            runtimeClasspath += googleextension.output
+            runtimeClasspath += googleaccess.output + googleimpl.output
         }
     }
 }
@@ -23,8 +32,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
     testImplementation('org.junit.jupiter:junit-jupiter')
-    googleextensionCompileOnly('com.google.guava:guava:21.0')
-    googleextensionCompileOnly('org.jetbrains:annotations:19.0.0')
+    googleaccessCompileOnly('com.google.guava:guava:21.0')
+    googleaccessCompileOnly('org.jetbrains:annotations:19.0.0')
 }
 
 architectury {
@@ -33,7 +42,11 @@ architectury {
 }
 
 jar {
-    from(sourceSets.googleextension.output)
+    // Move googleaccess to a directory that does not match the package to prevent accidental loads
+    into('googleaccess') {
+        from sourceSets.googleaccess.output
+    }
+    from(sourceSets.googleimpl.output)
 }
 
 test {
