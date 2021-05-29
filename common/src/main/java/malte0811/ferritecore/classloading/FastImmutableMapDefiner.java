@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
  */
 public class FastImmutableMapDefiner {
     private static final Logger LOGGER = LogManager.getLogger("FerriteCore - class definer");
+    public static String GOOGLE_ACCESS_PREFIX = "/googleaccess/";
+
     private static final LazyValue<Definer> DEFINE_CLASS = new LazyValue<>(() -> {
         try {
             // Try to create a Java 9+ style class definer
@@ -79,7 +81,7 @@ public class FastImmutableMapDefiner {
 
     private static void defineInAppClassloader(String name) throws Exception {
         InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream(
-                "/googleaccess/" + name.replace('.', '/') + ".class"
+                GOOGLE_ACCESS_PREFIX + name.replace('.', '/') + ".class"
         );
         byte[] classBytes = new byte[byteInput.available()];
         final int bytesRead = byteInput.read(classBytes);

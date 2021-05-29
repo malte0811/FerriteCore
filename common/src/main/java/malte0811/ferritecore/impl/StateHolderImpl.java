@@ -19,9 +19,7 @@ public class StateHolderImpl {
      */
     public static <S>
     void populateNeighbors(Map<Map<Property<?>, Comparable<?>>, S> states, FastMapStateHolder<S> holder) {
-        if (holder.getStateMap() != null) {
-            throw new IllegalStateException();
-        } else if (states == LAST_STATE_MAP.get()) {
+        if (states == LAST_STATE_MAP.get()) {
             // Use threadlocal state to use the same fast map for all states of one block
             holder.setStateMap((FastMap<S>) LAST_FAST_STATE_MAP.get());
         } else {

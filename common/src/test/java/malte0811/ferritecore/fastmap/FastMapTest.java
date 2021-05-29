@@ -10,10 +10,7 @@ import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.state.*;
 import net.minecraft.util.Direction;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +25,11 @@ public class FastMapTest {
     private static final IntegerProperty INT = IntegerProperty.create("B", 0, 7);
     private static final EnumProperty<Direction> DIR = DirectionProperty.create("C", Direction.class);
     private static final BooleanList BOOLS = new BooleanArrayList(new boolean[]{false, true});
+
+    @BeforeAll
+    public static void init() {
+        FastImmutableMapDefiner.GOOGLE_ACCESS_PREFIX = "/";
+    }
 
     @TestFactory
     public Stream<DynamicTest> basicMapping() {
