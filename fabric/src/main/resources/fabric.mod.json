@@ -4,9 +4,15 @@
   "version": "${version}",
   "name": "FerriteCore",
   "description": "Reduces memory usage",
+  "icon": "logo.png",
   "authors": [
     "malte0811"
   ],
+  "contact": {
+      "issues": "https://github.com/malte0811/FerriteCore/issues",
+      "source": "https://github.com/malte0811/FerriteCore",
+      "homepage": "https://www.curseforge.com/minecraft/mc-mods/ferritecore-fabric"
+  },
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
