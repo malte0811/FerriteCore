@@ -45,6 +45,11 @@ jar {
     // Move googleaccess to a directory that does not match the package to prevent accidental loads
     into('googleaccess') {
         from sourceSets.googleaccess.output
+        rename { String filename ->
+            // Add suffix to stop parts of the toolchain from moving these classes to the "correct" package
+            filename + "_manual"
+        }
+
     }
     from(sourceSets.googleimpl.output)
 }

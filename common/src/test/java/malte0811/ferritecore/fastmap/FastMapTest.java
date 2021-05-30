@@ -29,6 +29,7 @@ public class FastMapTest {
     @BeforeAll
     public static void init() {
         FastImmutableMapDefiner.GOOGLE_ACCESS_PREFIX = "/";
+        FastImmutableMapDefiner.GOOGLE_ACCESS_SUFFIX = ".class";
     }
 
     @TestFactory
