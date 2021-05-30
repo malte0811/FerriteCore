@@ -12,19 +12,19 @@ jobs:
         with:
           java-version: 8
       - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-        - name: Test on Java 8
-          run: ./gradlew build
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v1
-          with:
-            name: build-artifacts
-            path: |
-              forge/build/libs/ferritecore-*-forge.jar
-              fabric/build/libs/ferritecore-*-fabric.jar
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test on Java 8
+        run: ./gradlew build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-artifacts
+          path: |
+            forge/build/libs/ferritecore-*-forge.jar
+            fabric/build/libs/ferritecore-*-fabric.jar

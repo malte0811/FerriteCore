@@ -13,20 +13,20 @@ jobs:
         with:
           java-version: 8
       - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-        - name: Test on Java 8
-          run: ./gradlew common:test
-        - name: Set up JDK 16
-          uses: actions/setup-java@v1
-          with:
-            java-version: 16
-        - name: Use gradle 7.0 pre 1 for Java 16 test
-          run: sed -i "s/6\.8/7.0-rc-1/" gradle/wrapper/gradle-wrapper.properties
-        - name: Test on Java 16
-          run: ./gradlew common:test --rerun-tasks
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Test on Java 8
+        run: ./gradlew common:test
+      - name: Set up JDK 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+      - name: Use gradle 7.0 pre 1 for Java 16 test
+        run: sed -i "s/6\.8/7.0-rc-1/" gradle/wrapper/gradle-wrapper.properties
+      - name: Test on Java 16
+        run: ./gradlew common:test --rerun-tasks
