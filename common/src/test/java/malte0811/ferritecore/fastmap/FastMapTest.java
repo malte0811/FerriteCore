@@ -38,6 +38,11 @@ public class FastMapTest {
     }
 
     @TestFactory
+    public Stream<DynamicTest> testWithInvalid() {
+        return forEachType(TestData::testWithInvalid);
+    }
+
+    @TestFactory
     public Stream<DynamicTest> testWith() {
         return forEachType(TestData::testWith);
     }
@@ -126,6 +131,13 @@ public class FastMapTest {
                 for (Property<?> toSwap : baseMap.keySet()) {
                     testSwaps(baseIndex, toSwap, baseMap);
                 }
+            }
+        }
+
+        private void testWithInvalid() {
+            for (Map<Property<?>, Comparable<?>> baseMap : values.keySet()) {
+                final int baseIndex = map.getIndexOf(baseMap);
+                Assertions.assertNull(map.with(baseIndex, INT, 8));
             }
         }
 
