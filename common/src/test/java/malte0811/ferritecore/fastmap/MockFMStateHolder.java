@@ -2,7 +2,7 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 
 public class MockFMStateHolder<T> implements FastMapStateHolder<T> {
     private final FastMap<T> map;

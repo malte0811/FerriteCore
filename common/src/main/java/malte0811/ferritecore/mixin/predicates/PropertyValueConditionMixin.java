@@ -2,10 +2,10 @@ package malte0811.ferritecore.mixin.predicates;
 
 import com.google.common.base.Splitter;
 import malte0811.ferritecore.impl.PropertyValueConditionImpl;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.multipart.PropertyValueCondition;
-import net.minecraft.state.StateContainer;
+import net.minecraft.client.renderer.block.model.multipart.KeyValueCondition;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.function.Predicate;
 
-@Mixin(value = PropertyValueCondition.class, priority = 2000)
+@Mixin(value = KeyValueCondition.class, priority = 2000)
 public class PropertyValueConditionMixin {
     @Shadow
     @Final
@@ -23,7 +23,7 @@ public class PropertyValueConditionMixin {
     private String value;
     @Shadow
     @Final
-    private static Splitter SPLITTER;
+    private static Splitter PIPE_SPLITTER;
 
     /**
      * @reason Use cached predicates in the case of multiple specified values
@@ -33,7 +33,7 @@ public class PropertyValueConditionMixin {
      * @author malte0811
      */
     @Overwrite
-    public Predicate<BlockState> getPredicate(StateContainer<Block, BlockState> stateContainer) {
-        return PropertyValueConditionImpl.getPredicate(stateContainer, key, value, SPLITTER);
+    public Predicate<BlockState> getPredicate(StateDefinition<Block, BlockState> stateContainer) {
+        return PropertyValueConditionImpl.getPredicate(stateContainer, key, value, PIPE_SPLITTER);
     }
 }

@@ -4,8 +4,7 @@ import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
-import net.minecraft.state.Property;
-
+import net.minecraft.world.level.block.state.properties.Property;
 import java.util.Map;
 
 public class StateHolderImpl {
@@ -14,7 +13,7 @@ public class StateHolderImpl {
 
     /**
      * Set up the {@link FastMap} used by the given {@link FastMapStateHolder} to handle neighbors and property lookups.
-     * This is called in a loop for each {@link net.minecraft.state.StateContainer}, so all state holders of a given
+     * This is called in a loop for each {@link net.minecraft.world.level.block.state.StateDefinition}, so all state holders of a given
      * container will use the same {@link FastMap} instance.
      */
     public static <S>

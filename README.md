@@ -12,6 +12,6 @@ high-level description of the improvements implemented by this mod see [here](su
 
 ### Mappings
 
-This mod currently uses MCP names for everything, in case someone involved in MCP mapping wants to look at it. There are
-a few commits using official names, so be careful when looking at the commit history if you are concerned about "mapping
-taint".
+This mod currently uses official/Mojmap names for everything, some of the history is in MCP names. If you don't know
+what this means it most likely isn't relevant to you, this information is mostly for people who do not want to see names
+in these mappings for legel reasons.

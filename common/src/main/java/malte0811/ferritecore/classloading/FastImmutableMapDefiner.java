@@ -3,8 +3,8 @@ package malte0811.ferritecore.classloading;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import net.minecraft.state.Property;
-import net.minecraft.util.LazyValue;
+import net.minecraft.util.LazyLoadedValue;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +23,7 @@ public class FastImmutableMapDefiner {
     public static String GOOGLE_ACCESS_PREFIX = "/googleaccess/";
     public static String GOOGLE_ACCESS_SUFFIX = ".class_manual";
 
-    private static final LazyValue<Definer> DEFINE_CLASS = new LazyValue<>(() -> {
+    private static final LazyLoadedValue<Definer> DEFINE_CLASS = new LazyLoadedValue<>(() -> {
         try {
             // Try to create a Java 9+ style class definer
             // These are all public methods, but just don't exist in Java 8
@@ -55,7 +55,7 @@ public class FastImmutableMapDefiner {
      * Creates a MethodHandle for the constructor of FastMapEntryImmutableMap which takes one argument, which has to be
      * an instance FastMapStateHolder. This also handles the necessary classloader acrobatics.
      */
-    private static final LazyValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyValue<>(() -> {
+    private static final LazyLoadedValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyLoadedValue<>(() -> {
         try {
             // Load these in the app classloader!
             defineInAppClassloader("com.google.common.collect.FerriteCoreEntrySetAccess");
@@ -72,7 +72,7 @@ public class FastImmutableMapDefiner {
 
     public static ImmutableMap<Property<?>, Comparable<?>> makeMap(FastMapStateHolder<?> state) {
         try {
-            return (ImmutableMap<Property<?>, Comparable<?>>) MAKE_IMMUTABLE_FAST_MAP.getValue().invoke(state);
+            return (ImmutableMap<Property<?>, Comparable<?>>) MAKE_IMMUTABLE_FAST_MAP.get().invoke(state);
         } catch (Error e) {
             throw e;
         } catch (Throwable x) {
@@ -87,7 +87,7 @@ public class FastImmutableMapDefiner {
         byte[] classBytes = new byte[byteInput.available()];
         final int bytesRead = byteInput.read(classBytes);
         Preconditions.checkState(bytesRead == classBytes.length);
-        Class<?> loaded = DEFINE_CLASS.getValue().define(classBytes, name);
+        Class<?> loaded = DEFINE_CLASS.get().define(classBytes, name);
         Preconditions.checkState(loaded.getClassLoader() == ImmutableMap.class.getClassLoader());
     }
 

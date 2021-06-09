@@ -8,8 +8,8 @@ import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
 import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import net.minecraft.state.*;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.*;
 import org.junit.jupiter.api.*;
 
 import java.util.Collections;
@@ -99,7 +99,7 @@ public class FastMapTest {
             Stream<List<Pair<Property<?>, Comparable<?>>>> stream = Stream.of(Collections.emptyList());
 
             for (Property<?> property : properties) {
-                stream = stream.flatMap(baseList -> property.getAllowedValues().stream().map(value -> {
+                stream = stream.flatMap(baseList -> property.getPossibleValues().stream().map(value -> {
                     List<Pair<Property<?>, Comparable<?>>> withAdded = Lists.newArrayList(baseList);
                     withAdded.add(Pair.of(property, value));
                     return withAdded;
@@ -144,7 +144,7 @@ public class FastMapTest {
         private <T extends Comparable<T>>
         void testSwaps(int baseIndex, Property<T> toSwap, Map<Property<?>, Comparable<?>> baseMap) {
             Map<Property<?>, Comparable<?>> expected = new HashMap<>(baseMap);
-            for (T newValue : toSwap.getAllowedValues()) {
+            for (T newValue : toSwap.getPossibleValues()) {
                 Map<Property<?>, Comparable<?>> newMap = map.with(baseIndex, toSwap, newValue);
                 expected.put(toSwap, newValue);
                 Assertions.assertEquals(expected, newMap);

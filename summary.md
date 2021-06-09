@@ -102,7 +102,7 @@ By default every blockstate using a multipart model gets its own instance of tha
 models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory. The
 only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is already
 deduplicated by point 4, so it is very easy to use the same instance for equivalent lists. This reduces the number of
-instance from about 200k to 1.5k (DW20 1.2.0).
+instances from about 200k to 1.5k (DW20 1.2.0).
 
 Saved memory: Close to 200 MB  
 CPU impact: Slight during loading, zero at runtime  

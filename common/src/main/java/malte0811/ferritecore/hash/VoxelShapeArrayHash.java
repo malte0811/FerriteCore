@@ -3,24 +3,24 @@ package malte0811.ferritecore.hash;
 import it.unimi.dsi.fastutil.Hash;
 import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapeArray;
-import net.minecraft.util.math.shapes.VoxelShapePart;
+import net.minecraft.world.phys.shapes.ArrayVoxelShape;
+import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Objects;
 
-public class VoxelShapeArrayHash implements Hash.Strategy<VoxelShapeArray> {
+public class VoxelShapeArrayHash implements Hash.Strategy<ArrayVoxelShape> {
     public static final VoxelShapeArrayHash INSTANCE = new VoxelShapeArrayHash();
 
     @Override
-    public int hashCode(VoxelShapeArray o) {
+    public int hashCode(ArrayVoxelShape o) {
         VSArrayAccess access = access(o);
         return 31 * Objects.hash(access.getXPoints(), access.getYPoints(), access.getZPoints())
                 + VoxelShapePartHash.INSTANCE.hashCode(getPart(o));
     }
 
     @Override
-    public boolean equals(VoxelShapeArray a, VoxelShapeArray b) {
+    public boolean equals(ArrayVoxelShape a, ArrayVoxelShape b) {
         if (a == b) {
             return true;
         } else if (a == null || b == null) {
@@ -35,11 +35,11 @@ public class VoxelShapeArrayHash implements Hash.Strategy<VoxelShapeArray> {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static VSArrayAccess access(VoxelShapeArray a) {
+    private static VSArrayAccess access(ArrayVoxelShape a) {
         return (VSArrayAccess) (Object) a;
     }
 
-    private static VoxelShapePart getPart(VoxelShape a) {
-        return ((VoxelShapeAccess) a).getPart();
+    private static DiscreteVoxelShape getPart(VoxelShape a) {
+        return ((VoxelShapeAccess) a).getShape();
     }
 }

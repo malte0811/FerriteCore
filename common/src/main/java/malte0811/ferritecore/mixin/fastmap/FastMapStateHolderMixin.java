@@ -5,8 +5,8 @@ import com.google.common.collect.Table;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.impl.StateHolderImpl;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateHolder;
+import net.minecraft.world.level.block.state.StateHolder;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -18,13 +18,13 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Mutable
     @Shadow
     @Final
-    private ImmutableMap<Property<?>, Comparable<?>> properties;
+    private ImmutableMap<Property<?>, Comparable<?>> values;
 
     private int globalTableIndex;
     private FastMap<S> globalTable;
 
     @Redirect(
-            method = "with",
+            method = "setValue",
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/google/common/collect/Table;get(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
@@ -41,7 +41,7 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
      * @author malte0811
      */
     @Overwrite
-    public void func_235899_a_(Map<Map<Property<?>, Comparable<?>>, S> states) {
+    public void populateNeighbours(Map<Map<Property<?>, Comparable<?>>, S> states) {
         StateHolderImpl.populateNeighbors(states, this);
     }
 
@@ -57,12 +57,12 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
 
     @Override
     public ImmutableMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
-        return properties;
+        return values;
     }
 
     @Override
     public void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap) {
-        properties = newMap;
+        values = newMap;
     }
 
     @Override

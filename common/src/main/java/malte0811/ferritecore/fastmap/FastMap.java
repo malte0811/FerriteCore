@@ -2,9 +2,8 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.state.Property;
-
 import javax.annotation.Nullable;
+import net.minecraft.world.level.block.state.properties.Property;
 import java.util.*;
 
 /**

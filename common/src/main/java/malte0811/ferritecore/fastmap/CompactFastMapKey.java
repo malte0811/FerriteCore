@@ -1,6 +1,6 @@
 package malte0811.ferritecore.fastmap;
 
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * A "compact" implementation of a FastMapKey, i.e. one which completely fills the value matrix

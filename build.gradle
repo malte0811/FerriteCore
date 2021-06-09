@@ -46,8 +46,8 @@ subprojects {
     build.dependsOn signJar
 
     dependencies {
-        minecraft("com.mojang:minecraft:${rootProject.minecraft_version}")
-        mappings "de.oceanlabs.mcp:mcp_snapshot:${rootProject.mcp_version}"
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings minecraft.officialMojangMappings()
     }
 }
 
