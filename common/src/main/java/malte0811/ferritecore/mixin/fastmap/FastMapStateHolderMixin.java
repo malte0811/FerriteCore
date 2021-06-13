@@ -19,6 +19,8 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Shadow
     @Final
     private ImmutableMap<Property<?>, Comparable<?>> properties;
+    @Shadow
+    private Table<Property<?>, Comparable<?>, S> propertyToStateTable;
 
     private int globalTableIndex;
     private FastMap<S> globalTable;
@@ -73,5 +75,15 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Override
     public void setStateIndex(int newValue) {
         globalTableIndex = newValue;
+    }
+
+    @Override
+    public void setNeighborTable(Table<Property<?>, Comparable<?>, S> table) {
+        propertyToStateTable = table;
+    }
+
+    @Override
+    public Table<Property<?>, Comparable<?>, S> getNeighborTable() {
+        return propertyToStateTable;
     }
 }

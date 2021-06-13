@@ -132,7 +132,7 @@ public class FastMap<Value> {
         return keys.size();
     }
 
-    FastMapKey<?> getKey(int keyIndex) {
+    public FastMapKey<?> getKey(int keyIndex) {
         return keys.get(keyIndex);
     }
 
@@ -145,5 +145,9 @@ public class FastMap<Value> {
         } else {
             return (FastMapKey<T>) getKey(index);
         }
+    }
+
+    public boolean isSingleState() {
+        return valueMatrix.size() == 1;
     }
 }

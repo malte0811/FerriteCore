@@ -3,6 +3,8 @@ package malte0811.ferritecore.impl;
 import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
+import malte0811.ferritecore.fastmap.table.CrashNeighborTable;
+import malte0811.ferritecore.fastmap.table.FastmapNeighborTable;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
 import net.minecraft.state.Property;
 
@@ -19,7 +21,9 @@ public class StateHolderImpl {
      */
     public static <S>
     void populateNeighbors(Map<Map<Property<?>, Comparable<?>>, S> states, FastMapStateHolder<S> holder) {
-        if (states == LAST_STATE_MAP.get()) {
+        if (holder.getNeighborTable() != null) {
+            throw new IllegalStateException();
+        } else if (states == LAST_STATE_MAP.get()) {
             // Use threadlocal state to use the same fast map for all states of one block
             holder.setStateMap((FastMap<S>) LAST_FAST_STATE_MAP.get());
         } else {
@@ -34,6 +38,11 @@ public class StateHolderImpl {
         holder.setStateIndex(index);
         if (FerriteConfig.PROPERTY_MAP.isEnabled()) {
             holder.replacePropertyMap(FastImmutableMapDefiner.makeMap(holder));
+        }
+        if (FerriteConfig.POPULATE_NEIGHBOR_TABLE.isEnabled()) {
+            holder.setNeighborTable(new FastmapNeighborTable<>(holder));
+        } else {
+            holder.setNeighborTable(CrashNeighborTable.getInstance());
         }
     }
 }

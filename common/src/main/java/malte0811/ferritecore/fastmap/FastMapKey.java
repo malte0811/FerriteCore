@@ -41,11 +41,11 @@ public abstract class FastMapKey<T extends Comparable<T>> {
      */
     abstract int getFactorToNext();
 
-    protected final int numValues() {
+    public final int numValues() {
         return indexer.numValues();
     }
 
-    protected final Property<T> getProperty() {
+    public final Property<T> getProperty() {
         return indexer.getProperty();
     }
 
