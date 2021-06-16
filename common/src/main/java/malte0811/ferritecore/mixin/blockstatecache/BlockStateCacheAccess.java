@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import javax.annotation.Nullable;
 
-@Mixin(targets = "net.minecraft.block.AbstractBlock$AbstractBlockState$Cache")
+//TODO This is a hack to fix builds for the time being (should be AB$ABS$C). Running in dev is currently not possible.
+@Mixin(targets = "net.minecraft.block.AbstractBlock.AbstractBlockState.Cache")
 public interface BlockStateCacheAccess {
     @Accessor
     VoxelShape getCollisionShape();

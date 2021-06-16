@@ -56,8 +56,8 @@ public class FerriteConfig {
         );
         POPULATE_NEIGHBOR_TABLE = builder.createOptInOption(
                 "populateNeighborTable",
-                "Populate the neighbor table used by vanilla. This will increase memory usage, but increases" +
-                        " compatibility with mods using this table directly."
+                "Populate the neighbor table used by vanilla. Enabling this slightly increases memory usage, but" +
+                        " can help with issues in the rare case where mods access it directly."
         );
         builder.finish();
     }
