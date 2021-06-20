@@ -1,27 +1,12 @@
-name: Run tests on Java 8 and Java 16-ea
+name: Run tests on Java 16
 on:
   push:
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    # TODO this should probably be a matrix build, but the J16 test needs to use a different gradle version
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Test on Java 8
-        run: ./gradlew common:test
       - name: Set up JDK 16
         uses: actions/setup-java@v1
         with:

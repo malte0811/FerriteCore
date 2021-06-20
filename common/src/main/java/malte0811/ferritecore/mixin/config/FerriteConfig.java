@@ -17,6 +17,7 @@ public class FerriteConfig {
     public static final Option DEDUP_BLOCKSTATE_CACHE;
     public static final Option DEDUP_QUADS;
     public static final Option COMPACT_FAST_MAP;
+    public static final Option POPULATE_NEIGHBOR_TABLE;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -52,6 +53,11 @@ public class FerriteConfig {
         COMPACT_FAST_MAP = builder.createOptInOption(
                 "compactFastMap",
                 "Use a slightly more compact, but also slightly slower representation for block states"
+        );
+        POPULATE_NEIGHBOR_TABLE = builder.createOptInOption(
+                "populateNeighborTable",
+                "Populate the neighbor table used by vanilla. Enabling this slightly increases memory usage, but" +
+                        " can help with issues in the rare case where mods access it directly."
         );
         builder.finish();
     }

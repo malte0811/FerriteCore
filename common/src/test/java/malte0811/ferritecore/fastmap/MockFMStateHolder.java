@@ -1,6 +1,7 @@
 package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Table;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
 
@@ -41,5 +42,15 @@ public class MockFMStateHolder<T> implements FastMapStateHolder<T> {
     @Override
     public void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setNeighborTable(Table<Property<?>, Comparable<?>, T> table) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Table<Property<?>, Comparable<?>, T> getNeighborTable() {
+        return null;
     }
 }

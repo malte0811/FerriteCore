@@ -2,7 +2,7 @@ import java.util.stream.Collectors
 
 plugins {
     id "architectury-plugin" version "3.1-SNAPSHOT"
-    id "forgified-fabric-loom" version "0.6.78" apply false
+    id "dev.architectury.loom" version "0.7.2-SNAPSHOT" apply false
 }
 
 architectury {
@@ -10,7 +10,7 @@ architectury {
 }
 
 subprojects {
-    apply plugin: "forgified-fabric-loom"
+    apply plugin: "dev.architectury.loom"
 
     def fcMixinConfigs = [
             "predicates",

@@ -3,7 +3,7 @@ plugins {
 }
 
 configurations {
-    shadow
+    shadowCommon
 }
 
 architectury {
@@ -21,7 +21,7 @@ dependencies {
     developmentFabric(project(path: ":common")) {
         transitive = false
     }
-    shadow(project(path: ":common", configuration: "transformProductionFabric")) {
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) {
         transitive = false
     }
 }
@@ -35,14 +35,18 @@ processResources {
 }
 
 shadowJar {
-    configurations = [project.configurations.shadow]
-    classifier "shadow"
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
 }
 
 remapJar {
-    dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
     classifier "fabric"
+}
+
+jar {
+    classifier "dev"
 }
 
 loom {
