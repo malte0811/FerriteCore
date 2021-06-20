@@ -1,7 +1,7 @@
 package malte0811.ferritecore.mixin.predicates;
 
 import com.google.common.base.Splitter;
-import malte0811.ferritecore.impl.PropertyValueConditionImpl;
+import malte0811.ferritecore.impl.KeyValueConditionImpl;
 import net.minecraft.client.renderer.block.model.multipart.KeyValueCondition;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.function.Predicate;
 
 @Mixin(value = KeyValueCondition.class, priority = 2000)
-public class PropertyValueConditionMixin {
+public class KeyValueConditionMixin {
     @Shadow
     @Final
     private String key;
@@ -34,6 +34,6 @@ public class PropertyValueConditionMixin {
      */
     @Overwrite
     public Predicate<BlockState> getPredicate(StateDefinition<Block, BlockState> stateContainer) {
-        return PropertyValueConditionImpl.getPredicate(stateContainer, key, value, PIPE_SPLITTER);
+        return KeyValueConditionImpl.getPredicate(stateContainer, key, value, PIPE_SPLITTER);
     }
 }

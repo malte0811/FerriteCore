@@ -15,6 +15,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,12 +61,14 @@ public class Deduplicator {
         // Register the reload listener s.t. its "sync" part runs after the model loader reload
         ((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new SimplePreparableReloadListener<Unit>() {
             @Override
-            protected Unit prepare(ResourceManager iResourceManager, ProfilerFiller iProfiler) {
+            protected Unit prepare(@NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
                 return Unit.INSTANCE;
             }
 
             @Override
-            protected void apply(Unit object, ResourceManager iResourceManager, ProfilerFiller iProfiler) {
+            protected void apply(
+                    @NotNull Unit object, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler
+            ) {
                 VARIANT_IDENTITIES.clear();
                 KNOWN_MULTIPART_MODELS.clear();
                 OR_PREDICATE_CACHE.clear();

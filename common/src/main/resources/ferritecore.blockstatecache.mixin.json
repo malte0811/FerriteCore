@@ -10,13 +10,13 @@
   "minVersion": "0.8",
   "plugin": "malte0811.ferritecore.mixin.blockstatecache.Config",
   "mixins": [
-    "AbstractBlockStateMixin",
+    "ArrayVSAccess",
+    "BitSetDVSAccess",
+    "BlockStateBaseMixin",
     "BlockStateCacheAccess",
-    "VoxelShapeAccess",
-    "VSArrayAccess",
-    "VSPartAccess",
-    "VSPBitSetAccess",
-    "VSPSplitAccess",
-    "VSSplitAccess"
+    "DiscreteVSAccess",
+    "SliceShapeAccess",
+    "SubShapeAccess",
+    "VoxelShapeAccess"
   ]
 }

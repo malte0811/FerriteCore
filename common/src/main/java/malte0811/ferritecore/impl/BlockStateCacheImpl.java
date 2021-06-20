@@ -2,16 +2,14 @@ package malte0811.ferritecore.impl;
 
 import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import malte0811.ferritecore.hash.VoxelShapeArrayHash;
+import malte0811.ferritecore.hash.ArrayVoxelShapeHash;
 import malte0811.ferritecore.hash.VoxelShapeHash;
+import malte0811.ferritecore.mixin.blockstatecache.ArrayVSAccess;
 import malte0811.ferritecore.mixin.blockstatecache.BlockStateCacheAccess;
-import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
-import malte0811.ferritecore.mixin.blockstatecache.VSSplitAccess;
-import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
+import malte0811.ferritecore.mixin.blockstatecache.SliceShapeAccess;
 import malte0811.ferritecore.util.Constants;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
-import net.minecraft.world.phys.shapes.SliceShape;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -24,8 +22,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class BlockStateCacheImpl {
-    public static final Map<ArrayVoxelShape, ArrayVoxelShape> CACHE_COLLIDE = new Object2ObjectOpenCustomHashMap<>(
-            VoxelShapeArrayHash.INSTANCE
+    public static final Map<ArrayVSAccess, ArrayVSAccess> CACHE_COLLIDE = new Object2ObjectOpenCustomHashMap<>(
+            ArrayVoxelShapeHash.INSTANCE
     );
     // Maps a shape to the "canonical instance" of that shape and its side projections
     public static final Map<VoxelShape, Pair<VoxelShape, VoxelShape[]>> CACHE_PROJECT =
@@ -79,10 +77,8 @@ public class BlockStateCacheImpl {
             dedupedCollisionShape = oldCache.getCollisionShape();
         } else {
             dedupedCollisionShape = newCache.getCollisionShape();
-            if (dedupedCollisionShape instanceof ArrayVoxelShape) {
-                dedupedCollisionShape = CACHE_COLLIDE.computeIfAbsent(
-                        (ArrayVoxelShape) dedupedCollisionShape, Function.identity()
-                );
+            if (dedupedCollisionShape instanceof ArrayVSAccess access) {
+                dedupedCollisionShape = (VoxelShape) CACHE_COLLIDE.computeIfAbsent(access, Function.identity());
             }
         }
         replaceInternals(dedupedCollisionShape, newCache.getCollisionShape());
@@ -131,28 +127,21 @@ public class BlockStateCacheImpl {
         // that we can't do anything about shallow size and replace the internals with those used in the cache. This is
         // not theoretically 100% safe since VSs can technically be modified after they are created, but handing out VSs
         // that will be modified is unsafe in any case since a lot of vanilla code relies on VSs being immutable.
-        access(toReplace).setXPoints(access(toKeep).getXPoints());
-        access(toReplace).setYPoints(access(toKeep).getYPoints());
-        access(toReplace).setZPoints(access(toKeep).getZPoints());
-        accessVS(toReplace).setFaces(accessVS(toKeep).getFaces());
-        accessVS(toReplace).setShape(accessVS(toKeep).getShape());
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    private static VSArrayAccess access(ArrayVoxelShape a) {
-        return (VSArrayAccess) (Object) a;
-    }
-
-    private static VoxelShapeAccess accessVS(VoxelShape a) {
-        return (VoxelShapeAccess) a;
+        ArrayVSAccess toReplaceAccess = (ArrayVSAccess) toReplace;
+        ArrayVSAccess toKeepAccess = (ArrayVSAccess) toKeep;
+        toReplaceAccess.setXPoints(toKeepAccess.getXPoints());
+        toReplaceAccess.setYPoints(toKeepAccess.getYPoints());
+        toReplaceAccess.setZPoints(toKeepAccess.getZPoints());
+        toReplaceAccess.setFaces(toKeepAccess.getFaces());
+        toReplaceAccess.setShape(toKeepAccess.getShape());
     }
 
     @Nullable
     private static VoxelShape getRenderShape(@Nullable VoxelShape[] projected) {
         if (projected != null) {
             for (VoxelShape side : projected) {
-                if (side instanceof SliceShape) {
-                    return ((VSSplitAccess) side).getDelegate();
+                if (side instanceof SliceShapeAccess slice) {
+                    return slice.getDelegate();
                 }
             }
         }

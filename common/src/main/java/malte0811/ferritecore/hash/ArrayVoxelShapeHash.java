@@ -1,0 +1,29 @@
+package malte0811.ferritecore.hash;
+
+import it.unimi.dsi.fastutil.Hash;
+import malte0811.ferritecore.mixin.blockstatecache.ArrayVSAccess;
+
+import java.util.Objects;
+
+public class ArrayVoxelShapeHash implements Hash.Strategy<ArrayVSAccess> {
+    public static final ArrayVoxelShapeHash INSTANCE = new ArrayVoxelShapeHash();
+
+    @Override
+    public int hashCode(ArrayVSAccess o) {
+        return 31 * Objects.hash(o.getXPoints(), o.getYPoints(), o.getZPoints())
+                + VoxelShapePartHash.INSTANCE.hashCode(o.getShape());
+    }
+
+    @Override
+    public boolean equals(ArrayVSAccess a, ArrayVSAccess b) {
+        if (a == b) {
+            return true;
+        } else if (a == null || b == null) {
+            return false;
+        }
+        return Objects.equals(a.getXPoints(), b.getXPoints()) &&
+                Objects.equals(a.getYPoints(), b.getYPoints()) &&
+                Objects.equals(a.getZPoints(), b.getZPoints()) &&
+                VoxelShapePartHash.INSTANCE.equals(a.getShape(), b.getShape());
+    }
+}

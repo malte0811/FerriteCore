@@ -4,8 +4,8 @@
   "compatibilityLevel": "JAVA_16",
   "client": [
     "AndConditionMixin",
-    "OrConditionMixin",
-    "PropertyValueConditionMixin"
+    "KeyValueConditionMixin",
+    "OrConditionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

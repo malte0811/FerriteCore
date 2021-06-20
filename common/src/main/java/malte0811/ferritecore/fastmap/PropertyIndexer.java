@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import javax.annotation.Nullable;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -12,6 +11,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -91,14 +92,11 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         @Override
         @Nullable
         public Boolean byIndex(int index) {
-            switch (index) {
-                case 0:
-                    return Boolean.TRUE;
-                case 1:
-                    return Boolean.FALSE;
-                default:
-                    return null;
-            }
+            return switch (index) {
+                case 0 -> Boolean.TRUE;
+                case 1 -> Boolean.FALSE;
+                default -> null;
+            };
         }
 
         @Override
@@ -198,21 +196,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
         @Override
         public int toIndex(Direction value) {
-            switch (value) {
-                case NORTH:
-                    return 0;
-                case EAST:
-                    return 1;
-                case SOUTH:
-                    return 2;
-                case WEST:
-                    return 3;
-                case UP:
-                    return 4;
-                case DOWN:
-                    return 5;
-            }
-            return -1;
+            return switch (value) {
+                case NORTH -> 0;
+                case EAST -> 1;
+                case SOUTH -> 2;
+                case WEST -> 3;
+                case UP -> 4;
+                case DOWN -> 5;
+            };
         }
     }
 

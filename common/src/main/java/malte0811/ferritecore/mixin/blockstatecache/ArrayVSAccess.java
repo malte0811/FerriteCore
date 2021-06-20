@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ArrayVoxelShape.class)
-public interface VSArrayAccess {
+public interface ArrayVSAccess extends VoxelShapeAccess {
     @Accessor("xs")
     @Mutable
     void setXPoints(DoubleList newPoints);

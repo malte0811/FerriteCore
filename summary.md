@@ -4,7 +4,7 @@ first 4 points refers to a ForgeCraft 1 instance around 19th December 2020, afte
 which is great for rapid mod updates, but also makes reproducible tests near-impossible (and means that I can't test
 when the server is down :smile:)
 
-### 1. Optionals in `PropertyValueCondition`
+### 1. Optionals in `KeyValueCondition`
 
 This change is made obsolete by the 4th point, it is only included in this list for completeness.
 
@@ -62,19 +62,18 @@ Notes: If this is ever included in Forge the custom `ImmutableMap` should probab
 new `getValues` method returning a `map` rather than an `ImmutableMap` should be added
 
 ### 4. Multipart model predicate caching
-Each multipart model stores a number of predicates to determine which parts to show under
-what conditions. These predicates take up 300-400 MB. However in many cases these
-predicates are checking the same thing, they are just newly created every time. For
-`PropertyValueCondition` the predicates can be cached by using the property and its value
-as a key, for `And/OrCondition` (and multi-value `PropertyValueCondition`s) the key is the
-list of input predicates sorted by hash value.  
-One detail that makes this even more effective is that a block can never have two
-properties that are equal according to `equals`, while the common property implementations
-include `equals`. Additionally `StateHolder#get` also considers `equals` (as opposed to
-reference equality), so using the same lambda for equivalent (but non reference-equivalent) properties and values is
-actually possible. This is particularly useful as one of the most common usages of multipart models is pipes, where the
-states are nearly always boolean properties named `north` etc. As a result the number of predicates is reduced from
-between 10s of thousands and millions to a few ten or hundred instances.
+
+Each multipart model stores a number of predicates to determine which parts to show under what conditions. These
+predicates take up 300-400 MB. However in many cases these predicates are checking the same thing, they are just newly
+created every time. For
+`KeyValueCondition` the predicates can be cached by using the property and its value as a key, for `And/OrCondition` (
+and multi-value `KeyValueCondition`s) the key is the list of input predicates sorted by hash value.  
+One detail that makes this even more effective is that a block can never have two properties that are equal according
+to `equals`, while the common property implementations include `equals`. Additionally `StateHolder#get` also
+considers `equals` (as opposed to reference equality), so using the same lambda for equivalent (but non
+reference-equivalent) properties and values is actually possible. This is particularly useful as one of the most common
+usages of multipart models is pipes, where the states are nearly always boolean properties named `north` etc. As a
+result the number of predicates is reduced from between 10s of thousands and millions to a few ten or hundred instances.
 
 Saved memory: 300-400 MB (relative to the state after the first change, so 100 MB more compared to a "clean" instance)  
 CPU impact: Some impact in model loading (but less allocations), zero while playing  

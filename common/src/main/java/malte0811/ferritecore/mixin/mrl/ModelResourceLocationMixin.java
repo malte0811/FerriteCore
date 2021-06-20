@@ -18,10 +18,7 @@ public class ModelResourceLocationMixin {
     @Mutable
     private String variant;
 
-    @Inject(
-            method = "<init>(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)V",
-            at = @At("TAIL")
-    )
+    @Inject(method = "<init>(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)V", at = @At("TAIL"))
     private void constructTail(ResourceLocation location, String variantIn, CallbackInfo ci) {
         // Do not use new strings for path and namespace, and deduplicate the variant string
         ((ResourceLocationAccess) this).setPath(location.getPath());

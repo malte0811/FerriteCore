@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class PropertyValueConditionImpl {
+public class KeyValueConditionImpl {
     private static final Map<Pair<Property<?>, Comparable<?>>, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE = new ConcurrentHashMap<>();
 
     /**
@@ -46,10 +46,10 @@ public class PropertyValueConditionImpl {
             } else {
                 Predicate<BlockState> isMatchedState;
                 if (matchedStates.size() == 1) {
-                    isMatchedState = makePropertyPredicate(stateContainer, property, valueNoInvert, key, value);
+                    isMatchedState = getBlockStatePredicate(stateContainer, property, valueNoInvert, key, value);
                 } else {
                     List<Predicate<BlockState>> subPredicates = matchedStates.stream()
-                            .map(subValue -> makePropertyPredicate(stateContainer, property, subValue, key, value))
+                            .map(subValue -> getBlockStatePredicate(stateContainer, property, subValue, key, value))
                             .collect(Collectors.toList());
                     // This line is the only functional change, but targeting it with anything but Overwrite appears to
                     // be impossible
@@ -63,11 +63,15 @@ public class PropertyValueConditionImpl {
     }
 
     private static <T extends Comparable<T>>
-    Predicate<BlockState> makePropertyPredicate(
-            StateDefinition<Block, BlockState> container, Property<T> property, String subValue, String key, String value
+    Predicate<BlockState> getBlockStatePredicate(
+            StateDefinition<Block, BlockState> container,
+            Property<T> property,
+            String subValue,
+            String key,
+            String value
     ) {
         Optional<T> optional = property.getValue(subValue);
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             throw new RuntimeException(String.format(
                     "Unknown value '%s' for property '%s' on '%s' in '%s'",
                     subValue, key, container.getOwner().toString(), value

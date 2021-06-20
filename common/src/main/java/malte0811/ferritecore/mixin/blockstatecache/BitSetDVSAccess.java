@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.BitSet;
 
 @Mixin(BitSetDiscreteVoxelShape.class)
-public interface VSPBitSetAccess {
+public interface BitSetDVSAccess extends DiscreteVSAccess {
     @Accessor
     BitSet getStorage();
 

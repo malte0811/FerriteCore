@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
-public class AbstractBlockStateMixin {
+public class BlockStateBaseMixin {
     @Inject(method = "initCache", at = @At("HEAD"))
     public void cacheStateHead(CallbackInfo ci) {
         BlockStateCacheImpl.deduplicateCachePre((BlockBehaviour.BlockStateBase) (Object) this);

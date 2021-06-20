@@ -1,10 +1,10 @@
 package malte0811.ferritecore.hash;
 
 import it.unimi.dsi.fastutil.Hash;
+import malte0811.ferritecore.mixin.blockstatecache.ArrayVSAccess;
+import malte0811.ferritecore.mixin.blockstatecache.SliceShapeAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
-import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import net.minecraft.world.phys.shapes.CubeVoxelShape;
-import net.minecraft.world.phys.shapes.SliceShape;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
@@ -12,36 +12,45 @@ public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
 
     @Override
     public int hashCode(VoxelShape o) {
-        if (o instanceof SliceShape) {
-            return VoxelShapeSplitHash.INSTANCE.hashCode((SliceShape) o);
-        } else if (o instanceof ArrayVoxelShape) {
-            return VoxelShapeArrayHash.INSTANCE.hashCode((ArrayVoxelShape) o);
-        } else if (o instanceof CubeVoxelShape) {
-            return VoxelShapePartHash.INSTANCE.hashCode(((VoxelShapeAccess) o).getShape());
+        return hashCode((VoxelShapeAccess) o);
+    }
+
+    public int hashCode(VoxelShapeAccess o) {
+        if (o instanceof SliceShapeAccess access) {
+            return SliceShapeHash.INSTANCE.hashCode(access);
+        } else if (o instanceof ArrayVSAccess access) {
+            return ArrayVoxelShapeHash.INSTANCE.hashCode(access);
+        } else if (isCubeShape(o)) {
+            return VoxelShapePartHash.INSTANCE.hashCode(o.getShape());
         } else {
-            //TODO VSCube?
             return o.hashCode();
         }
     }
 
     @Override
     public boolean equals(VoxelShape a, VoxelShape b) {
+        return equals((VoxelShapeAccess) a, (VoxelShapeAccess) b);
+    }
+
+    public boolean equals(VoxelShapeAccess a, VoxelShapeAccess b) {
         if (a == b) {
             return true;
         } else if (a == null || b == null) {
             return false;
         } else if (a.getClass() != b.getClass()) {
             return false;
-        } else if (a instanceof SliceShape) {
-            return VoxelShapeSplitHash.INSTANCE.equals((SliceShape) a, (SliceShape) b);
-        } else if (a instanceof ArrayVoxelShape) {
-            return VoxelShapeArrayHash.INSTANCE.equals((ArrayVoxelShape) a, (ArrayVoxelShape) b);
-        } else if (a instanceof CubeVoxelShape) {
-            return VoxelShapePartHash.INSTANCE.equals(
-                    ((VoxelShapeAccess) a).getShape(), ((VoxelShapeAccess) b).getShape()
-            );
+        } else if (a instanceof SliceShapeAccess accessA) {
+            return SliceShapeHash.INSTANCE.equals(accessA, (SliceShapeAccess) b);
+        } else if (a instanceof ArrayVSAccess accessA) {
+            return ArrayVoxelShapeHash.INSTANCE.equals(accessA, (ArrayVSAccess) b);
+        } else if (isCubeShape(a)) {
+            return VoxelShapePartHash.INSTANCE.equals(a.getShape(), b.getShape());
         } else {
             return a.equals(b);
         }
+    }
+
+    private boolean isCubeShape(Object o) {
+        return o instanceof CubeVoxelShape;
     }
 }
