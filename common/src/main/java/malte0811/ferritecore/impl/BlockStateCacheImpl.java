@@ -1,5 +1,6 @@
 package malte0811.ferritecore.impl;
 
+import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.hash.VoxelShapeArrayHash;
 import malte0811.ferritecore.hash.VoxelShapeHash;
@@ -8,7 +9,6 @@ import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSSplitAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
 import malte0811.ferritecore.util.Constants;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import net.minecraft.world.phys.shapes.SliceShape;
@@ -21,6 +21,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class BlockStateCacheImpl {
     public static final Map<ArrayVoxelShape, ArrayVoxelShape> CACHE_COLLIDE = new Object2ObjectOpenCustomHashMap<>(
@@ -32,18 +33,17 @@ public class BlockStateCacheImpl {
 
     // Get the cache from a blockstate. Mixin does not handle private inner classes too well, so method handles and
     // manual remapping it is
-    private static final LazyLoadedValue<Function<BlockStateBase, BlockStateCacheAccess>> GET_CACHE =
-            new LazyLoadedValue<>(() -> {
+    private static final Supplier<Function<BlockStateBase, BlockStateCacheAccess>> GET_CACHE = Suppliers.memoize(() -> {
+        try {
+            Field cacheField = BlockStateBase.class.getDeclaredField(Constants.blockstateCacheFieldName);
+            cacheField.setAccessible(true);
+            MethodHandle getter = MethodHandles.lookup().unreflectGetter(cacheField);
+            return state -> {
                 try {
-                    Field cacheField = BlockStateBase.class.getDeclaredField(Constants.blockstateCacheFieldName);
-                    cacheField.setAccessible(true);
-                    MethodHandle getter = MethodHandles.lookup().unreflectGetter(cacheField);
-                    return state -> {
-                        try {
-                            return (BlockStateCacheAccess) getter.invoke(state);
-                        } catch (Throwable throwable) {
-                            throw new RuntimeException(throwable);
-                        }
+                    return (BlockStateCacheAccess) getter.invoke(state);
+                } catch (Throwable throwable) {
+                    throw new RuntimeException(throwable);
+                }
                     };
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     throw new RuntimeException(e);

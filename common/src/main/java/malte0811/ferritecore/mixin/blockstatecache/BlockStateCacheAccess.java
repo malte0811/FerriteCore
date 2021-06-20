@@ -7,7 +7,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import javax.annotation.Nullable;
 
-@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase$Cache")
+// TODO this does not work in Dev, but BB$BSB$C causes build issues
+@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase.Cache")
 public interface BlockStateCacheAccess {
     @Accessor
     VoxelShape getCollisionShape();

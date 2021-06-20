@@ -1,6 +1,6 @@
 package malte0811.ferritecore.fastmap.table;
 
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
