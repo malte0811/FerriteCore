@@ -1,53 +1,33 @@
 package malte0811.ferritecore.classloading;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.level.block.state.properties.Property;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 /**
  * Helper to define classes in the com.google.common.collect package without issues due to jar signing and classloaders
  * (the second one only seems to be an issue on Fabric, but the first one is a problem on both)
  */
 public class FastImmutableMapDefiner {
-    private static final Logger LOGGER = LogManager.getLogger("FerriteCore - class definer");
     public static String GOOGLE_ACCESS_PREFIX = "/googleaccess/";
     public static String GOOGLE_ACCESS_SUFFIX = ".class_manual";
 
-    private static final LazyLoadedValue<Definer> DEFINE_CLASS = new LazyLoadedValue<>(() -> {
+    private static final Supplier<Definer> DEFINE_CLASS = Suppliers.memoize(() -> {
         try {
-            // Try to create a Java 9+ style class definer
-            // These are all public methods, but just don't exist in Java 8
-            Method makePrivateLookup = MethodHandles.class.getMethod(
-                    "privateLookupIn", Class.class, MethodHandles.Lookup.class
+            MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(
+                    ImmutableMap.class, MethodHandles.lookup()
             );
-            Object privateLookup = makePrivateLookup.invoke(null, ImmutableMap.class, MethodHandles.lookup());
-            Method defineClass = MethodHandles.Lookup.class.getMethod("defineClass", byte[].class);
-            LOGGER.info("Using Java 9+ class definer");
-            return (bytes, name) -> (Class<?>) defineClass.invoke(privateLookup, (Object) bytes);
-        } catch (Exception x) {
-            try {
-                // If that fails, try a Java 8 style definer
-                Method defineClass = ClassLoader.class.getDeclaredMethod(
-                        "defineClass", String.class, byte[].class, int.class, int.class
-                );
-                defineClass.setAccessible(true);
-                ClassLoader loader = ImmutableMap.class.getClassLoader();
-                LOGGER.info("Using Java 8 class definer");
-                return (bytes, name) -> (Class<?>) defineClass.invoke(loader, name, bytes, 0, bytes.length);
-            } catch (NoSuchMethodException e) {
-                // Fail if neither works
-                throw new RuntimeException(e);
-            }
+            return (bytes, name) -> privateLookup.defineClass(bytes);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     });
 
@@ -55,7 +35,7 @@ public class FastImmutableMapDefiner {
      * Creates a MethodHandle for the constructor of FastMapEntryImmutableMap which takes one argument, which has to be
      * an instance FastMapStateHolder. This also handles the necessary classloader acrobatics.
      */
-    private static final LazyLoadedValue<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = new LazyLoadedValue<>(() -> {
+    private static final Supplier<MethodHandle> MAKE_IMMUTABLE_FAST_MAP = Suppliers.memoize(() -> {
         try {
             // Load these in the app classloader!
             defineInAppClassloader("com.google.common.collect.FerriteCoreEntrySetAccess");
