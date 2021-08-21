@@ -8,7 +8,7 @@ version = "${version}"
 displayName = "Ferrite Core"
 authors="malte0811"
 description='''
-Reduces memory usage. Some of these changes will probably be PRd to Forge soon.
+Reduces memory usage.
 '''
 logoFile="logo.png"
 [[dependencies.ferritecore]]
