@@ -1,8 +1,8 @@
 package malte0811.ferritecore.mixin.dedupmultipart;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.model.MultipartBakedModel;
+import net.minecraft.client.resources.model.MultiPartBakedModel;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,7 +13,7 @@ import java.util.BitSet;
 import java.util.Map;
 
 /**
- * The map implementation used for {@link MultipartBakedModel#bitSetCache} ({@link Object2ObjectOpenCustomHashMap})
+ * The map implementation used for {@link MultiPartBakedModel#selectorCache} ({@link Object2ObjectOpenCustomHashMap})
  * is not thread-safe, but getQuads is called in parallel in vanilla (and even more so in Forge with
  * alwaysSetupTerrainOffThread=true). The only reason this works for vanilla is that the cache will never contain more
  * than a single blockstate, since a new instance is created for each blockstate (this is probably unintentional, a map
@@ -28,11 +28,11 @@ import java.util.Map;
 // Unresolved reference: Forge adds a parameter to getQuads, so the usual remapping process breaks and I need to specify
 // SRG and intermediary names directly, which confuses the MCDev IntelliJ plugin
 @SuppressWarnings({"SynchronizeOnNonFinalField", "UnresolvedMixinReference"})
-@Mixin(MultipartBakedModel.class)
+@Mixin(MultiPartBakedModel.class)
 public class MixinMultipartModel {
     @Shadow
     @Final
-    private Map<BlockState, BitSet> bitSetCache;
+    private Map<BlockState, BitSet> selectorCache;
 
     @Redirect(
             method = {"method_4707", "func_200117_a", "getQuads"},
@@ -40,7 +40,7 @@ public class MixinMultipartModel {
             remap = false
     )
     public <K, V> V redirectCacheGet(Map<K, V> map, K key) {
-        synchronized (bitSetCache) {
+        synchronized (selectorCache) {
             return map.get(key);
         }
     }
@@ -51,7 +51,7 @@ public class MixinMultipartModel {
             remap = false
     )
     public <K, V> V redirectCachePut(Map<K, V> map, K key, V value) {
-        synchronized (bitSetCache) {
+        synchronized (selectorCache) {
             return map.put(key, value);
         }
     }
