@@ -1,5 +1,6 @@
 package malte0811.ferritecore.mixin.dedupmultipart;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.MultipartBakedModel;
 import org.spongepowered.asm.mixin.Final;
@@ -12,7 +13,7 @@ import java.util.BitSet;
 import java.util.Map;
 
 /**
- * The map implementation used for {@link MultipartBakedModel#bitSetCache} ({@link it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap})
+ * The map implementation used for {@link MultipartBakedModel#bitSetCache} ({@link Object2ObjectOpenCustomHashMap})
  * is not thread-safe, but getQuads is called in parallel in vanilla (and even more so in Forge with
  * alwaysSetupTerrainOffThread=true). The only reason this works for vanilla is that the cache will never contain more
  * than a single blockstate, since a new instance is created for each blockstate (this is probably unintentional, a map

@@ -22,8 +22,8 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Shadow
     private Table<Property<?>, Comparable<?>, S> propertyToStateTable;
 
-    private int globalTableIndex;
-    private FastMap<S> globalTable;
+    private int ferritecore_globalTableIndex;
+    private FastMap<S> ferritecore_globalTable;
 
     @Redirect(
             method = "with",
@@ -34,7 +34,11 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
             )
     )
     public Object getNeighborFromFastMap(Table<?, ?, ?> ignore, Object rowKey, Object columnKey) {
-        return this.globalTable.withUnsafe(this.globalTableIndex, (Property<?>) rowKey, columnKey);
+        return this.ferritecore_globalTable.withUnsafe(
+                this.ferritecore_globalTableIndex,
+                (Property<?>) rowKey,
+                columnKey
+        );
     }
 
     /**
@@ -49,12 +53,12 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
 
     @Override
     public FastMap<S> getStateMap() {
-        return globalTable;
+        return ferritecore_globalTable;
     }
 
     @Override
     public int getStateIndex() {
-        return globalTableIndex;
+        return ferritecore_globalTableIndex;
     }
 
     @Override
@@ -69,12 +73,12 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
 
     @Override
     public void setStateMap(FastMap<S> newValue) {
-        globalTable = newValue;
+        ferritecore_globalTable = newValue;
     }
 
     @Override
     public void setStateIndex(int newValue) {
-        globalTableIndex = newValue;
+        ferritecore_globalTableIndex = newValue;
     }
 
     @Override
