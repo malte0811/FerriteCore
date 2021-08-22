@@ -2,14 +2,10 @@ package malte0811.ferritecore.mixin.dedupmultipart;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
-import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.BitSet;
 import java.util.Map;
 
 /**
@@ -22,25 +18,26 @@ import java.util.Map;
  * concurrent get-calls can (and will) crash, so we need to synchronize them.<br>
  * It is not clear if this implementation (naive synchronization on the cache) is optimal w.r.t.
  * runtime/parallelization, in my experience this part of the code is not runtime-critical enough to put significant
- * effort into fancy parallelization solutions (may change in the future).
+ * effort into fancy parallelization solutions (may change in the future).<br>
+ * The increased priority takes care of compatibility with sodium's prio 1000 overwrite. Some versions of sodium come
+ * with their own synchronization, but disabling the FC synchronization when sodium's is present is near-impossible. Any
+ * decent JIT should be able to remove the inner synchronization since both are on the same final field, so performance
+ * should not be an issue.
  */
-// Non-final fields: Work around Java/Mixin limitations
 // Unresolved reference: Forge adds a parameter to getQuads, so the usual remapping process breaks and I need to specify
 // SRG and intermediary names directly, which confuses the MCDev IntelliJ plugin
-@SuppressWarnings({"SynchronizeOnNonFinalField", "UnresolvedMixinReference"})
-@Mixin(MultiPartBakedModel.class)
+// Sync on local/parameter: The parameter is actually always a final field, but which one it is depends on whether
+// sodium is installed or not.
+@SuppressWarnings({"UnresolvedMixinReference", "SynchronizationOnLocalVariableOrMethodParameter"})
+@Mixin(value = MultiPartBakedModel.class, priority = 1100)
 public class MixinMultipartModel {
-    @Shadow
-    @Final
-    private Map<BlockState, BitSet> selectorCache;
-
     @Redirect(
             method = {"method_4707", "func_200117_a", "getQuads"},
             at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
     )
     public <K, V> V redirectCacheGet(Map<K, V> map, K key) {
-        synchronized (selectorCache) {
+        synchronized (map) {
             return map.get(key);
         }
     }
@@ -51,7 +48,7 @@ public class MixinMultipartModel {
             remap = false
     )
     public <K, V> V redirectCachePut(Map<K, V> map, K key, V value) {
-        synchronized (selectorCache) {
+        synchronized (map) {
             return map.put(key, value);
         }
     }

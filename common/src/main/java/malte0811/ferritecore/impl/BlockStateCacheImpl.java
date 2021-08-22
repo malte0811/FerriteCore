@@ -2,10 +2,10 @@ package malte0811.ferritecore.impl;
 
 import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import malte0811.ferritecore.ducks.BlockStateCacheAccess;
 import malte0811.ferritecore.hash.ArrayVoxelShapeHash;
 import malte0811.ferritecore.hash.VoxelShapeHash;
 import malte0811.ferritecore.mixin.blockstatecache.ArrayVSAccess;
-import malte0811.ferritecore.mixin.blockstatecache.BlockStateCacheAccess;
 import malte0811.ferritecore.mixin.blockstatecache.SliceShapeAccess;
 import malte0811.ferritecore.util.Constants;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
