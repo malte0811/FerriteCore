@@ -11,7 +11,7 @@
   "plugin": "malte0811.ferritecore.mixin.blockstatecache.Config",
   "mixins": [
     "AbstractBlockStateMixin",
-    "BlockStateCacheAccess",
+    "BlockStateCacheMixin",
     "VoxelShapeAccess",
     "VSArrayAccess",
     "VSPartAccess",

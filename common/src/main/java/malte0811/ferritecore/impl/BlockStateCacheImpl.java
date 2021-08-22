@@ -1,9 +1,9 @@
 package malte0811.ferritecore.impl;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import malte0811.ferritecore.ducks.BlockStateCacheAccess;
 import malte0811.ferritecore.hash.VoxelShapeArrayHash;
 import malte0811.ferritecore.hash.VoxelShapeHash;
-import malte0811.ferritecore.mixin.blockstatecache.BlockStateCacheAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSArrayAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VSSplitAccess;
 import malte0811.ferritecore.mixin.blockstatecache.VoxelShapeAccess;
