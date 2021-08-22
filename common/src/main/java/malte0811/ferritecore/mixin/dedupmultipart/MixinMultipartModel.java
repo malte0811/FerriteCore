@@ -24,22 +24,32 @@ import java.util.Map;
  * runtime/parallelization, in my experience this part of the code is not runtime-critical enough to put significant
  * effort into fancy parallelization solutions (may change in the future).
  */
-// Work around Java/Mixin limitations
-@SuppressWarnings("SynchronizeOnNonFinalField")
+// Non-final fields: Work around Java/Mixin limitations
+// Unresolved reference: Forge adds a parameter to getQuads, so the usual remapping process breaks and I need to specify
+// SRG and intermediary names directly, which confuses the MCDev IntelliJ plugin
+@SuppressWarnings({"SynchronizeOnNonFinalField", "UnresolvedMixinReference"})
 @Mixin(MultipartBakedModel.class)
 public class MixinMultipartModel {
     @Shadow
     @Final
     private Map<BlockState, BitSet> bitSetCache;
 
-    @Redirect(method = "getQuads", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
+    @Redirect(
+            method = {"method_4707", "func_200117_a", "getQuads"},
+            at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"),
+            remap = false
+    )
     public <K, V> V redirectCacheGet(Map<K, V> map, K key) {
         synchronized (bitSetCache) {
             return map.get(key);
         }
     }
 
-    @Redirect(method = "getQuads", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    @Redirect(
+            method = {"method_4707", "func_200117_a", "getQuads"},
+            at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
+            remap = false
+    )
     public <K, V> V redirectCachePut(Map<K, V> map, K key, V value) {
         synchronized (bitSetCache) {
             return map.put(key, value);
