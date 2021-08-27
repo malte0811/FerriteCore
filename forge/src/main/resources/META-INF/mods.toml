@@ -13,13 +13,13 @@ Reduces memory usage.
 logoFile="logo.png"
 [[dependencies.ferritecore]]
     modId="forge"
-    mandatory=true
-    versionRange="[35.1.0,)"
-    ordering="NONE"
+    mandatory = true
+versionRange = "[37.0.44,)"
+ordering = "NONE"
     side="BOTH"
 [[dependencies.ferritecore]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.16.4,)"
-    ordering="NONE"
+mandatory = true
+versionRange = "[1.17.1,)"
+ordering = "NONE"
     side="BOTH"

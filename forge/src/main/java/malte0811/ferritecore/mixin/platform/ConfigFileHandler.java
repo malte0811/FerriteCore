@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.config;
+package malte0811.ferritecore.mixin.platform;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;

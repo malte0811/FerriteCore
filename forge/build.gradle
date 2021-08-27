@@ -3,7 +3,7 @@ plugins {
 }
 
 configurations {
-    shadow
+    shadowCommon
 }
 
 architectury {
@@ -20,7 +20,7 @@ dependencies {
     developmentForge(project(path: ":common")) {
         transitive = false
     }
-    shadow(project(path: ":common", configuration: "transformProductionForge")) {
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
     }
 }
@@ -36,12 +36,12 @@ processResources {
 shadowJar {
     exclude "fabric.mod.json"
 
-    configurations = [project.configurations.shadow]
-    classifier "shadow"
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
 }
 
 remapJar {
     dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
+    input.set(shadowJar.archiveFile)
     classifier "forge"
 }

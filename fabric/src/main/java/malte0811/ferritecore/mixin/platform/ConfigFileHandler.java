@@ -1,7 +1,8 @@
-package malte0811.ferritecore.mixin.config;
+package malte0811.ferritecore.mixin.platform;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import malte0811.ferritecore.mixin.config.FerriteConfig;
 import malte0811.ferritecore.util.Constants;
 
 import java.io.IOException;

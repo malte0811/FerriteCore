@@ -2,23 +2,21 @@ package malte0811.ferritecore;
 
 import cpw.mods.modlauncher.api.INameMappingService;
 import malte0811.ferritecore.util.Constants;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
 
 @Mod(Constants.MODID)
 public class ModMainForge {
 
     public ModMainForge() {
         Constants.blockstateCacheFieldName = ObfuscationReflectionHelper.remapName(
-                INameMappingService.Domain.FIELD, "field_215707_c"
+                INameMappingService.Domain.FIELD, "f_60593_"
         );
         ModLoadingContext.get().registerExtensionPoint(
-                ExtensionPoint.DISPLAYTEST,
-                () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (s, b) -> true)
+                DisplayTest.class, () -> new DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (s, b) -> true)
         );
     }
 }
