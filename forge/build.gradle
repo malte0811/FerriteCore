@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 configurations {
@@ -11,8 +11,15 @@ architectury {
     forge()
 }
 
+repositories {
+    maven { // Mixins for early 1.17
+        url 'https://repo.spongepowered.org/repository/maven-public/'
+    }
+}
+
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
+    compileOnly 'org.spongepowered:mixin:0.8.4-SNAPSHOT'
 
     implementation(project(path: ":common")) {
         transitive = false
@@ -44,4 +51,8 @@ remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archiveFile)
     classifier "forge"
+}
+
+loom {
+    mixinConfigs += "ferritecore.forge.mixin.json"
 }
