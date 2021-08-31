@@ -18,6 +18,7 @@ public class FerriteConfig {
     public static final Option DEDUP_QUADS;
     public static final Option COMPACT_FAST_MAP;
     public static final Option POPULATE_NEIGHBOR_TABLE;
+    public static final Option REDUCED_CHUNK_NBT;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -49,6 +50,10 @@ public class FerriteConfig {
         DEDUP_QUADS = builder.createOption(
                 "bakedQuadDeduplication",
                 "Deduplicate vertex data of baked quads in the basic model implementations"
+        );
+        REDUCED_CHUNK_NBT = builder.createOption(
+                "reducedChunkNBT",
+                "Do not keep already-parsed NBT data for partially loaded chunks in memory"
         );
         COMPACT_FAST_MAP = builder.createOptInOption(
                 "compactFastMap",

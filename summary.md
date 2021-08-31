@@ -137,3 +137,19 @@ Saved memory: Close to 150 MB
 CPU impact: Some during model loading, none afterwards  
 Side: client  
 Mixin subpackage: `bakedquad`
+
+### 9. NBT data of partially loaded chunks
+
+Chunks are loaded from NBT in two steps. First everything but entities and block entities is loaded, then those are
+created later in the second step. Minecraft tries to keep a "buffer" of "half-loaded" chunks (i.e. ones that have
+completed the first, but not the second step) around the "fully loaded" chunks (i.e. ones that have completed both
+steps). By default, the full chunk NBT is kept between the two steps, rather than just the sub-tags for entities and
+block entities. Since those typically only account for a small fraction of the chunk data this wastes a decent amount of
+RAM.
+
+Saved memory: 90-100 MB  
+CPU impact: Minimal during chunk loading (creating a new compound tag with just entities and block entites)  
+Side: server  
+Mixin subpackage: `chunknbt`  
+Notes: The memory impact is practically independent of mods, but does depend on the loaded chunk regions. The chunks
+around the fully loaded area need to have been generated, either by a player or using a chunk pregenerator command.
