@@ -19,6 +19,7 @@ subprojects {
             "dedupmultipart",
             "blockstatecache",
             "dedupbakedquad",
+            "chunknbt",
         ].stream()
         .map({s -> rootProject.archives_base_name+"."+s+".mixin.json"})
         .collect(Collectors.toList())
