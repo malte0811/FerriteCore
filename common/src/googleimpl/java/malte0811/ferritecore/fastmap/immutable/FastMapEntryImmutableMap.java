@@ -37,4 +37,9 @@ public class FastMapEntryImmutableMap extends FerriteCoreImmutableMapAccess<Prop
     public boolean isPartialView() {
         return false;
     }
+
+    @Override
+    public ImmutableSet<Property<?>> createKeySet() {
+        return viewedState.getStateMap().getPropertySet();
+    }
 }

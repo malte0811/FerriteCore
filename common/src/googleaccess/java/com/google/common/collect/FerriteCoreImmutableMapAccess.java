@@ -14,4 +14,7 @@ public abstract class FerriteCoreImmutableMapAccess<K, V> extends ImmutableMap<K
 
     @Override
     public abstract boolean isPartialView();
+
+    @Override
+    public abstract ImmutableSet<K> createKeySet();
 }
