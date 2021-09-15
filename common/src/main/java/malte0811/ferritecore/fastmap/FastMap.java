@@ -2,8 +2,10 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -16,6 +18,7 @@ public class FastMap<Value> {
     // property name (natural order for values) and using a binary search above a given size, but choosing that size
     // would likely be more effort than it's worth
     private final Map<Property<?>, Integer> toKeyIndex;
+    private final ImmutableSet<Property<?>> propertySet;
 
     public FastMap(
             Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap, boolean compact
@@ -45,6 +48,7 @@ public class FastMap<Value> {
             valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
         this.valueMatrix = Collections.unmodifiableList(valuesList);
+        this.propertySet = ImmutableSet.copyOf(properties);
     }
 
     /**
@@ -148,5 +152,9 @@ public class FastMap<Value> {
 
     public boolean isSingleState() {
         return valueMatrix.size() == 1;
+    }
+
+    public ImmutableSet<Property<?>> getPropertySet() {
+        return propertySet;
     }
 }
