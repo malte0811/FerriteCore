@@ -32,7 +32,11 @@ import java.util.Map;
 @Mixin(value = MultiPartBakedModel.class, priority = 1100)
 public class MixinMultipartModel {
     @Redirect(
-            method = {"method_4707", "func_200117_a", "getQuads"},
+            method = {
+                    "getQuads", // Mapped name in MCP, Moj and Yarn
+                    "method_4707", "func_200117_a", // SRG and Intermediary names
+                    "emitBlockQuads" // Added by FRAPI, also needs to be synchronized
+            },
             at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
     )
@@ -43,7 +47,7 @@ public class MixinMultipartModel {
     }
 
     @Redirect(
-            method = {"method_4707", "func_200117_a", "getQuads"},
+            method = {"getQuads", "method_4707", "func_200117_a", "emitBlockQuads"},
             at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
     )
