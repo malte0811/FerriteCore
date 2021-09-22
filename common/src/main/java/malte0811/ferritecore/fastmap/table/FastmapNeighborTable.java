@@ -1,6 +1,5 @@
 package malte0811.ferritecore.fastmap.table;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Tables;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
@@ -22,28 +21,30 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
-        if (!(columnKey instanceof Comparable<?>) || !(rowKey instanceof Property<?>)) {
+        if(!(columnKey instanceof Comparable<?>)||!(rowKey instanceof Property<?> rowProperty))
+        {
             return false;
         }
-        Comparable<?> valueInState = owner.getStateMap().getValue(owner.getStateIndex(), (Property<?>) rowKey);
+        Comparable<?> valueInState = owner.getStateMap().getValue(owner.getStateIndex(), rowProperty);
         if (valueInState == null || valueInState.equals(columnKey)) {
             // Not contained in state, or the current value (which isn't added to the table)
             return false;
         } else {
-            // We contain the row, and we only ever contain non-null row keys
-            Preconditions.checkNotNull(rowKey);
             // Is value allowed for property?
-            return ((Property<?>) rowKey).getPossibleValues().contains(columnKey);
+            return rowProperty.getPossibleValues().contains(columnKey);
         }
     }
 
     @Override
     public boolean containsRow(@Nullable Object rowKey) {
-        if (!(rowKey instanceof Property<?>)) {
+        if(!(rowKey instanceof Property<?> rowProperty))
+        {
             return false;
-        } else {
+        }
+        else
+        {
             // Property is not in state
-            return owner.getStateMap().getValue(owner.getStateIndex(), (Property<?>) rowKey) != null;
+            return owner.getStateMap().getValue(owner.getStateIndex(), rowProperty)!=null;
         }
     }
 
@@ -90,10 +91,11 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public S get(@Nullable Object rowKey, @Nullable Object columnKey) {
-        if (!(rowKey instanceof Property)) {
+        if(!(rowKey instanceof Property<?> rowProperty))
+        {
             return null;
         }
-        return owner.getStateMap().withUnsafe(owner.getStateIndex(), (Property<?>) rowKey, columnKey);
+        return owner.getStateMap().withUnsafe(owner.getStateIndex(), rowProperty, columnKey);
     }
 
     @Override

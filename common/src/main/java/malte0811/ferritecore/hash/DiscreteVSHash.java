@@ -8,18 +8,21 @@ import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 
 import java.util.Objects;
 
-public class VoxelShapePartHash implements Hash.Strategy<DiscreteVoxelShape> {
-    public static final VoxelShapePartHash INSTANCE = new VoxelShapePartHash();
+public class DiscreteVSHash implements Hash.Strategy<DiscreteVoxelShape>
+{
+    public static final DiscreteVSHash INSTANCE = new DiscreteVSHash();
 
     @Override
-    public int hashCode(DiscreteVoxelShape shape) {
-        return hashCode((DiscreteVSAccess) shape);
+    public int hashCode(DiscreteVoxelShape shape)
+    {
+        return hashCode((DiscreteVSAccess)shape);
     }
 
-    public int hashCode(DiscreteVSAccess o) {
+    public int hashCode(DiscreteVSAccess o)
+    {
         int result = o.getXSize();
-        result = 31 * result + o.getYSize();
-        result = 31 * result + o.getZSize();
+        result = 31*result+o.getYSize();
+        result = 31*result+o.getZSize();
         if (o instanceof SubShapeAccess access) {
             result = 31 * result + access.getStartX();
             result = 31 * result + access.getStartY();

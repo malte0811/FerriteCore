@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class KeyValueConditionImpl {
                 } else {
                     List<Predicate<BlockState>> subPredicates = matchedStates.stream()
                             .map(subValue -> getBlockStatePredicate(stateContainer, property, subValue, key, value))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toCollection(ArrayList::new));
                     // This line is the only functional change, but targeting it with anything but Overwrite appears to
                     // be impossible
                     PredicateHelper.canonize(subPredicates);

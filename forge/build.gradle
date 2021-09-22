@@ -52,7 +52,3 @@ remapJar {
     input.set(shadowJar.archiveFile)
     classifier "forge"
 }
-
-loom {
-    mixinConfigs += "ferritecore.forge.mixin.json"
-}

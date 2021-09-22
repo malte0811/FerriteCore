@@ -21,7 +21,7 @@ public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
         } else if (o instanceof ArrayVSAccess access) {
             return ArrayVoxelShapeHash.INSTANCE.hashCode(access);
         } else if (isCubeShape(o)) {
-            return VoxelShapePartHash.INSTANCE.hashCode(o.getShape());
+            return DiscreteVSHash.INSTANCE.hashCode(o.getShape());
         } else {
             return o.hashCode();
         }
@@ -44,7 +44,7 @@ public class VoxelShapeHash implements Hash.Strategy<VoxelShape> {
         } else if (a instanceof ArrayVSAccess accessA) {
             return ArrayVoxelShapeHash.INSTANCE.equals(accessA, (ArrayVSAccess) b);
         } else if (isCubeShape(a)) {
-            return VoxelShapePartHash.INSTANCE.equals(a.getShape(), b.getShape());
+            return DiscreteVSHash.INSTANCE.equals(a.getShape(), b.getShape());
         } else {
             return a.equals(b);
         }

@@ -112,8 +112,9 @@ public class BlockStateCacheImpl {
     }
 
     private static void replaceInternals(VoxelShape toKeep, VoxelShape toReplace) {
-        if (toKeep instanceof ArrayVoxelShape && toReplace instanceof ArrayVoxelShape) {
-            replaceInternals((ArrayVoxelShape) toKeep, (ArrayVoxelShape) toReplace);
+        if(toKeep instanceof ArrayVoxelShape keepArray&&toReplace instanceof ArrayVoxelShape replaceArray)
+        {
+            replaceInternals(keepArray, replaceArray);
         }
     }
 
