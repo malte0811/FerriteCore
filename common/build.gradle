@@ -57,3 +57,11 @@ jar {
 test {
     useJUnitPlatform()
 }
+
+configurations {
+    dev
+}
+
+artifacts {
+    dev(jar)
+}

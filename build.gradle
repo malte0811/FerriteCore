@@ -1,8 +1,8 @@
 import java.util.stream.Collectors
 
 plugins {
-    id "architectury-plugin" version "3.2-SNAPSHOT"
-    id "dev.architectury.loom" version "0.7.2-SNAPSHOT" apply false
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "0.10.0-SNAPSHOT" apply false
 }
 
 architectury {
@@ -12,19 +12,8 @@ architectury {
 subprojects {
     apply plugin: "dev.architectury.loom"
 
-    def fcMixinConfigs = [
-            "predicates",
-            "fastmap",
-            "mrl",
-            "dedupmultipart",
-            "blockstatecache",
-            "dedupbakedquad",
-        ].stream()
-        .map({s -> rootProject.archives_base_name+"."+s+".mixin.json"})
-        .collect(Collectors.toList())
     loom {
         silentMojangMappingsLicense()
-        mixinConfigs += fcMixinConfigs
     }
 
     task signJar(description: "Sign jar") {

@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
 }
@@ -11,13 +13,30 @@ architectury {
     forge()
 }
 
+loom {
+    forge {
+        def fcMixinConfigs = [
+                "predicates",
+                "fastmap",
+                "mrl",
+                "dedupmultipart",
+                "blockstatecache",
+                "dedupbakedquad",
+                "chunknbt",
+        ].stream()
+                .<String>map({s -> "ferritecore."+s+".mixin.json"})
+                .collect(Collectors.toList())
+        mixinConfigs.addAll(fcMixinConfigs)
+    }
+}
+
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
 
-    implementation(project(path: ":common")) {
+    implementation(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
-    developmentForge(project(path: ":common")) {
+    developmentForge(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
     shadow(project(path: ":common", configuration: "transformProductionForge")) {
