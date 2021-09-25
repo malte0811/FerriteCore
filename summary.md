@@ -19,18 +19,20 @@ if(!opt.isPresent()){
 }
 ```
 
-The created lambda is kept around for a long time, and there are a few million of them. In
-total the shallow size (i.e. the equivalent to `sizeof` in C/C++) of the captured
+The created lambda is kept around for a long time, and there are a few million of them. In total the shallow size (i.e.
+the equivalent to `sizeof` in C/C++) of the captured
 `Optional`s is about 100 MB. By replacing the `else`-branch with
+
 ```java
 T unwrapped = opt.get();
 return () -> doThing(unwrapped);
 ```
+
 the `Optional`s can be GCd right away.
 
 Saved memory: 100 MB  
 CPU impact: zero or negative (one less pointer to follow)  
-Side: client  
+Side: client
 
 ### 2. BlockState neighbors
 
@@ -50,6 +52,7 @@ Side: both
 Mixin subpackage: `fastmap`
 
 ### 3. BlockState property storage
+
 Each blockstate stores its properties as an `ImmutableMap<Property<?>, Comparable<?>>`, which takes around 170 MB in
 total. Replacing this `ImmutableMap` by a custom implementation based on the `FastMap` from the previous point (loaded
 with some classloader trickery) removes most of that memory usage.
@@ -97,6 +100,7 @@ Note: The CPU impact of the current Mixin implementation is positive for both pa
 first part would require changing what constructor the constructor in question redirects to.
 
 ### 6. Multipart model instances
+
 By default every blockstate using a multipart model gets its own instance of that multipart model. Since multipart
 models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory. The
 only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is already

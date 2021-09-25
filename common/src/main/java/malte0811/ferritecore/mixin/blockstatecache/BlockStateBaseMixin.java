@@ -10,20 +10,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
-public abstract class BlockStateBaseMixin
-{
+public abstract class BlockStateBaseMixin {
     @Shadow
     protected abstract BlockState asState();
 
     @Inject(method = "initCache", at = @At("HEAD"))
-    public void cacheStateHead(CallbackInfo ci)
-    {
+    public void cacheStateHead(CallbackInfo ci) {
         BlockStateCacheImpl.deduplicateCachePre(asState());
     }
 
     @Inject(method = "initCache", at = @At("TAIL"))
-    public void cacheStateTail(CallbackInfo ci)
-    {
+    public void cacheStateTail(CallbackInfo ci) {
         BlockStateCacheImpl.deduplicateCachePost(asState());
     }
 }

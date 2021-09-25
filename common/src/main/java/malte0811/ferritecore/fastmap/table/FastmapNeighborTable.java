@@ -21,8 +21,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public boolean contains(@Nullable Object rowKey, @Nullable Object columnKey) {
-        if(!(columnKey instanceof Comparable<?>)||!(rowKey instanceof Property<?> rowProperty))
-        {
+        if (!(columnKey instanceof Comparable<?>) || !(rowKey instanceof Property<?> rowProperty)) {
             return false;
         }
         Comparable<?> valueInState = owner.getStateMap().getValue(owner.getStateIndex(), rowProperty);
@@ -37,14 +36,11 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public boolean containsRow(@Nullable Object rowKey) {
-        if(!(rowKey instanceof Property<?> rowProperty))
-        {
+        if (!(rowKey instanceof Property<?> rowProperty)) {
             return false;
-        }
-        else
-        {
+        } else {
             // Property is not in state
-            return owner.getStateMap().getValue(owner.getStateIndex(), rowProperty)!=null;
+            return owner.getStateMap().getValue(owner.getStateIndex(), rowProperty) != null;
         }
     }
 
@@ -91,8 +87,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public S get(@Nullable Object rowKey, @Nullable Object columnKey) {
-        if(!(rowKey instanceof Property<?> rowProperty))
-        {
+        if (!(rowKey instanceof Property<?> rowProperty)) {
             return null;
         }
         return owner.getStateMap().withUnsafe(owner.getStateIndex(), rowProperty, columnKey);

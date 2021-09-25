@@ -31,28 +31,18 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         synchronized (KNOWN_INDEXERS) {
             PropertyIndexer<?> unchecked = KNOWN_INDEXERS.computeIfAbsent(prop, propInner -> {
                 PropertyIndexer<?> result = null;
-                if(propInner instanceof BooleanProperty boolProp)
-                {
+                if (propInner instanceof BooleanProperty boolProp) {
                     result = new BoolIndexer(boolProp);
-                }
-                else if(propInner instanceof IntegerProperty intProp)
-                {
+                } else if (propInner instanceof IntegerProperty intProp) {
                     result = new IntIndexer(intProp);
-                }
-                else if(WeirdVanillaDirectionIndexer.isApplicable(propInner))
-                {
-                    result = new WeirdVanillaDirectionIndexer((Property<Direction>)propInner);
-                }
-                else if(propInner instanceof EnumProperty<?> enumProp)
-                {
+                } else if (WeirdVanillaDirectionIndexer.isApplicable(propInner)) {
+                    result = new WeirdVanillaDirectionIndexer((Property<Direction>) propInner);
+                } else if (propInner instanceof EnumProperty<?> enumProp) {
                     result = new EnumIndexer<>(enumProp);
                 }
-                if(result==null||!result.isValid())
-                {
+                if (result == null || !result.isValid()) {
                     return new GenericIndexer<>(propInner);
-                }
-                else
-                {
+                } else {
                     return result;
                 }
             });

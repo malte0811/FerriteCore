@@ -42,11 +42,11 @@ public class BlockStateCacheImpl {
                 } catch (Throwable throwable) {
                     throw new RuntimeException(throwable);
                 }
-                    };
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            };
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    });
     // Is set to the previous cache used by a state before updating the cache. If the new cache has shapes equivalent to
     // the ones in the old cache, we don't need to go through the map since the old one already had deduplicated shapes
     private static final ThreadLocal<BlockStateCacheAccess> LAST_CACHE = new ThreadLocal<>();
@@ -112,8 +112,7 @@ public class BlockStateCacheImpl {
     }
 
     private static void replaceInternals(VoxelShape toKeep, VoxelShape toReplace) {
-        if(toKeep instanceof ArrayVoxelShape keepArray&&toReplace instanceof ArrayVoxelShape replaceArray)
-        {
+        if (toKeep instanceof ArrayVoxelShape keepArray && toReplace instanceof ArrayVoxelShape replaceArray) {
             replaceInternals(keepArray, replaceArray);
         }
     }

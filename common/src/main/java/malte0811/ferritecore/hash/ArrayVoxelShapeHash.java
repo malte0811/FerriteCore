@@ -10,8 +10,8 @@ public class ArrayVoxelShapeHash implements Hash.Strategy<ArrayVSAccess> {
 
     @Override
     public int hashCode(ArrayVSAccess o) {
-        return 31*Objects.hash(o.getXPoints(), o.getYPoints(), o.getZPoints())
-                +DiscreteVSHash.INSTANCE.hashCode(o.getShape());
+        return 31 * Objects.hash(o.getXPoints(), o.getYPoints(), o.getZPoints())
+                + DiscreteVSHash.INSTANCE.hashCode(o.getShape());
     }
 
     @Override
@@ -21,9 +21,9 @@ public class ArrayVoxelShapeHash implements Hash.Strategy<ArrayVSAccess> {
         } else if (a == null || b == null) {
             return false;
         }
-        return Objects.equals(a.getXPoints(), b.getXPoints())&&
-                Objects.equals(a.getYPoints(), b.getYPoints())&&
-                Objects.equals(a.getZPoints(), b.getZPoints())&&
+        return Objects.equals(a.getXPoints(), b.getXPoints()) &&
+                Objects.equals(a.getYPoints(), b.getYPoints()) &&
+                Objects.equals(a.getZPoints(), b.getZPoints()) &&
                 DiscreteVSHash.INSTANCE.equals(a.getShape(), b.getShape());
     }
 }

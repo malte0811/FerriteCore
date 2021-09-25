@@ -7,6 +7,7 @@ import malte0811.ferritecore.fastmap.table.CrashNeighborTable;
 import malte0811.ferritecore.fastmap.table.FastmapNeighborTable;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
 import net.minecraft.world.level.block.state.properties.Property;
+
 import java.util.Map;
 
 public class StateHolderImpl {

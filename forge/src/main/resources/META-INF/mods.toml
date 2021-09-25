@@ -1,25 +1,25 @@
-modLoader="javafml"
-loaderVersion="[28,)"
+modLoader = "javafml"
+loaderVersion = "[28,)"
 
-license="MIT"
+license = "MIT"
 [[mods]]
 modId = "ferritecore"
 version = "${version}"
 displayName = "Ferrite Core"
-authors="malte0811"
-description='''
+authors = "malte0811"
+description = '''
 Reduces memory usage.
 '''
-logoFile="logo.png"
+logoFile = "logo.png"
 [[dependencies.ferritecore]]
-    modId="forge"
-    mandatory = true
+modId = "forge"
+mandatory = true
 versionRange = "[37.0.59,)"
 ordering = "NONE"
-    side="BOTH"
+side = "BOTH"
 [[dependencies.ferritecore]]
-    modId="minecraft"
+modId = "minecraft"
 mandatory = true
 versionRange = "[1.17.1,)"
 ordering = "NONE"
-    side="BOTH"
+side = "BOTH"

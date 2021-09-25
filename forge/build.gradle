@@ -24,7 +24,7 @@ loom {
                 "dedupbakedquad",
                 "chunknbt",
         ].stream()
-                .<String>map({s -> "ferritecore."+s+".mixin.json"})
+                .<String> map({ s -> "ferritecore." + s + ".mixin.json" })
                 .collect(Collectors.toList())
         mixinConfigs.addAll(fcMixinConfigs)
     }

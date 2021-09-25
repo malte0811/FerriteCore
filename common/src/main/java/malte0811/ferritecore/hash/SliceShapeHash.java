@@ -11,8 +11,8 @@ public class SliceShapeHash implements Hash.Strategy<SliceShapeAccess> {
     @Override
     public int hashCode(SliceShapeAccess o) {
         int result = Objects.hashCode(o.getAxis());
-        result = 31*result+DiscreteVSHash.INSTANCE.hashCode(o.getShape());
-        result = 31*result+VoxelShapeHash.INSTANCE.hashCode(o.getDelegate());
+        result = 31 * result + DiscreteVSHash.INSTANCE.hashCode(o.getShape());
+        result = 31 * result + VoxelShapeHash.INSTANCE.hashCode(o.getDelegate());
         return result;
     }
 
@@ -23,8 +23,8 @@ public class SliceShapeHash implements Hash.Strategy<SliceShapeAccess> {
         } else if (a == null || b == null) {
             return false;
         }
-        return Objects.equals(a.getAxis(), b.getAxis())&&
-                VoxelShapeHash.INSTANCE.equals(a.getDelegate(), b.getDelegate())&&
+        return Objects.equals(a.getAxis(), b.getAxis()) &&
+                VoxelShapeHash.INSTANCE.equals(a.getDelegate(), b.getDelegate()) &&
                 DiscreteVSHash.INSTANCE.equals(a.getShape(), b.getShape());
     }
 }
