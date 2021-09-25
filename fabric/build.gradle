@@ -14,10 +14,10 @@ architectury {
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}")
 
-    implementation(project(path: ":common")) {
+    implementation(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
-    developmentFabric(project(path: ":common")) {
+    developmentFabric(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) {
@@ -46,8 +46,4 @@ remapJar {
 
 jar {
     classifier "dev"
-}
-
-loom {
-    mixinConfigs += "ferritecore.fabric.mixin.json"
 }

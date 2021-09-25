@@ -1,3 +1,5 @@
+import java.util.stream.Collectors
+
 plugins {
     id "com.github.johnrengelman.shadow" version "7.0.0"
 }
@@ -11,20 +13,30 @@ architectury {
     forge()
 }
 
-repositories {
-    maven { // Mixins for early 1.17
-        url 'https://repo.spongepowered.org/repository/maven-public/'
+loom {
+    forge {
+        def fcMixinConfigs = [
+                "predicates",
+                "fastmap",
+                "mrl",
+                "dedupmultipart",
+                "blockstatecache",
+                "dedupbakedquad",
+                "chunknbt",
+        ].stream()
+                .<String>map({s -> "ferritecore."+s+".mixin.json"})
+                .collect(Collectors.toList())
+        mixinConfigs.addAll(fcMixinConfigs)
     }
 }
 
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
-    compileOnly 'org.spongepowered:mixin:0.8.4-SNAPSHOT'
 
-    implementation(project(path: ":common")) {
+    implementation(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
-    developmentForge(project(path: ":common")) {
+    developmentForge(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
