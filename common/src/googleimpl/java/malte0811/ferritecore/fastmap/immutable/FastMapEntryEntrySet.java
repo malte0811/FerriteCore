@@ -3,7 +3,7 @@ package malte0811.ferritecore.fastmap.immutable;
 import com.google.common.collect.FerriteCoreEntrySetAccess;
 import com.google.common.collect.UnmodifiableIterator;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

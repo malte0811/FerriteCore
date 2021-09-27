@@ -1,14 +1,14 @@
 package malte0811.ferritecore.mixin.blockstatecache;
 
 import malte0811.ferritecore.ducks.BlockStateCacheAccess;
-import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(targets = "net.minecraft.block.AbstractBlock$AbstractBlockState$Cache")
+@Mixin(targets = "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase$Cache")
 public class BlockStateCacheMixin implements BlockStateCacheAccess {
     @Shadow
     @Final
@@ -19,7 +19,7 @@ public class BlockStateCacheMixin implements BlockStateCacheAccess {
     @Final
     @Mutable
     @Nullable
-    private VoxelShape[] renderShapes;
+    private VoxelShape[] occlusionShapes;
 
     @Override
     public VoxelShape getCollisionShape() {
@@ -32,12 +32,12 @@ public class BlockStateCacheMixin implements BlockStateCacheAccess {
     }
 
     @Override
-    public VoxelShape[] getRenderShapes() {
-        return this.renderShapes;
+    public VoxelShape[] getOcclusionShapes() {
+        return this.occlusionShapes;
     }
 
     @Override
-    public void setRenderShapes(@Nullable VoxelShape[] newShapes) {
-        this.renderShapes = newShapes;
+    public void setOcclusionShapes(@Nullable VoxelShape[] newShapes) {
+        this.occlusionShapes = newShapes;
     }
 }

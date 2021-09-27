@@ -47,7 +47,7 @@ subprojects {
 
     dependencies {
         minecraft("com.mojang:minecraft:${rootProject.minecraft_version}")
-        mappings "de.oceanlabs.mcp:mcp_snapshot:${rootProject.mcp_version}"
+        mappings minecraft.officialMojangMappings()
     }
 }
 

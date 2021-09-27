@@ -1,7 +1,7 @@
 package malte0811.ferritecore.mixin.dedupmultipart;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import net.minecraft.client.renderer.model.MultipartBakedModel;
+import net.minecraft.client.resources.model.MultiPartBakedModel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.Map;
 
 /**
- * The map implementation used for {@link MultipartBakedModel#bitSetCache} ({@link Object2ObjectOpenCustomHashMap})
+ * The map implementation used for {@link MultiPartBakedModel#bitSetCache} ({@link Object2ObjectOpenCustomHashMap})
  * is not thread-safe, but getQuads is called in parallel in vanilla (and even more so in Forge with
  * alwaysSetupTerrainOffThread=true). The only reason this works for vanilla is that the cache will never contain more
  * than a single blockstate, since a new instance is created for each blockstate (this is probably unintentional, a map
@@ -29,7 +29,7 @@ import java.util.Map;
 // Sync on local/parameter: The parameter is actually always a final field, but which one it is depends on whether
 // sodium is installed or not.
 @SuppressWarnings({"UnresolvedMixinReference", "SynchronizationOnLocalVariableOrMethodParameter"})
-@Mixin(value = MultipartBakedModel.class, priority = 1100)
+@Mixin(value = MultiPartBakedModel.class, priority = 1100)
 public class MixinMultipartModel {
     @Redirect(
             method = {"method_4707", "func_200117_a", "getQuads"},

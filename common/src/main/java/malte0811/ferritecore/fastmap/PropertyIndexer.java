@@ -4,13 +4,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.Property;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -21,7 +21,7 @@ import java.util.*;
  */
 public abstract class PropertyIndexer<T extends Comparable<T>> {
     private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenCustomHashMap<>(
-            Util.identityHashStrategy()
+            Util.identityStrategy()
     );
 
     private final Property<T> property;
@@ -52,7 +52,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
     protected PropertyIndexer(Property<T> property) {
         this.property = property;
-        this.numValues = property.getAllowedValues().size();
+        this.numValues = property.getPossibleValues().size();
     }
 
     public Property<T> getProperty() {
@@ -72,7 +72,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
      * Checks if this indexer is valid, i.e. iterates over the correct set of values in the correct order
      */
     protected boolean isValid() {
-        Collection<T> allowed = getProperty().getAllowedValues();
+        Collection<T> allowed = getProperty().getPossibleValues();
         int index = 0;
         for (T val : allowed) {
             if (toIndex(val) != index || !val.equals(byIndex(index))) {
@@ -113,7 +113,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
         protected IntIndexer(IntegerProperty property) {
             super(property);
-            this.min = property.getAllowedValues().stream().min(Comparator.naturalOrder()).orElse(0);
+            this.min = property.getPossibleValues().stream().min(Comparator.naturalOrder()).orElse(0);
         }
 
         @Override
@@ -132,14 +132,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
     }
 
-    private static class EnumIndexer<E extends Enum<E> & IStringSerializable>
+    private static class EnumIndexer<E extends Enum<E> & StringRepresentable>
             extends PropertyIndexer<E> {
         private final int ordinalOffset;
         private final E[] enumValues;
 
         protected EnumIndexer(EnumProperty<E> property) {
             super(property);
-            this.ordinalOffset = property.getAllowedValues()
+            this.ordinalOffset = property.getPossibleValues()
                     .stream()
                     .mapToInt(Enum::ordinal)
                     .min()
@@ -180,7 +180,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         static boolean isApplicable(Property<?> prop) {
-            Collection<?> values = prop.getAllowedValues();
+            Collection<?> values = prop.getPossibleValues();
             if (values.size() != ORDER.length) {
                 return false;
             }
@@ -223,7 +223,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
         protected GenericIndexer(Property<T> property) {
             super(property);
-            this.values = ImmutableList.copyOf(property.getAllowedValues());
+            this.values = ImmutableList.copyOf(property.getPossibleValues());
             ImmutableMap.Builder<Comparable<?>, Integer> toValueIndex = ImmutableMap.builder();
             for (int i = 0; i < this.values.size(); i++) {
                 toValueIndex.put(this.values.get(i), i);

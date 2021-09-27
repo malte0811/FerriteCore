@@ -1,6 +1,6 @@
 package malte0811.ferritecore.fastmap;
 
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * Defines the indexing strategy for a single property in a FastMap

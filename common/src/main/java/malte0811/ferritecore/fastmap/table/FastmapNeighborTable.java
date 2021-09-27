@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Tables;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import net.minecraft.state.Property;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +33,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
             // We contain the row, and we only ever contain non-null row keys
             Preconditions.checkNotNull(rowKey);
             // Is value allowed for property?
-            return ((Property<?>) rowKey).getAllowedValues().contains(columnKey);
+            return ((Property<?>) rowKey).getPossibleValues().contains(columnKey);
         }
     }
 
@@ -52,7 +52,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         FastMap<S> map = owner.getStateMap();
         for (int i = 0; i < map.numProperties(); ++i) {
             Map.Entry<Property<?>, Comparable<?>> entry = map.getEntry(i, owner.getStateIndex());
-            if (!entry.getValue().equals(columnKey) && entry.getKey().getAllowedValues().contains(columnKey)) {
+            if (!entry.getValue().equals(columnKey) && entry.getKey().getPossibleValues().contains(columnKey)) {
                 return true;
             }
         }
@@ -76,7 +76,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
     private <T extends Comparable<T>> boolean isNeighbor(Property<T> prop, Object potentialNeighbor) {
         final FastMap<S> map = owner.getStateMap();
         final T valueInState = map.getValue(owner.getStateIndex(), prop);
-        for (final T neighborValue : prop.getAllowedValues()) {
+        for (final T neighborValue : prop.getPossibleValues()) {
             if (neighborValue.equals(valueInState)) {
                 continue;
             }
@@ -114,7 +114,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
     public Map<Comparable<?>, S> row(@NotNull Property<?> rowKey) {
         final Map<Comparable<?>, S> rowMap = new HashMap<>();
         final Comparable<?> contained = owner.getStateMap().getValue(owner.getStateIndex(), rowKey);
-        for (Comparable<?> val : rowKey.getAllowedValues()) {
+        for (Comparable<?> val : rowKey.getPossibleValues()) {
             if (!val.equals(contained)) {
                 rowMap.put(val, owner.getStateMap().withUnsafe(owner.getStateIndex(), rowKey, val));
             }
@@ -130,7 +130,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         for (int i = 0; i < map.numProperties(); ++i) {
             final Property<?> rowKey = map.getKey(i).getProperty();
             final Comparable<?> contained = map.getValue(index, rowKey);
-            for (Comparable<?> val : rowKey.getAllowedValues()) {
+            for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained) && val.equals(columnKey)) {
                     rowMap.put(rowKey, map.withUnsafe(index, rowKey, val));
                 }
@@ -147,7 +147,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         for (int i = 0; i < map.numProperties(); ++i) {
             final Property<?> rowKey = map.getKey(i).getProperty();
             final Comparable<?> contained = map.getValue(index, rowKey);
-            for (Comparable<?> val : rowKey.getAllowedValues()) {
+            for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained)) {
                     rowMap.add(Tables.immutableCell(rowKey, val, map.withUnsafe(index, rowKey, val)));
                 }
@@ -168,7 +168,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         for (int i = 0; i < map.numProperties(); ++i) {
             final Property<?> rowKey = map.getKey(i).getProperty();
             final Comparable<?> contained = map.getValue(owner.getStateIndex(), rowKey);
-            for (Comparable<?> val : rowKey.getAllowedValues()) {
+            for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained)) {
                     rowMap.add(val);
                 }
@@ -185,7 +185,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         for (int i = 0; i < map.numProperties(); ++i) {
             final Property<?> rowKey = map.getKey(i).getProperty();
             final Comparable<?> contained = map.getValue(index, rowKey);
-            for (Comparable<?> val : rowKey.getAllowedValues()) {
+            for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained)) {
                     rowMap.add(map.withUnsafe(index, rowKey, val));
                 }

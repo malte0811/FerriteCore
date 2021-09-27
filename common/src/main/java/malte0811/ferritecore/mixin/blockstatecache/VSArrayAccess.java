@@ -1,27 +1,27 @@
 package malte0811.ferritecore.mixin.blockstatecache;
 
 import it.unimi.dsi.fastutil.doubles.DoubleList;
-import net.minecraft.util.math.shapes.VoxelShapeArray;
+import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(VoxelShapeArray.class)
+@Mixin(ArrayVoxelShape.class)
 public interface VSArrayAccess {
     @Accessor
-    void setXPoints(DoubleList newPoints);
+    void setXs(DoubleList newPoints);
 
     @Accessor
-    void setYPoints(DoubleList newPoints);
+    void setYs(DoubleList newPoints);
 
     @Accessor
-    void setZPoints(DoubleList newPoints);
+    void setZs(DoubleList newPoints);
 
     @Accessor
-    DoubleList getXPoints();
+    DoubleList getXs();
 
     @Accessor
-    DoubleList getYPoints();
+    DoubleList getYs();
 
     @Accessor
-    DoubleList getZPoints();
+    DoubleList getZs();
 }

@@ -1,6 +1,6 @@
 package malte0811.ferritecore.ducks;
 
-import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 
@@ -11,7 +11,7 @@ public interface BlockStateCacheAccess {
 
     void setCollisionShape(VoxelShape newShape);
 
-    VoxelShape[] getRenderShapes();
+    VoxelShape[] getOcclusionShapes();
 
-    void setRenderShapes(@Nullable VoxelShape[] newShapes);
+    void setOcclusionShapes(@Nullable VoxelShape[] newShapes);
 }

@@ -1,8 +1,8 @@
 package malte0811.ferritecore.fastmap;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.state.Property;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * A bitmask-based implementation of a FastMapKey. This reduces the density of data in the value matrix, but allows
@@ -14,12 +14,12 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
 
     public BinaryFastMapKey(Property<T> property, int mapFactor) {
         super(property);
-        Preconditions.checkArgument(MathHelper.isPowerOfTwo(mapFactor));
-        final int addedFactor = MathHelper.smallestEncompassingPowerOfTwo(numValues());
+        Preconditions.checkArgument(Mth.isPowerOfTwo(mapFactor));
+        final int addedFactor = Mth.smallestEncompassingPowerOfTwo(numValues());
         Preconditions.checkState(numValues() <= addedFactor);
         Preconditions.checkState(addedFactor < 2 * numValues());
-        final int setBitInBaseFactor = MathHelper.log2(mapFactor);
-        final int setBitInAddedFactor = MathHelper.log2(addedFactor);
+        final int setBitInBaseFactor = Mth.log2(mapFactor);
+        final int setBitInAddedFactor = Mth.log2(addedFactor);
         Preconditions.checkState(setBitInBaseFactor + setBitInAddedFactor <= 31);
         firstBitInValue = (byte) setBitInBaseFactor;
         firstBitAfterValue = (byte) (setBitInBaseFactor + setBitInAddedFactor);
