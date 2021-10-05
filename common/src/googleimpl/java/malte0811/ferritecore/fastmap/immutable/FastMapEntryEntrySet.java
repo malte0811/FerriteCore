@@ -29,11 +29,12 @@ public class FastMapEntryEntrySet extends FerriteCoreEntrySetAccess<Property<?>,
 
     @Override
     public boolean contains(@Nullable Object object) {
-        if (!(object instanceof Map.Entry<?, ?> entry)) {
+        if (!(object instanceof Map.Entry<?, ?>)) {
             return false;
         }
+        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
         Comparable<?> valueInMap = viewedState.getStateMap().getValue(viewedState.getStateIndex(), entry.getKey());
-        return valueInMap != null && valueInMap.equals(((Map.Entry<?, ?>) object).getValue());
+        return valueInMap != null && valueInMap.equals(entry.getValue());
     }
 
     @Override

@@ -23,8 +23,9 @@ import java.util.function.Consumer;
 
 @Mixin(ChunkSerializer.class)
 public abstract class ChunkSerializerMixin {
+
     @Shadow
-    private static void postLoadChunk(ServerLevel serverLevel, CompoundTag compoundTag, LevelChunk levelChunk) {}
+    private static void postLoadChunk(CompoundTag compoundTag, LevelChunk levelChunk) {}
 
     @Inject(
             method = "read",
@@ -47,7 +48,7 @@ public abstract class ChunkSerializerMixin {
             TickList<Fluid> fluidTicks, long l, LevelChunkSection[] sections, Consumer<LevelChunk> consumer
     ) {
         CompoundTag strippedNBT = ChunkNBTImpl.getExtractedNBT();
-        return levelChunk -> postLoadChunk((ServerLevel) level, strippedNBT, levelChunk);
+        return levelChunk -> postLoadChunk(strippedNBT, levelChunk);
     }
 
     @Inject(method = "read", at = @At("RETURN"))
