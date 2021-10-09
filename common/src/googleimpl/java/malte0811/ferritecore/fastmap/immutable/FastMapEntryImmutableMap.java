@@ -42,4 +42,10 @@ public class FastMapEntryImmutableMap extends FerriteCoreImmutableMapAccess<Prop
     public ImmutableSet<Property<?>> createKeySet() {
         return viewedState.getStateMap().getPropertySet();
     }
+
+    @Override
+    @SuppressWarnings("SuspiciousMethodCalls")
+    public boolean containsKey(@Nullable Object key) {
+        return viewedState.getStateMap().getPropertySet().contains(key);
+    }
 }
