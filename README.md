@@ -9,6 +9,5 @@ For a high-level description of the improvements implemented by this mod see [he
 
 ### Mappings
 
-This mod currently uses MCP names for everything, in case someone involved in MCP mapping wants to look at it. There are
-a few commits using official names, so be careful when looking at the commit history if you are concerned about "mapping
-taint".
+This mod currently uses official names for everything. It previously used MCP names, so be careful when looking
+at the commit history if you are concerned about "mapping taint".
