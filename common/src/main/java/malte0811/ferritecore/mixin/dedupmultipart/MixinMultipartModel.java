@@ -34,7 +34,7 @@ public class MixinMultipartModel {
     @Redirect(
             method = {
                     "getQuads", // Mapped name in MCP, Moj and Yarn
-                    "method_4707", "func_200117_a", // SRG and Intermediary names
+                    "method_4707", "m_6840_", // SRG and Intermediary names
                     "emitBlockQuads" // Added by FRAPI, also needs to be synchronized
             },
             at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"),
@@ -47,7 +47,7 @@ public class MixinMultipartModel {
     }
 
     @Redirect(
-            method = {"getQuads", "method_4707", "func_200117_a", "emitBlockQuads"},
+            method = {"getQuads", "method_4707", "m_6840_", "emitBlockQuads"},
             at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
     )

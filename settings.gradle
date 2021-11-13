@@ -11,4 +11,4 @@ include("common")
 include("fabric")
 include("forge")
 
-rootProject.name = "ferritecore"
+rootProject.name = "FerriteCore-1.17"
