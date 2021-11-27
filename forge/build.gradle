@@ -22,7 +22,6 @@ loom {
                 "dedupmultipart",
                 "blockstatecache",
                 "dedupbakedquad",
-                "chunknbt",
         ].stream()
                 .<String> map({ s -> "ferritecore." + s + ".mixin.json" })
                 .collect(Collectors.toList())
