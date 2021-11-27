@@ -2,11 +2,12 @@ package malte0811.ferritecore.fastmap.immutable;
 
 import com.google.common.collect.UnmodifiableIterator;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
+import malte0811.ferritecore.fastmap.FastMap;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import java.util.Map;
 
-public class FastMapEntryIterator extends UnmodifiableIterator<Map.Entry<Property<?>, Comparable<?>>> {
+public abstract class FastMapEntryIterator<T> extends UnmodifiableIterator<T> {
     private final FastMapStateHolder<?> viewedState;
     private int currentIndex = 0;
 
@@ -20,11 +21,11 @@ public class FastMapEntryIterator extends UnmodifiableIterator<Map.Entry<Propert
     }
 
     @Override
-    public Map.Entry<Property<?>, Comparable<?>> next() {
-        Map.Entry<Property<?>, Comparable<?>> next = viewedState.getStateMap().getEntry(
-                currentIndex, viewedState.getStateIndex()
-        );
+    public T next() {
+        T next = getEntry(currentIndex, viewedState.getStateMap(), viewedState.getStateIndex());
         ++currentIndex;
         return next;
     }
+
+    protected abstract T getEntry(int propertyIndex, FastMap<?> map, int stateIndex);
 }

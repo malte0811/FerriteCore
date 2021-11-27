@@ -3,6 +3,7 @@ package malte0811.ferritecore.fastmap.immutable;
 import com.google.common.collect.FerriteCoreEntrySetAccess;
 import com.google.common.collect.UnmodifiableIterator;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
+import malte0811.ferritecore.fastmap.FastMap;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,14 @@ public class FastMapEntryEntrySet extends FerriteCoreEntrySetAccess<Property<?>,
     @Override
     @NotNull
     public UnmodifiableIterator<Map.Entry<Property<?>, Comparable<?>>> iterator() {
-        return new FastMapEntryIterator(viewedState);
+        return new FastMapEntryIterator<>(viewedState) {
+            @Override
+            protected Map.Entry<Property<?>, Comparable<?>> getEntry(
+                    int propertyIndex, FastMap<?> map, int stateIndex
+            ) {
+                return map.getEntry(propertyIndex, stateIndex);
+            }
+        };
     }
 
     @Override

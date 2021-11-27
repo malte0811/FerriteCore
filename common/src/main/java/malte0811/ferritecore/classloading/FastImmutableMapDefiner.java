@@ -40,6 +40,7 @@ public class FastImmutableMapDefiner {
             // Load these in the app classloader!
             defineInAppClassloader("com.google.common.collect.FerriteCoreEntrySetAccess");
             defineInAppClassloader("com.google.common.collect.FerriteCoreImmutableMapAccess");
+            defineInAppClassloader("com.google.common.collect.FerriteCoreImmutableCollectionAccess");
             // This lives in the transforming classloader, but must not be loaded before the previous classes are in
             // the app classloader!
             Class<?> map = Class.forName("malte0811.ferritecore.fastmap.immutable.FastMapEntryImmutableMap");

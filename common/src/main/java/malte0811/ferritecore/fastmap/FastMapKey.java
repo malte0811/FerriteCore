@@ -19,7 +19,7 @@ public abstract class FastMapKey<T extends Comparable<T>> {
      * @param mapIndex An index in the FastMap's value matrix
      * @return The value of this property in that index
      */
-    abstract T getValue(int mapIndex);
+    public abstract T getValue(int mapIndex);
 
     /**
      * @param mapIndex The original index in the FastMap's value matrix

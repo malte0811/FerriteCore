@@ -1,6 +1,7 @@
 package malte0811.ferritecore.fastmap.immutable;
 
 import com.google.common.collect.FerriteCoreImmutableMapAccess;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -41,5 +42,10 @@ public class FastMapEntryImmutableMap extends FerriteCoreImmutableMapAccess<Prop
     @Override
     public ImmutableSet<Property<?>> createKeySet() {
         return viewedState.getStateMap().getPropertySet();
+    }
+
+    @Override
+    public ImmutableCollection<Comparable<?>> createValues() {
+        return new FastMapValueSet(viewedState);
     }
 }
