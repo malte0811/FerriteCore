@@ -38,7 +38,7 @@ dependencies {
 
 architectury {
     injectInjectables = false
-    common(false)
+    common()
 }
 
 jar {

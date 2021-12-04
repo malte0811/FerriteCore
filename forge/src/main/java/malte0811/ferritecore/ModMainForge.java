@@ -6,7 +6,7 @@ import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
+import net.minecraftforge.network.NetworkConstants;
 
 @Mod(Constants.MODID)
 public class ModMainForge {
@@ -16,7 +16,7 @@ public class ModMainForge {
                 INameMappingService.Domain.FIELD, "f_60593_"
         );
         ModLoadingContext.get().registerExtensionPoint(
-                DisplayTest.class, () -> new DisplayTest(() -> FMLNetworkConstants.IGNORESERVERONLY, (s, b) -> true)
+                DisplayTest.class, () -> new DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (s, b) -> true)
         );
     }
 }
