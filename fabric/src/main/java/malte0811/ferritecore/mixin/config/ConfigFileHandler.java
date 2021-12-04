@@ -3,6 +3,7 @@ package malte0811.ferritecore.mixin.config;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import malte0811.ferritecore.util.Constants;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,9 +16,10 @@ import java.util.Properties;
 public class ConfigFileHandler {
     // Called reflectively from FerriteConfig
     public static void finish(List<FerriteConfig.Option> options) throws IOException {
-        Path config = Paths.get("config", Constants.MODID + ".mixin.properties");
-        if (!Files.exists(config))
+        Path config = FabricLoader.getInstance().getConfigDir().resolve(Constants.MODID + ".mixin.properties");
+        if (!Files.exists(config)) {
             Files.createFile(config);
+        }
         Properties propsInFile = new Properties();
         propsInFile.load(Files.newInputStream(config));
         Object2BooleanMap<String> existingOptions = new Object2BooleanOpenHashMap<>();
