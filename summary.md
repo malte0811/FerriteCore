@@ -140,3 +140,18 @@ Saved memory: Close to 150 MB
 CPU impact: Some during model loading, none afterwards  
 Side: client  
 Mixin subpackage: `bakedquad`
+
+### 9. `ThreadingDetector`
+
+Since 1.18 each `PalettedContainer` contains a `ThreadingDetector` to trigger a crash when multiple threads try to use
+the container at the same time. Since one of these exists for every loaded chunk section (actually two due to the
+implementation of `ImposterProtoChunk`) this adds up to around 10-15 MB with only one player and scales with the amount
+of loaded chunks. In singleplayer these objects exist for both server and client, so the amount is doubled.  
+The same effect can be achieved by adding a single field of type `Thread` to `PalettedContainer` and accessing it
+atomically using `VarHandle`. The most expensive operation in both implementations is one atomic memory access, the new
+implementation even saves an additional lock acquisition.
+
+Saved memory: 10-15 MB with only one player, more if more chunks are loaded. Does not depend on modpack size.  
+CPU impact: None or slightly negative  
+Side: Both  
+Mixin subpackage: `threaddetec`
