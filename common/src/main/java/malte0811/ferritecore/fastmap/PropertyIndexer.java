@@ -1,7 +1,6 @@
 package malte0811.ferritecore.fastmap;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.Util;
@@ -13,7 +12,10 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
 
 /**
  * Provides a way of converting between values of a property and indices in [0, #values). Most properties are covered
@@ -26,6 +28,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
     private final Property<T> property;
     private final int numValues;
+    protected final T[] valuesInOrder;
 
     public static <T extends Comparable<T>> PropertyIndexer<T> makeIndexer(Property<T> prop) {
         synchronized (KNOWN_INDEXERS) {
@@ -50,9 +53,10 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
     }
 
-    protected PropertyIndexer(Property<T> property) {
+    protected PropertyIndexer(Property<T> property, T[] valuesInOrder) {
         this.property = property;
         this.numValues = property.getPossibleValues().size();
+        this.valuesInOrder = valuesInOrder;
     }
 
     public Property<T> getProperty() {
@@ -64,7 +68,13 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
     }
 
     @Nullable
-    public abstract T byIndex(int index);
+    public final T byIndex(int index) {
+        if (index >= 0 && index < valuesInOrder.length) {
+            return valuesInOrder[index];
+        } else {
+            return null;
+        }
+    }
 
     public abstract int toIndex(T value);
 
@@ -84,19 +94,10 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
     }
 
     private static class BoolIndexer extends PropertyIndexer<Boolean> {
+        private static final Boolean[] VALUES = {true, false};
 
         protected BoolIndexer(BooleanProperty property) {
-            super(property);
-        }
-
-        @Override
-        @Nullable
-        public Boolean byIndex(int index) {
-            return switch (index) {
-                case 0 -> Boolean.TRUE;
-                case 1 -> Boolean.FALSE;
-                default -> null;
-            };
+            super(property, VALUES);
         }
 
         @Override
@@ -109,18 +110,8 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         private final int min;
 
         protected IntIndexer(IntegerProperty property) {
-            super(property);
+            super(property, property.getPossibleValues().toArray(new Integer[0]));
             this.min = property.getPossibleValues().stream().min(Comparator.naturalOrder()).orElse(0);
-        }
-
-        @Override
-        @Nullable
-        public Integer byIndex(int index) {
-            if (index >= 0 && index < numValues()) {
-                return index + min;
-            } else {
-                return null;
-            }
         }
 
         @Override
@@ -132,27 +123,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
     private static class EnumIndexer<E extends Enum<E> & StringRepresentable>
             extends PropertyIndexer<E> {
         private final int ordinalOffset;
-        private final E[] enumValues;
 
         protected EnumIndexer(EnumProperty<E> property) {
-            super(property);
+            super(property, property.getPossibleValues().toArray((E[]) new Enum<?>[0]));
             this.ordinalOffset = property.getPossibleValues()
                     .stream()
                     .mapToInt(Enum::ordinal)
                     .min()
                     .orElse(0);
-            this.enumValues = getProperty().getValueClass().getEnumConstants();
-        }
-
-        @Override
-        @Nullable
-        public E byIndex(int index) {
-            final int arrayIndex = index + ordinalOffset;
-            if (arrayIndex < enumValues.length) {
-                return enumValues[arrayIndex];
-            } else {
-                return null;
-            }
         }
 
         @Override
@@ -172,7 +150,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         };
 
         public WeirdVanillaDirectionIndexer(Property<Direction> prop) {
-            super(prop);
+            super(prop, ORDER);
             Preconditions.checkState(isValid());
         }
 
@@ -182,16 +160,6 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
                 return false;
             }
             return Arrays.equals(ORDER, values.toArray());
-        }
-
-        @Override
-        @Nullable
-        public Direction byIndex(int index) {
-            if (index >= 0 && index < ORDER.length) {
-                return ORDER[index];
-            } else {
-                return null;
-            }
         }
 
         @Override
@@ -209,22 +177,14 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
 
     private static class GenericIndexer<T extends Comparable<T>> extends PropertyIndexer<T> {
         private final Map<Comparable<?>, Integer> toValueIndex;
-        private final List<T> values;
 
         protected GenericIndexer(Property<T> property) {
-            super(property);
-            this.values = ImmutableList.copyOf(property.getPossibleValues());
+            super(property, property.getPossibleValues().toArray((T[]) new Comparable[0]));
             ImmutableMap.Builder<Comparable<?>, Integer> toValueIndex = ImmutableMap.builder();
-            for (int i = 0; i < this.values.size(); i++) {
-                toValueIndex.put(this.values.get(i), i);
+            for (int i = 0; i < this.valuesInOrder.length; i++) {
+                toValueIndex.put(this.valuesInOrder[i], i);
             }
             this.toValueIndex = toValueIndex.build();
-        }
-
-        @Override
-        @Nullable
-        public T byIndex(int index) {
-            return values.get(index);
         }
 
         @Override
