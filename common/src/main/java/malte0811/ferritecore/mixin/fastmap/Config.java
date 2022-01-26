@@ -5,6 +5,6 @@ import malte0811.ferritecore.mixin.config.FerriteMixinConfig;
 
 public class Config extends FerriteMixinConfig {
     public Config() {
-        super(FerriteConfig.NEIGHBOR_LOOKUP, false);
+        super(FerriteConfig.NEIGHBOR_LOOKUP);
     }
 }
