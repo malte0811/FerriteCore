@@ -1,8 +1,9 @@
 package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import javax.annotation.Nullable;
@@ -12,12 +13,14 @@ import java.util.*;
  * Maps a Property->Value assignment to a value, while allowing fast access to "neighbor" states
  */
 public class FastMap<Value> {
+    private static final int INVALID_INDEX = -1;
+
     private final List<FastMapKey<?>> keys;
     private final List<Value> valueMatrix;
     // It might be possible to get rid of this (and the equivalent map for values) by sorting the key vectors by
     // property name (natural order for values) and using a binary search above a given size, but choosing that size
     // would likely be more effort than it's worth
-    private final Map<Property<?>, Integer> toKeyIndex;
+    private final Object2IntMap<Property<?>> toKeyIndex;
     private final ImmutableSet<Property<?>> propertySet;
 
     public FastMap(
@@ -25,9 +28,10 @@ public class FastMap<Value> {
     ) {
         List<FastMapKey<?>> keys = new ArrayList<>(properties.size());
         int factorUpTo = 1;
-        ImmutableMap.Builder<Property<?>, Integer> toKeyIndex = ImmutableMap.builder();
+        this.toKeyIndex = new Object2IntOpenHashMap<>();
+        this.toKeyIndex.defaultReturnValue(INVALID_INDEX);
         for (Property<?> prop : properties) {
-            toKeyIndex.put(prop, keys.size());
+            this.toKeyIndex.put(prop, keys.size());
             FastMapKey<?> nextKey;
             if (compact) {
                 nextKey = new CompactFastMapKey<>(prop, factorUpTo);
@@ -38,7 +42,6 @@ public class FastMap<Value> {
             factorUpTo *= nextKey.getFactorToNext();
         }
         this.keys = ImmutableList.copyOf(keys);
-        this.toKeyIndex = toKeyIndex.build();
 
         List<Value> valuesList = new ArrayList<>(factorUpTo);
         for (int i = 0; i < factorUpTo; ++i) {
@@ -142,8 +145,8 @@ public class FastMap<Value> {
     @Nullable
     private <T extends Comparable<T>>
     FastMapKey<T> getKeyFor(Property<T> prop) {
-        Integer index = toKeyIndex.get(prop);
-        if (index == null) {
+        int index = toKeyIndex.getInt(prop);
+        if (index == INVALID_INDEX) {
             return null;
         } else {
             return (FastMapKey<T>) getKey(index);
