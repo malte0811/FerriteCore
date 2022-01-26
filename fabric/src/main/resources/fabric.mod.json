@@ -32,5 +32,10 @@
     "ferritecore.predicates.mixin.json",
     "ferritecore.dedupbakedquad.mixin.json",
     "ferritecore.fabric.mixin.json"
-  ]
+  ],
+  "custom": {
+    "lithium:options": {
+      "mixin.alloc.blockstate": false
+    }
+  }
 }
