@@ -21,8 +21,8 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.12.8",
-    "minecraft": ">=1.18"
+    "fabricloader": ">=0.12.11",
+    "minecraft": ">=1.18.1 <1.19"
   },
   "mixins": [
     "ferritecore.blockstatecache.mixin.json",
