@@ -31,7 +31,6 @@
     "ferritecore.mrl.mixin.json",
     "ferritecore.predicates.mixin.json",
     "ferritecore.dedupbakedquad.mixin.json",
-    "ferritecore.threaddetec.mixin.json",
     "ferritecore.fabric.mixin.json"
   ],
   "custom": {
