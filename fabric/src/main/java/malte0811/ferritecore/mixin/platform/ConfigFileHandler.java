@@ -9,7 +9,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -19,6 +18,7 @@ public class ConfigFileHandler {
     public static void finish(List<FerriteConfig.Option> options) throws IOException {
         Path config = FabricLoader.getInstance().getConfigDir().resolve(Constants.MODID + ".mixin.properties");
         if (!Files.exists(config)) {
+            Files.createDirectories(config.getParent());
             Files.createFile(config);
         }
         Properties propsInFile = new Properties();
