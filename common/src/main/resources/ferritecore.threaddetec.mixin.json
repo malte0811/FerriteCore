@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.threaddetec",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.threaddetec.Config",
+  "mixins": [
+    "PalettedContainerMixin"
+  ]
+}

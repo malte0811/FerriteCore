@@ -140,3 +140,22 @@ Saved memory: Close to 150 MB
 CPU impact: Some during model loading, none afterwards  
 Side: client  
 Mixin subpackage: `bakedquad`
+
+### 9. `ThreadingDetector`
+
+Since 1.18 each `PalettedContainer` contains a `ThreadingDetector` to trigger a crash when multiple threads try to use
+the container at the same time. Since one of these exists for every loaded chunk section (actually two due to the
+implementation of `ImposterProtoChunk`) this adds up to around 10-15 MB with only one player and scales with the amount
+of loaded chunks (in particular with render distance). In singleplayer these objects exist for both server and client,
+so the amount is doubled.  
+The same effect can be achieved by adding a single field of type `byte` to `PalettedContainer` and using
+the `PalettedContainer` itself as the monitor for synchronization (nothing else synchronizes on them), with a slow
+global data structure for handling the actual crashing since this path should virtually never run. The performance
+should be nearly identical to vanilla, possibly even a little better: Vanilla's fast path consist mainly of a lock
+acquisition, an atomic CAS (behind some abstraction), and a lock release. This implementation replaces the atomic CAS
+with a non-atomic one, and does not need any additional atomic operations.
+
+Saved memory: 10-15 MB with only one player, more if more chunks are loaded. Does not depend on modpack size.  
+CPU impact: None or slightly negative  
+Side: Both  
+Mixin subpackage: `threaddetec`
