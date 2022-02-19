@@ -24,6 +24,9 @@
     "fabricloader": ">=0.12.11",
     "minecraft": ">=1.18.1 <1.19"
   },
+  "breaks": {
+    "hydrogen": "*"
+  },
   "mixins": [
     "ferritecore.blockstatecache.mixin.json",
     "ferritecore.dedupmultipart.mixin.json",
