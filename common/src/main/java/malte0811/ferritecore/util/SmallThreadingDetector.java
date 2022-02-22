@@ -6,6 +6,7 @@ import net.minecraft.util.ThreadingDetector;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 
 @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 public class SmallThreadingDetector {
@@ -73,12 +74,12 @@ public class SmallThreadingDetector {
 
         private static void crashAcquire(SmallThreadDetectable owner) {
             var state = getAndWait(owner, ThreadRole.ACQUIRE);
-            throw ThreadingDetector.makeThreadingException(state.name, state.acquireThread);
+            throw state.mainException;
         }
 
         private static void crashRelease(SmallThreadDetectable owner) {
             var state = getAndWait(owner, ThreadRole.RELEASE);
-            throw ThreadingDetector.makeThreadingException(state.name, state.releaseThread);
+            throw state.mainException;
         }
 
         private static void crashBystander(SmallThreadDetectable owner) {
@@ -110,6 +111,7 @@ public class SmallThreadingDetector {
         final String name;
         Thread acquireThread;
         Thread releaseThread;
+        RuntimeException mainException;
 
         private CrashingState(String name) {
             this.name = name;
@@ -126,22 +128,32 @@ public class SmallThreadingDetector {
             // Notify other threads waiting for this crash to be ready
             notifyAll();
             try {
-                final long maxTotalTime = 10000;
-                final var start = System.currentTimeMillis();
-                while (acquireThread == null || releaseThread == null) {
-                    if (System.currentTimeMillis() - start > maxTotalTime) {
-                        // Crash without both threads present if we don't manage to "find" them within 10 seconds
-                        // Happens e.g. when a release call is just missing, vanilla would hang indefinitely instead
-                        // in this case
-                        throw new RuntimeException(
-                                "Threading detector crash did not find other thread, missing release call?"
-                        );
-                    }
-                    // Release lock on this for up to 10 seconds, or until the other threads are ready
-                    this.wait(maxTotalTime);
+                waitUntilOrCrash(() -> acquireThread != null && releaseThread != null);
+                if (role == ThreadRole.ACQUIRE) {
+                    mainException = ThreadingDetector.makeThreadingException(name, releaseThread);
+                    notifyAll();
+                } else {
+                    waitUntilOrCrash(() -> mainException != null);
                 }
             } catch (InterruptedException x) {
                 Thread.currentThread().interrupt();
+            }
+        }
+
+        private synchronized void waitUntilOrCrash(BooleanSupplier isReady) throws InterruptedException {
+            final long maxTotalTime = 10000;
+            final var start = System.currentTimeMillis();
+            while (!isReady.getAsBoolean()) {
+                if (System.currentTimeMillis() - start > maxTotalTime) {
+                    // Crash without both threads present if we don't manage to "find" them within 10 seconds
+                    // Happens e.g. when a release call is just missing, vanilla would hang indefinitely instead
+                    // in this case
+                    throw new RuntimeException(
+                            "Threading detector crash did not find other thread, missing release call?"
+                    );
+                }
+                // Release lock on this for up to 10 seconds, or until the other threads are ready
+                this.wait(maxTotalTime);
             }
         }
     }

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -49,15 +51,18 @@ class SmallThreadingDetectorTest {
     public void testRace() throws InterruptedException {
         var obj = new OwnedObject();
         AtomicBoolean anyTripped = new AtomicBoolean(false);
+        List<Thread> threads = new ArrayList<>(10);
         for (int i = 0; i < 10; ++i)
-            runOnNewThread(() -> {
+            threads.add(runOnNewThread(() -> {
                 final long start = System.currentTimeMillis();
                 while (!anyTripped.get() && System.currentTimeMillis() - start < 1000) {
                     SmallThreadingDetector.acquire(obj, "test");
                     SmallThreadingDetector.release(obj);
                 }
-            }, $ -> anyTripped.set(true));
+            }, $ -> anyTripped.set(true)));
         Thread.sleep(1000);
+        for (var thread : threads)
+            thread.join();
         Assertions.assertTrue(anyTripped.get());
     }
 
