@@ -6,17 +6,40 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.spongepowered.asm.service.MixinService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     protected static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
+    private static final boolean HAS_LITHIUM;
+
+    static {
+        boolean hasLithium;
+        try {
+            // This does *not* load the class!
+            MixinService.getService()
+                    .getBytecodeProvider()
+                    .getClassNode("me.jellysquid.mods.lithium.common.LithiumMod");
+            hasLithium = true;
+        } catch (ClassNotFoundException | IOException e) {
+            hasLithium = false;
+        }
+        HAS_LITHIUM = hasLithium;
+    }
     private String prefix = null;
     private final FerriteConfig.Option enableOption;
+    private final boolean disableWithLithium;
+
+    protected FerriteMixinConfig(FerriteConfig.Option enableOption, boolean disableWithLithium) {
+        this.enableOption = enableOption;
+        this.disableWithLithium = disableWithLithium;
+    }
 
     protected FerriteMixinConfig(FerriteConfig.Option enableOption) {
-        this.enableOption = enableOption;
+        this(enableOption, false);
     }
 
     @Override
@@ -24,6 +47,9 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
         Preconditions.checkState(mixinClassName.startsWith(prefix), "Unexpected prefix on " + mixinClassName);
         if (!enableOption.isEnabled()) {
             LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
+            return false;
+        } else if (disableWithLithium && HAS_LITHIUM) {
+            LOGGER.warn("Mixin " + mixinClassName + " is disabled automatically as lithium is installed");
             return false;
         } else {
             return true;
