@@ -22,7 +22,7 @@
   },
   "depends": {
     "fabricloader": ">=0.12.11",
-    "minecraft": ">=1.18.1 <1.19"
+    "minecraft": ">=1.18.2 <1.19"
   },
   "breaks": {
     "hydrogen": "*"
