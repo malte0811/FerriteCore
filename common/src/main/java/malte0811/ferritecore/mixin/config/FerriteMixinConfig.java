@@ -15,31 +15,23 @@ import java.util.Set;
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     protected static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
     private static final boolean HAS_LITHIUM;
+    private static final boolean HAS_ROADRUNNER;
 
     static {
-        boolean hasLithium;
-        try {
-            // This does *not* load the class!
-            MixinService.getService()
-                    .getBytecodeProvider()
-                    .getClassNode("me.jellysquid.mods.lithium.common.LithiumMod");
-            hasLithium = true;
-        } catch (ClassNotFoundException | IOException e) {
-            hasLithium = false;
-        }
-        HAS_LITHIUM = hasLithium;
+        HAS_LITHIUM = hasClass("me.jellysquid.mods.lithium.common.LithiumMod");
+        HAS_ROADRUNNER = hasClass("me.jellysquid.mods.lithium.common.RoadRunner");
     }
     private String prefix = null;
     private final FerriteConfig.Option enableOption;
-    private final boolean disableWithLithium;
+    private final LithiumSupportState lithiumState;
 
-    protected FerriteMixinConfig(FerriteConfig.Option enableOption, boolean disableWithLithium) {
+    protected FerriteMixinConfig(FerriteConfig.Option enableOption, LithiumSupportState lithiumCompat) {
         this.enableOption = enableOption;
-        this.disableWithLithium = disableWithLithium;
+        this.lithiumState = lithiumCompat;
     }
 
     protected FerriteMixinConfig(FerriteConfig.Option enableOption) {
-        this(enableOption, false);
+        this(enableOption, LithiumSupportState.NO_CONFLICT);
     }
 
     @Override
@@ -48,7 +40,7 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
         if (!enableOption.isEnabled()) {
             LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
             return false;
-        } else if (disableWithLithium && HAS_LITHIUM) {
+        } else if (!this.lithiumState.shouldApply()) {
             LOGGER.warn("Mixin " + mixinClassName + " is disabled automatically as lithium is installed");
             return false;
         } else {
@@ -75,4 +67,28 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+
+    private static boolean hasClass(String name) {
+        try {
+            // This does *not* load the class!
+            MixinService.getService().getBytecodeProvider().getClassNode(name);
+            return true;
+        } catch (ClassNotFoundException | IOException e) {
+            return false;
+        }
+    }
+
+    protected enum LithiumSupportState {
+        NO_CONFLICT,
+        INCOMPATIBLE,
+        APPLY_IF_ROADRUNNER;
+
+        private boolean shouldApply() {
+            return switch (this) {
+                case NO_CONFLICT -> true;
+                case INCOMPATIBLE -> !HAS_LITHIUM;
+                case APPLY_IF_ROADRUNNER -> !HAS_LITHIUM || HAS_ROADRUNNER;
+            };
+        }
+    }
 }
