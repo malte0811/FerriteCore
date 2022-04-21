@@ -75,6 +75,23 @@ class SmallThreadingDetectorTest {
         detec.checkAndUnlock();
     }
 
+    @Test
+    public void testDoubleAcquire() throws InterruptedException {
+        var obj = new OwnedObject();
+        SmallThreadingDetector.acquire(obj, "Test");
+        Assertions.assertThrows(RuntimeException.class, () -> SmallThreadingDetector.acquire(obj, "Test"));
+
+        AtomicBoolean locked = new AtomicBoolean(false);
+        runOnNewThread(() -> {
+            ThreadingDetector detec = new ThreadingDetector("test");
+            detec.checkAndLock();
+            detec.checkAndLock();
+            locked.set(true);
+        });
+        Thread.sleep(1000);
+        Assertions.assertFalse(locked.get());
+    }
+
     private static Thread runOnNewThread(Executable toRun) {
         return runOnNewThread(toRun, Throwable::printStackTrace);
     }

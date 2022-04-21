@@ -68,7 +68,7 @@ public class SmallThreadingDetector {
 
         private static void startCrash(SmallThreadDetectable owner, String name) {
             synchronized (MONITOR) {
-                ACTIVE_CRASHES.put(owner, new CrashingState(name));
+                ACTIVE_CRASHES.put(owner, new CrashingState(name, owner));
             }
         }
 
@@ -105,16 +105,18 @@ public class SmallThreadingDetector {
     }
 
     /**
-     * Data needed to produce the proper crash for race on a single SmallThreadingDetectable
+     * Data needed to produce the proper crash for race on a single SmallThreadDetectable
      */
     private static class CrashingState {
         final String name;
+        final SmallThreadDetectable owner;
         Thread acquireThread;
         Thread releaseThread;
         RuntimeException mainException;
 
-        private CrashingState(String name) {
+        private CrashingState(String name, SmallThreadDetectable owner) {
             this.name = name;
+            this.owner = owner;
         }
 
         public synchronized void waitUntilReady(ThreadRole role) {
@@ -141,15 +143,17 @@ public class SmallThreadingDetector {
         }
 
         private synchronized void waitUntilOrCrash(BooleanSupplier isReady) throws InterruptedException {
-            final long maxTotalTime = 10000;
+            final long maxTotalTime = 10_000;
             final var start = System.currentTimeMillis();
             while (!isReady.getAsBoolean()) {
-                if (System.currentTimeMillis() - start > maxTotalTime) {
-                    // Crash without both threads present if we don't manage to "find" them within 10 seconds
+                if (System.currentTimeMillis() - start > 6 * maxTotalTime) {
+                    // Crash without both threads present if we don't manage to "find" them within 60 seconds
                     // Happens e.g. when a release call is just missing, vanilla would hang indefinitely instead
                     // in this case
                     throw new RuntimeException(
-                            "Threading detector crash did not find other thread, missing release call?"
+                            "Threading detector crash did not find other thread, missing release call?"+
+                            " Owner: "+this.owner+" (ID hash: "+System.identityHashCode(this.owner)+")"+
+                            ", time: "+System.currentTimeMillis()
                     );
                 }
                 // Release lock on this for up to 10 seconds, or until the other threads are ready
