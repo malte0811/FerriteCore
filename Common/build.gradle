@@ -1,0 +1,57 @@
+plugins {
+    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
+    id 'ferritecore.subproject-conventions'
+}
+
+sourceSets {
+    // Only defines classes that override the package-private Google methods as public, to allow access from other
+    // packages. Loaded on the app classloader
+    googleaccess {
+        java
+    }
+    // Defines custom implementations of ImmutableMap (and related classes). These classes live on the transforming/knot
+    // classloader, but need to be loaded after googleaccess
+    googleimpl {
+        java {
+            compileClasspath += googleaccess.output + main.compileClasspath + main.output
+        }
+    }
+    main {
+        java {
+            runtimeClasspath += googleimpl.output
+        }
+    }
+    test {
+        java {
+            runtimeClasspath += googleaccess.output + googleimpl.output
+        }
+    }
+}
+
+minecraft {
+    version(minecraft_version)
+}
+
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.3'
+    googleaccessCompileOnly group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
+    testImplementation(platform group: 'org.junit', name: 'junit-bom', version: '5.7.1')
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
+}
+
+processResources {
+    def buildProps = project.properties.clone()
+
+    filesMatching(['pack.mcmeta']) {
+        expand buildProps
+    }
+    // Move googleaccess to a directory that does not match the package to prevent accidental loads
+    into('googleaccess') {
+        from sourceSets.googleaccess.output
+        rename { String filename ->
+            // Add suffix to stop parts of the toolchain from moving these classes to the "correct" package
+            filename + "_manual"
+        }
+    }
+}

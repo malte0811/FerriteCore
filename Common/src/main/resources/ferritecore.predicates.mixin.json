@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.predicates",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "AndConditionMixin",
+    "KeyValueConditionMixin",
+    "OrConditionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.predicates.Config",
+  "refmap": "${refmap_target}refmap.json"
+}

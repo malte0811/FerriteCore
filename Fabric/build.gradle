@@ -1,0 +1,54 @@
+plugins {
+    id 'fabric-loom' version '0.11-SNAPSHOT'
+    id 'ferritecore.loader-conventions'
+}
+
+repositories {
+    maven {
+        url 'https://maven.parchmentmc.org'
+    }
+}
+
+dependencies {
+    minecraft group: 'com.mojang', name: 'minecraft', version: minecraft_version
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+    }
+    modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: fabric_loader_version
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand "version": mod_version
+    }
+}
+
+jar {
+    filesMatching("*.mixin.json") {
+        expand "refmap_target": "${archivesBaseName}-"
+    }
+}
+
+// For some reason this doesn't work when in the "convention" scripts...
+def customGradle = project.file('custom.gradle');
+if (customGradle.exists()) {
+    apply from: customGradle;
+}

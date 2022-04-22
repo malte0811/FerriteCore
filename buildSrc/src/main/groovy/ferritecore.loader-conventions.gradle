@@ -1,0 +1,75 @@
+plugins {
+    id 'ferritecore.subproject-conventions'
+}
+
+archivesBaseName = "${mod_id}-${mod_version}-" + project.name.toLowerCase()
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title'     : mod_name,
+            'Specification-Vendor'    : mod_author,
+            'Specification-Version'   : project.jar.archiveVersion,
+            'Implementation-Title'    : project.name,
+            'Implementation-Version'  : project.jar.archiveVersion,
+            'Implementation-Vendor'   : mod_author,
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'Timestampe'              : System.currentTimeMillis(),
+            'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+            'Build-On-Minecraft'      : minecraft_version
+        ])
+    }
+}
+
+task signJar(description: "Sign jar") {
+    doLast {
+        if (project.hasProperty('keyStore')) {
+            def path;
+            if (project.name == "Forge") {
+                path = tasks.getByName("reobfJar").input.get()
+            } else {
+                path = remapJar.archivePath
+            }
+            logger.warn("Signing " + path + "\n")
+            ant.signjar(jar: path,
+                    alias: project.storeAlias,
+                    keystore: project.keyStore,
+                    storepass: project.storePass,
+                    keypass: project.storePass
+            )
+        } else {
+            logger.warn("No key store found, not signing the output jar\n")
+        }
+    }
+}
+
+build.finalizedBy signJar
+
+compileJava.doFirst {
+    // This is set by Mixin during annotation processing, but should not persist between subprobjects
+    System.clearProperty("mixin.target.mapid")
+}
+
+jar {
+    from project(":Common").sourceSets.googleimpl.java.outputDir
+}
+
+tasks.withType(JavaCompile) {
+    // This really isn't ideal, but without it refmaps aren't generated correctly
+    source(project(":Common").sourceSets.main.allSource)
+    dependsOn project(":Common").compileGoogleimplJava
+}
+
+dependencies {
+    implementation project(":Common")
+    runtimeOnly files(project(":Common").sourceSets.googleimpl.java.outputDir)
+}
+
+processResources {
+    from project(":Common").sourceSets.main.output.resourcesDir
+    dependsOn project(":Common").processResources
+}
+
+// Loader-specific projects should not have any unit tests
+compileTestJava.enabled = false
+test.enabled = false

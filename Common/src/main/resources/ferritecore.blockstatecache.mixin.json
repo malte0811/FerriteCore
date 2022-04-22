@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.blockstatecache",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.blockstatecache.Config",
+  "mixins": [
+    "ArrayVSAccess",
+    "BitSetDVSAccess",
+    "BlockStateBaseMixin",
+    "BlockStateCacheMixin",
+    "DiscreteVSAccess",
+    "SliceShapeAccess",
+    "SubShapeAccess",
+    "VoxelShapeAccess"
+  ],
+  "refmap": "${refmap_target}refmap.json"
+}
