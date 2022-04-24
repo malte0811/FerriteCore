@@ -21,29 +21,39 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
         HAS_LITHIUM = hasClass("me.jellysquid.mods.lithium.common.LithiumMod");
         HAS_ROADRUNNER = hasClass("me.jellysquid.mods.lithium.common.RoadRunner");
     }
+
     private String prefix = null;
     private final FerriteConfig.Option enableOption;
     private final LithiumSupportState lithiumState;
+    private final boolean optIn;
 
-    protected FerriteMixinConfig(FerriteConfig.Option enableOption, LithiumSupportState lithiumCompat) {
+    protected FerriteMixinConfig(
+            FerriteConfig.Option enableOption, LithiumSupportState lithiumCompat, boolean optIn
+    ) {
         this.enableOption = enableOption;
         this.lithiumState = lithiumCompat;
+        this.optIn = optIn;
     }
 
     protected FerriteMixinConfig(FerriteConfig.Option enableOption) {
-        this(enableOption, LithiumSupportState.NO_CONFLICT);
+        this(enableOption, LithiumSupportState.NO_CONFLICT, false);
     }
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         Preconditions.checkState(mixinClassName.startsWith(prefix), "Unexpected prefix on " + mixinClassName);
         if (!enableOption.isEnabled()) {
-            LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
+            if (!optIn) {
+                LOGGER.warn("Mixin " + mixinClassName + " is disabled by config");
+            }
             return false;
         } else if (!this.lithiumState.shouldApply()) {
             LOGGER.warn("Mixin " + mixinClassName + " is disabled automatically as lithium is installed");
             return false;
         } else {
+            if (optIn) {
+                LOGGER.warn("Opt-in mixin {} is enabled by config", mixinClassName);
+            }
             return true;
         }
     }

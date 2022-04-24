@@ -51,9 +51,11 @@ public class FerriteConfig {
                 "bakedQuadDeduplication",
                 "Deduplicate vertex data of baked quads in the basic model implementations"
         );
-        THREADING_DETECTOR = builder.createOption(
-                "smallThreadingDetector",
-                "Replace objects used to detect multi-threaded access to chunks by a much smaller field"
+        THREADING_DETECTOR = builder.createOptInOption(
+                "useSmallThreadingDetector",
+                "Replace objects used to detect multi-threaded access to chunks by a much smaller field. This option" +
+                        " is disabled by default due to very rare and very hard-to-reproduce crashes, use at your own" +
+                        " risk!"
         );
         COMPACT_FAST_MAP = builder.createOptInOption(
                 "compactFastMap",

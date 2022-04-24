@@ -158,4 +158,6 @@ with a non-atomic one, and does not need any additional atomic operations.
 Saved memory: 10-15 MB with only one player, more if more chunks are loaded. Does not depend on modpack size.  
 CPU impact: None or slightly negative  
 Side: Both  
-Mixin subpackage: `threaddetec`
+Mixin subpackage: `threaddetec`  
+Notes: Currently this optimization is disabled by default, since it seems to cause (very) rare race conditions under
+unknown circumstances.
