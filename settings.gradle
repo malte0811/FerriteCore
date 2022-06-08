@@ -36,5 +36,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'FerriteCore-1.18'
+rootProject.name = 'FerriteCore-1.19'
 include("Common", "Fabric", "Forge")

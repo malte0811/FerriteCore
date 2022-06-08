@@ -13,7 +13,7 @@ dependencies {
     minecraft group: 'com.mojang', name: 'minecraft', version: minecraft_version
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+        //parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
     }
     modImplementation group: 'net.fabricmc', name: 'fabric-loader', version: fabric_loader_version
 }
