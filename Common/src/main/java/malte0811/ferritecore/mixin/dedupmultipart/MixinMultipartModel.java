@@ -24,7 +24,7 @@ import java.util.Map;
  * decent JIT should be able to remove the inner synchronization since both are on the same final field, so performance
  * should not be an issue.
  */
-// Unresolved reference: Forge adds a parameter to getQuads, so the usual remapping process breaks and I need to specify
+// Unresolved reference: Forge adds parameters to getQuads, so the usual remapping process breaks and I need to specify
 // SRG and intermediary names directly, which confuses the MCDev IntelliJ plugin
 // Sync on local/parameter: The parameter is actually always a final field, but which one it is depends on whether
 // sodium is installed or not.
@@ -34,8 +34,9 @@ public class MixinMultipartModel {
     @Redirect(
             method = {
                     "getQuads", // Mapped name in MCP, Moj and Yarn
-                    "method_4707", "m_6840_", // SRG and Intermediary names
-                    "emitBlockQuads" // Added by FRAPI, also needs to be synchronized
+                    "method_4707", // Intermediary
+                    "emitBlockQuads", // Added by FRAPI, also needs to be synchronized
+                    "getSelectors" // Forge moves the logic into its own method
             },
             at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
@@ -47,7 +48,7 @@ public class MixinMultipartModel {
     }
 
     @Redirect(
-            method = {"getQuads", "method_4707", "m_6840_", "emitBlockQuads"},
+            method = {"getQuads", "method_4707", "emitBlockQuads", "getSelectors"},
             at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
             remap = false
     )
