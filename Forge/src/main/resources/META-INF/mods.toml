@@ -14,7 +14,7 @@ logoFile = "logo.png"
 [[dependencies.ferritecore]]
 modId = "forge"
 mandatory = true
-versionRange = "[41.0.1,)"
+versionRange = "[41.0.98,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
