@@ -25,7 +25,7 @@
     "minecraft": ">=1.19 <1.20"
   },
   "breaks": {
-    "hydrogen": "*"
+    "hydrogen": "<=0.3"
   },
   "mixins": [
     "ferritecore.blockstatecache.mixin.json",
