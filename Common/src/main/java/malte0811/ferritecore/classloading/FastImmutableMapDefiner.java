@@ -5,6 +5,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
@@ -62,12 +63,13 @@ public class FastImmutableMapDefiner {
     }
 
     private static void defineInAppClassloader(String name) throws Exception {
-        InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream(
+        byte[] classBytes;
+        try (InputStream byteInput = FastImmutableMapDefiner.class.getResourceAsStream(
                 GOOGLE_ACCESS_PREFIX + name.replace('.', '/') + GOOGLE_ACCESS_SUFFIX
-        );
-        byte[] classBytes = new byte[byteInput.available()];
-        final int bytesRead = byteInput.read(classBytes);
-        Preconditions.checkState(bytesRead == classBytes.length);
+        )) {
+            Preconditions.checkNotNull(byteInput, "Failed to find class bytes for " + name);
+            classBytes = IOUtils.toByteArray(byteInput);
+        }
         Class<?> loaded = DEFINE_CLASS.get().define(classBytes, name);
         Preconditions.checkState(loaded.getClassLoader() == ImmutableMap.class.getClassLoader());
     }
