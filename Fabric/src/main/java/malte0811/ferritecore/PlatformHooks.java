@@ -1,13 +1,11 @@
 package malte0811.ferritecore;
 
-import malte0811.ferritecore.util.Constants;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
-public class ModMain implements ModInitializer {
+public class PlatformHooks implements IPlatformHooks {
     @Override
-    public void onInitialize() {
-        Constants.blockstateCacheFieldName = FabricLoader.getInstance()
+    public String computeBlockstateCacheFieldName() {
+        return FabricLoader.getInstance()
                 .getMappingResolver()
                 .mapFieldName(
                         "intermediary",

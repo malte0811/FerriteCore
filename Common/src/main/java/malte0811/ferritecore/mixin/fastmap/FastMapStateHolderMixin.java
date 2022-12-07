@@ -26,7 +26,7 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     private FastMap<S> ferritecore_globalTable;
 
     @Redirect(
-            method = "setValue",
+            method = {"setValue", "trySetValue"},
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/google/common/collect/Table;get(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",

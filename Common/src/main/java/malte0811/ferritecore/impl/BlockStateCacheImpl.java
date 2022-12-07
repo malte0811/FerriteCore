@@ -12,8 +12,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -33,7 +33,8 @@ public class BlockStateCacheImpl {
     // manual remapping it is
     private static final Supplier<Function<BlockStateBase, BlockStateCacheAccess>> GET_CACHE = Suppliers.memoize(() -> {
         try {
-            Field cacheField = BlockStateBase.class.getDeclaredField(Constants.blockstateCacheFieldName);
+            final String cacheName = Constants.PLATFORM_HOOKS.computeBlockstateCacheFieldName();
+            final Field cacheField = BlockStateBase.class.getDeclaredField(cacheName);
             cacheField.setAccessible(true);
             MethodHandle getter = MethodHandles.lookup().unreflectGetter(cacheField);
             return state -> {

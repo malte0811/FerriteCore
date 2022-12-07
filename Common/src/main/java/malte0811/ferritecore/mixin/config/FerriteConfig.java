@@ -1,6 +1,7 @@
 package malte0811.ferritecore.mixin.config;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

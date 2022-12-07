@@ -15,11 +15,6 @@
   },
   "license": "MIT",
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      "malte0811.ferritecore.ModMain"
-    ]
-  },
   "depends": {
     "fabricloader": ">=0.14.6",
     "minecraft": ">=1.19 <1.20"

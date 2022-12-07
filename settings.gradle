@@ -36,5 +36,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'FerriteCore-1.19'
-include("Common", "Fabric", "Forge")
+rootProject.name = "FerriteCore-${minecraft_version}"
+include("Common", "Fabric"/*, "Forge"*/)

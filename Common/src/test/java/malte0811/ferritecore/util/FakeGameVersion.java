@@ -1,5 +1,6 @@
 package malte0811.ferritecore.util;
 
+import com.mojang.bridge.game.PackType;
 import net.minecraft.WorldVersion;
 import net.minecraft.world.level.storage.DataVersion;
 
@@ -22,12 +23,12 @@ public class FakeGameVersion implements WorldVersion {
     }
 
     @Override
-    public String getReleaseTarget() {
-        return "none";
+    public int getProtocolVersion() {
+        return 0;
     }
 
     @Override
-    public int getProtocolVersion() {
+    public int getPackVersion(PackType packType) {
         return 0;
     }
 
