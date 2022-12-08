@@ -12,9 +12,6 @@ import net.minecraftforge.network.NetworkConstants;
 public class ModMainForge {
 
     public ModMainForge() {
-        Constants.blockstateCacheFieldName = ObfuscationReflectionHelper.remapName(
-                INameMappingService.Domain.FIELD, "f_60593_"
-        );
         ModLoadingContext.get().registerExtensionPoint(
                 DisplayTest.class, () -> new DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (s, b) -> true)
         );
