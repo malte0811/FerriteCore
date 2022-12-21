@@ -1,6 +1,7 @@
 package malte0811.ferritecore.impl;
 
 import com.google.common.base.Suppliers;
+import it.unimi.dsi.fastutil.booleans.BooleanArrays;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.ducks.BlockStateCacheAccess;
 import malte0811.ferritecore.hash.ArrayVoxelShapeHash;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,6 +30,9 @@ public class BlockStateCacheImpl {
     // Maps a shape to the "canonical instance" of that shape and its side projections
     public static final Map<VoxelShape, Pair<VoxelShape, VoxelShape[]>> CACHE_PROJECT =
             new Object2ObjectOpenCustomHashMap<>(VoxelShapeHash.INSTANCE);
+    public static final Map<boolean[], boolean[]> CACHE_FACE_STURDY = new Object2ObjectOpenCustomHashMap<>(
+            BooleanArrays.HASH_STRATEGY
+    );
 
     // Get the cache from a blockstate. Mixin does not handle private inner classes too well, so method handles and
     // manual remapping it is
@@ -64,6 +69,7 @@ public class BlockStateCacheImpl {
             final BlockStateCacheAccess oldCache = LAST_CACHE.get();
             deduplicateCollisionShape(newCache, oldCache);
             deduplicateRenderShapes(newCache, oldCache);
+            deduplicateFaceSturdyArray(newCache, oldCache);
             LAST_CACHE.set(null);
         }
     }
@@ -110,6 +116,18 @@ public class BlockStateCacheImpl {
         }
         replaceInternals(dedupedRenderShapes.getLeft(), newRenderShape);
         newCache.setOcclusionShapes(dedupedRenderShapes.getRight());
+    }
+
+    private static void deduplicateFaceSturdyArray(
+            BlockStateCacheAccess newCache, @Nullable BlockStateCacheAccess oldCache
+    ) {
+        boolean[] dedupedFaceSturdy;
+        if(oldCache != null && Arrays.equals(oldCache.getFaceSturdy(), newCache.getFaceSturdy())) {
+            dedupedFaceSturdy = oldCache.getFaceSturdy();
+        } else {
+            dedupedFaceSturdy = CACHE_FACE_STURDY.computeIfAbsent(newCache.getFaceSturdy(), Function.identity());
+        }
+        newCache.setFaceSturdy(dedupedFaceSturdy);
     }
 
     private static void replaceInternals(VoxelShape toKeep, VoxelShape toReplace) {

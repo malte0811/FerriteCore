@@ -21,6 +21,11 @@ public class BlockStateCacheMixin implements BlockStateCacheAccess {
     @Nullable
     VoxelShape[] occlusionShapes;
 
+    @Shadow
+    @Final
+    @Mutable
+    private boolean[] faceSturdy;
+
     @Override
     public VoxelShape getCollisionShape() {
         return this.collisionShape;
@@ -39,5 +44,15 @@ public class BlockStateCacheMixin implements BlockStateCacheAccess {
     @Override
     public void setOcclusionShapes(@Nullable VoxelShape[] newShapes) {
         this.occlusionShapes = newShapes;
+    }
+
+    @Override
+    public boolean[] getFaceSturdy() {
+        return faceSturdy;
+    }
+
+    @Override
+    public void setFaceSturdy(final boolean[] newFaceSturdyArray) {
+        this.faceSturdy = newFaceSturdyArray;
     }
 }
