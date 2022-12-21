@@ -27,6 +27,7 @@ def fcMixinConfigs = [
         "blockstatecache",
         "dedupbakedquad",
         "threaddetec",
+        "modelsides",
 ].stream()
         .<String> map({ s -> "ferritecore." + s + ".mixin.json" })
         .collect(Collectors.toList())

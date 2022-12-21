@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.modelsides",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "SimpleBakedModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.modelsides.Config",
+  "refmap": "${refmap_target}refmap.json"
+}

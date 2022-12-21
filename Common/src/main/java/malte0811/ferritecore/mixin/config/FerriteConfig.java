@@ -20,6 +20,7 @@ public class FerriteConfig {
     public static final Option COMPACT_FAST_MAP;
     public static final Option POPULATE_NEIGHBOR_TABLE;
     public static final Option THREADING_DETECTOR;
+    public static final Option MODEL_SIDES;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -51,6 +52,10 @@ public class FerriteConfig {
         DEDUP_QUADS = builder.createOption(
                 "bakedQuadDeduplication",
                 "Deduplicate vertex data of baked quads in the basic model implementations"
+        );
+        MODEL_SIDES = builder.createOption(
+                "modelSides",
+                "Use smaller data structures for \"simple\" models, especially models with few side-specific faces"
         );
         THREADING_DETECTOR = builder.createOptInOption(
                 "useSmallThreadingDetector",
