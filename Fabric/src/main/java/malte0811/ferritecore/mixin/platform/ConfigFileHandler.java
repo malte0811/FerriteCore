@@ -7,6 +7,7 @@ import malte0811.ferritecore.util.Constants;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -16,9 +17,17 @@ import java.util.Properties;
 public class ConfigFileHandler {
     // Called reflectively from FerriteConfig
     public static void finish(List<FerriteConfig.Option> options) throws IOException {
-        Path config = FabricLoader.getInstance().getConfigDir().resolve(Constants.MODID + ".mixin.properties");
+        Path configDir = FabricLoader.getInstance().getConfigDir();
+        Path config = configDir.resolve(Constants.MODID + ".mixin.properties");
         if (!Files.exists(config)) {
-            Files.createDirectories(config.getParent());
+            try {
+                Files.createDirectories(configDir);
+            } catch (FileAlreadyExistsException x) {
+                // Can happen if the config dir is a symlink, and possibly some other corner case on Windows? See #83
+                if (!Files.isDirectory(configDir)) {
+                    throw new IOException("Config dir exists, but is not a directory?", x);
+                }
+            }
             Files.createFile(config);
         }
         Properties propsInFile = new Properties();
