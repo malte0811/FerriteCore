@@ -26,6 +26,11 @@ public class ModelSidesImpl {
     }
 
     public static Map<Direction, List<BakedQuad>> minimizeCulled(Map<Direction, List<BakedQuad>> quadsBySide) {
+        if (quadsBySide.isEmpty()) {
+            // Workaround: Forge's EmptyModel does this, I'm quite sure that it would crash if it was actually used
+            // anywhere
+            return quadsBySide;
+        }
         boolean allEmpty = true;
         for (final var face : SIDES) {
             final var sideQuads = quadsBySide.get(face);
