@@ -6,12 +6,13 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 17
-      - uses: actions/cache@v2
+          distribution: 'temurin'
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -19,12 +20,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Run tests
+        run: ./gradlew common:test --rerun-tasks
       - name: Build
         run: ./gradlew build
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: |
-            forge/build/libs/ferritecore-*-forge.jar
-            fabric/build/libs/ferritecore-*-fabric.jar
+            Forge/build/libs/ferritecore-*-forge.jar
+            Fabric/build/libs/ferritecore-*-fabric.jar
