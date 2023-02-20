@@ -2,7 +2,15 @@ plugins {
     id 'ferritecore.subproject-conventions'
 }
 
-archivesBaseName = "${mod_id}-${mod_version}-" + project.name.toLowerCase()
+String makeVersionSuffix() {
+    if (System.getenv("GITHUB_ACTIONS") != null) {
+        return "-GH"+System.getenv("GITHUB_RUN_NUMBER");
+    } else {
+        return "";
+    }
+}
+
+archivesBaseName = "${mod_id}-${mod_version}${makeVersionSuffix()}-" + project.name.toLowerCase()
 
 jar {
     manifest {
