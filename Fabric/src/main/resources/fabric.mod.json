@@ -17,7 +17,7 @@
   "environment": "*",
   "depends": {
     "fabricloader": ">=0.14.6",
-    "minecraft": ">=1.19 <1.20"
+    "minecraft": ">=23w05a <1.20"
   },
   "breaks": {
     "hydrogen": "<=0.3"

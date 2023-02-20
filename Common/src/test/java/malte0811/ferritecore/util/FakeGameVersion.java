@@ -1,7 +1,7 @@
 package malte0811.ferritecore.util;
 
-import com.mojang.bridge.game.PackType;
 import net.minecraft.WorldVersion;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.DataVersion;
 
 import java.util.Date;
