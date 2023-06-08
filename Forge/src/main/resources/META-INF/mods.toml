@@ -14,12 +14,12 @@ logoFile = "logo.png"
 [[dependencies.ferritecore]]
 modId = "forge"
 mandatory = true
-versionRange = "[45.0.6,)"
+versionRange = "[46.0.1,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.4,1.20)"
+versionRange = "[1.20,1.21)"
 ordering = "NONE"
 side = "BOTH"
