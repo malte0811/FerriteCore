@@ -32,7 +32,7 @@ public class Deduplicator {
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final ObjectOpenCustomHashSet<int[]> BAKED_QUAD_CACHE = new ObjectOpenCustomHashSet<>(
-            new LambdaBasedHash<>(Arrays::hashCode, Arrays::equals)
+            new LambdaBasedHash<>(Deduplicator::betterIntArrayHash, Arrays::equals)
     );
 
     public static String deduplicateVariant(String variant) {
@@ -78,5 +78,18 @@ public class Deduplicator {
                 BAKED_QUAD_CACHE.trim();
             }
         });
+    }
+
+    /**
+     * An alternative to Arrays::hashCode for int arrays that appears to be more collision resistant for baked quad
+     * vertex data arrays. Arrays::hashCode seems to be prone to collisions when arrays only differ slightly; this
+     * caused the slowdown observed in #129.
+     */
+    private static int betterIntArrayHash(int[] in) {
+        int result = 0;
+        for (int i : in) {
+            result = 31 * result + HashCommon.murmurHash3(i);
+        }
+        return result;
     }
 }
