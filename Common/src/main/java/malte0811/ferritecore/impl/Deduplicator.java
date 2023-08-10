@@ -1,7 +1,8 @@
 package malte0811.ferritecore.impl;
 
 import com.mojang.datafixers.util.Unit;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.HashCommon;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import malte0811.ferritecore.hash.LambdaBasedHash;
 import malte0811.ferritecore.mixin.dedupbakedquad.BakedQuadAccess;
 import malte0811.ferritecore.util.PredicateHelper;
@@ -30,7 +31,7 @@ public class Deduplicator {
     private static final Map<List<Pair<Predicate<BlockState>, BakedModel>>, MultiPartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
-    private static final Object2ObjectOpenCustomHashMap<int[], int[]> BAKED_QUAD_CACHE = new Object2ObjectOpenCustomHashMap<>(
+    private static final ObjectOpenCustomHashSet<int[]> BAKED_QUAD_CACHE = new ObjectOpenCustomHashSet<>(
             new LambdaBasedHash<>(Arrays::hashCode, Arrays::equals)
     );
 
@@ -52,7 +53,7 @@ public class Deduplicator {
 
     public static void deduplicate(BakedQuad bq) {
         synchronized (BAKED_QUAD_CACHE) {
-            int[] deduped = BAKED_QUAD_CACHE.computeIfAbsent(bq.getVertices(), Function.identity());
+            int[] deduped = BAKED_QUAD_CACHE.addOrGet(bq.getVertices());
             ((BakedQuadAccess) bq).setVertices(deduped);
         }
     }
