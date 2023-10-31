@@ -1,23 +1,10 @@
 import java.util.stream.Collectors
 
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-        maven { url 'https://maven.parchmentmc.org' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
-        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
-    }
+plugins {
+    id 'ferritecore.loader-conventions'
+    id 'net.neoforged.gradle.userdev' version '7.0.5'
+    id 'net.neoforged.gradle.mixin' version '7.0.5'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-//apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'ferritecore.loader-conventions'
 
 def fcMixinConfigs = [
         "predicates",
@@ -34,78 +21,37 @@ def fcMixinConfigs = [
 
 // Work around what I consider a bug in FG: Common:googleimpl source set is specified as mod source, but FG tries to
 // compile it in this project
+// TODO remove old hacks and add new ones for NG
 sourceSets {
     googleimpl
 }
 
-minecraft {
-    //mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
-    mappings channel: 'official', version: "${minecraft_version}"
+runs {
+    configureEach {
+        workingDirectory project.file('run')
+        systemProperty 'forge.logging.console.level', 'debug'
 
-    runs {
-        client {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                ferritecore {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                    source project(":Common").sourceSets.googleimpl
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                ferritecore {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                    source project(":Common").sourceSets.googleimpl
-                }
-            }
-        }
+        modSource project.sourceSets.main
+        //modSource project(":Common").sourceSets.main
+        //modSource project(":Common").sourceSets.googleimpl
+        // TODO do I need mixin configs as args
     }
+    client
+    server
 }
 
 dependencies {
-    minecraft group: 'net.minecraftforge', name: 'forge', version: "${minecraft_version}-${forge_version}"
+    implementation "net.neoforged:neoforge:${neo_version}"
     annotationProcessor group: 'org.spongepowered', name: 'mixin', version: '0.8.5', classifier: 'processor'
 }
 
-jar.finalizedBy('reobfJar')
-
 mixin {
-    add project(":Common").sourceSets.main, "${mod_id}.refmap.json"
-    configNames += fcMixinConfigs
+    configs = fcMixinConfigs
 }
 
 jar {
     filesMatching("*.mixin.json") {
         expand "refmap_target": "${mod_id}."
-    }
-}
-
-task speedUpPreRun {
-    doLast {
-        for (String s : new String[]{"Client", "Server"}) {
-            ant.replace(
-                    file: project.rootDir.toString() + "/.idea/runConfigurations/Forge_run" + s + ".xml",
-                    // prepareRunX is prepareRuns + compile, but compiling is already handled by IntelliJ
-                    // Also (specific to FC), compiling doesn't properly see the googleimpl source set and breaks
-                    token: "prepareRun" + s,
-                    value: "prepareRuns"
-            )
-        }
-    }
-}
-
-tasks.withType(Task) {
-    if (it.name == "genIntellijRuns") {
-        it.finalizedBy speedUpPreRun
     }
 }
 

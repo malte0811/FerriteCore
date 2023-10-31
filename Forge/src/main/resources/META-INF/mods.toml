@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[28,)"
+loaderVersion = "[1,)"
 
 license = "MIT"
 [[mods]]
@@ -12,14 +12,14 @@ Reduces memory usage.
 '''
 logoFile = "logo.png"
 [[dependencies.ferritecore]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "[46.0.1,)"
+versionRange = "[20.2.1,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20,1.21)"
+versionRange = "[1.20.2,1.21)"
 ordering = "NONE"
 side = "BOTH"

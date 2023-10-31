@@ -34,7 +34,7 @@ task signJar(description: "Sign jar") {
         if (project.hasProperty('keyStore')) {
             def path;
             if (project.name == "Forge") {
-                path = tasks.getByName("reobfJar").input.get()
+                path = jar.archivePath
             } else {
                 path = remapJar.archivePath
             }
@@ -59,7 +59,7 @@ compileJava.doFirst {
 }
 
 jar {
-    from project(":Common").sourceSets.googleimpl.java.outputDir
+    from project(":Common").sourceSets.googleimpl.java.destinationDirectory
 }
 
 tasks.withType(JavaCompile) {
@@ -70,7 +70,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation project(":Common")
-    runtimeOnly files(project(":Common").sourceSets.googleimpl.java.outputDir)
+    runtimeOnly files(project(":Common").sourceSets.googleimpl.java.destinationDirectory)
 }
 
 processResources {

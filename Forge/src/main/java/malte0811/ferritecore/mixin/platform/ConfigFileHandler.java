@@ -4,7 +4,7 @@ import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import malte0811.ferritecore.mixin.config.FerriteConfig.Option;
 import malte0811.ferritecore.util.Constants;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
