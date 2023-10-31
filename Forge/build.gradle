@@ -42,7 +42,6 @@ runs {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
-    annotationProcessor group: 'org.spongepowered', name: 'mixin', version: '0.8.5', classifier: 'processor'
 }
 
 mixin {
