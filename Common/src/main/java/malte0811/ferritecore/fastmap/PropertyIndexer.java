@@ -3,6 +3,8 @@ package malte0811.ferritecore.fastmap;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -22,9 +24,7 @@ import java.util.Map;
  * by one of the (faster) specific implementations, all other properties use the {@link GenericIndexer}
  */
 public abstract class PropertyIndexer<T extends Comparable<T>> {
-    private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Object2ObjectOpenCustomHashMap<>(
-            Util.identityStrategy()
-    );
+    private static final Map<Property<?>, PropertyIndexer<?>> KNOWN_INDEXERS = new Reference2ObjectOpenHashMap<>();
 
     private final Property<T> property;
     private final int numValues;

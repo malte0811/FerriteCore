@@ -2,22 +2,8 @@ import java.util.stream.Collectors
 
 plugins {
     id 'ferritecore.loader-conventions'
-    id 'net.neoforged.gradle.userdev' version '7.0.5'
-    id 'net.neoforged.gradle.mixin' version '7.0.5'
+    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
 }
-
-def fcMixinConfigs = [
-        "predicates",
-        "fastmap",
-        "mrl",
-        "dedupmultipart",
-        "blockstatecache",
-        "dedupbakedquad",
-        "threaddetec",
-        "modelsides",
-].stream()
-        .<String> map({ s -> "ferritecore." + s + ".mixin.json" })
-        .collect(Collectors.toList())
 
 // Work around what I consider a bug in FG: Common:googleimpl source set is specified as mod source, but FG tries to
 // compile it in this project
@@ -42,10 +28,6 @@ runs {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
-}
-
-mixin {
-    configs = fcMixinConfigs
 }
 
 jar {

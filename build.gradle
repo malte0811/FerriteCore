@@ -1,4 +1,4 @@
 plugins {
     // TODO I do not really want this in the root project...
-    id 'net.neoforged.gradle.vanilla' version '7.0.5'
+    id 'net.neoforged.gradle.vanilla' version "${neogradle_version}"
 }
