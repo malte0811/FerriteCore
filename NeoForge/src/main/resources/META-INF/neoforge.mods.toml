@@ -13,14 +13,14 @@ Reduces memory usage.
 logoFile = "logo.png"
 [[dependencies.ferritecore]]
 modId = "neoforge"
-mandatory = true
-versionRange = "[20.4.11-beta,)"
+type = "required"
+versionRange = "[20.5.0-beta,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.4,1.21)"
+type = "required"
+versionRange = "[1.20.5,1.21)"
 ordering = "NONE"
 side = "BOTH"
 
