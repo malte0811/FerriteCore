@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Unit;
 import it.unimi.dsi.fastutil.HashCommon;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import malte0811.ferritecore.hash.LambdaBasedHash;
-import malte0811.ferritecore.mixin.dedupbakedquad.BakedQuadAccess;
+import malte0811.ferritecore.mixin.accessors.BakedQuadAccess;
 import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;

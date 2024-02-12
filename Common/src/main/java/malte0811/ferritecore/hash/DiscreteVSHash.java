@@ -1,9 +1,9 @@
 package malte0811.ferritecore.hash;
 
 import it.unimi.dsi.fastutil.Hash;
-import malte0811.ferritecore.mixin.blockstatecache.BitSetDVSAccess;
-import malte0811.ferritecore.mixin.blockstatecache.DiscreteVSAccess;
-import malte0811.ferritecore.mixin.blockstatecache.SubShapeAccess;
+import malte0811.ferritecore.mixin.accessors.BitSetDVSAccess;
+import malte0811.ferritecore.mixin.accessors.DiscreteVSAccess;
+import malte0811.ferritecore.mixin.accessors.SubShapeAccess;
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 
 import java.util.Objects;

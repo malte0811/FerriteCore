@@ -8,7 +8,6 @@
   "minVersion": "0.8",
   "plugin": "malte0811.ferritecore.mixin.dedupbakedquad.Config",
   "client": [
-    "BakedQuadAccess",
     "SimpleModelBuilderMixin"
   ],
   "mixins": [],

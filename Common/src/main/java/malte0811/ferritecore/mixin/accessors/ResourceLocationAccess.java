@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.mrl;
+package malte0811.ferritecore.mixin.accessors;
 
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;

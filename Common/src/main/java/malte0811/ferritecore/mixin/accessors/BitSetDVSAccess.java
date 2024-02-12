@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.blockstatecache;
+package malte0811.ferritecore.mixin.accessors;
 
 import net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape;
 import org.spongepowered.asm.mixin.Mixin;

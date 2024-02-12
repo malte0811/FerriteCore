@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.blockstatecache;
+package malte0811.ferritecore.mixin.accessors;
 
 import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 import net.minecraft.world.phys.shapes.SubShape;

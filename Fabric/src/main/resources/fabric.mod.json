@@ -23,6 +23,7 @@
     "hydrogen": "<=0.3"
   },
   "mixins": [
+    "ferritecore.accessors.mixin.json",
     "ferritecore.blockstatecache.mixin.json",
     "ferritecore.dedupmultipart.mixin.json",
     "ferritecore.fastmap.mixin.json",

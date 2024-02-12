@@ -1,7 +1,7 @@
 package malte0811.ferritecore.hash;
 
 import it.unimi.dsi.fastutil.Hash;
-import malte0811.ferritecore.mixin.blockstatecache.ArrayVSAccess;
+import malte0811.ferritecore.mixin.accessors.ArrayVSAccess;
 
 import java.util.Objects;
 

@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.accessors",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "BakedQuadAccess"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "mixins": [
+    "ArrayVSAccess",
+    "BitSetDVSAccess",
+    "DiscreteVSAccess",
+    "ResourceLocationAccess",
+    "SliceShapeAccess",
+    "SubShapeAccess",
+    "VoxelShapeAccess"
+  ],
+  "refmap": "${refmap_target}refmap.json"
+}

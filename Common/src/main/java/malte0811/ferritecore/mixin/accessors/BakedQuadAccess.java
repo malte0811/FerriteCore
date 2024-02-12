@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.dedupbakedquad;
+package malte0811.ferritecore.mixin.accessors;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import org.spongepowered.asm.mixin.Mixin;

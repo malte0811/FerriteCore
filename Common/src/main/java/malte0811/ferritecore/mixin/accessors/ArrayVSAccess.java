@@ -1,4 +1,4 @@
-package malte0811.ferritecore.mixin.blockstatecache;
+package malte0811.ferritecore.mixin.accessors;
 
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
