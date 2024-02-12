@@ -72,7 +72,6 @@ tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
 
 dependencies {
     implementation project(":Common")
-    runtimeOnly files(project(":Common").sourceSets.googleimpl.java.destinationDirectory)
 }
 
 // Loader-specific projects should not have any unit tests

@@ -1,7 +1,8 @@
 package malte0811.ferritecore.mixin.fastmap;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
 import malte0811.ferritecore.impl.StateHolderImpl;
@@ -18,7 +19,7 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Mutable
     @Shadow
     @Final
-    private ImmutableMap<Property<?>, Comparable<?>> values;
+    private Reference2ObjectArrayMap<Property<?>, Comparable<?>> values;
     @Shadow
     private Table<Property<?>, Comparable<?>, S> neighbours;
 
@@ -62,13 +63,15 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     }
 
     @Override
-    public ImmutableMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
+    public Reference2ObjectMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
         return values;
     }
 
     @Override
-    public void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap) {
-        values = newMap;
+    public void replacePropertyMap(Reference2ObjectMap<Property<?>, Comparable<?>> newMap) {
+        // This cast is incorrect and will be removed by FerriteMixinConfig#postApply when the field type is changed to
+        // Reference2ObjectMap
+        values = (Reference2ObjectArrayMap<Property<?>, Comparable<?>>) newMap;
     }
 
     @Override

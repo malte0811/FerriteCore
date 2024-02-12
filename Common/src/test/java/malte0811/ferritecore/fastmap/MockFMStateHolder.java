@@ -1,9 +1,11 @@
 package malte0811.ferritecore.fastmap;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import java.util.Map;
 
 public class MockFMStateHolder<T> implements FastMapStateHolder<T> {
     private final FastMap<T> map;
@@ -35,12 +37,12 @@ public class MockFMStateHolder<T> implements FastMapStateHolder<T> {
     }
 
     @Override
-    public ImmutableMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
+    public Reference2ObjectMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap) {
+    public void replacePropertyMap(Reference2ObjectMap<Property<?>, Comparable<?>> newMap) {
         throw new UnsupportedOperationException();
     }
 

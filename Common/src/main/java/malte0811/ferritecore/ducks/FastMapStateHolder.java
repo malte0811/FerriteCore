@@ -1,9 +1,12 @@
 package malte0811.ferritecore.ducks;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMaps;
 import malte0811.ferritecore.fastmap.FastMap;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import java.util.Map;
 
 public interface FastMapStateHolder<S> {
     FastMap<S> getStateMap();
@@ -14,9 +17,9 @@ public interface FastMapStateHolder<S> {
 
     void setStateIndex(int newValue);
 
-    ImmutableMap<Property<?>, Comparable<?>> getVanillaPropertyMap();
+    Reference2ObjectMap<Property<?>, Comparable<?>> getVanillaPropertyMap();
 
-    void replacePropertyMap(ImmutableMap<Property<?>, Comparable<?>> newMap);
+    void replacePropertyMap(Reference2ObjectMap<Property<?>, Comparable<?>> newMap);
 
     void setNeighborTable(Table<Property<?>, Comparable<?>, S> table);
 

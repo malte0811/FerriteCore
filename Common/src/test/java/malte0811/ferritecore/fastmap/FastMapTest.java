@@ -6,8 +6,8 @@ import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
-import malte0811.ferritecore.classloading.FastImmutableMapDefiner;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
+import malte0811.ferritecore.impl.FastMapEntryMap;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.*;
 import org.junit.jupiter.api.*;
@@ -25,12 +25,6 @@ public class FastMapTest {
     private static final IntegerProperty INT = IntegerProperty.create("B", 0, 7);
     private static final EnumProperty<Direction> DIR = DirectionProperty.create("C", Direction.class);
     private static final BooleanList BOOLS = new BooleanArrayList(new boolean[]{false, true});
-
-    @BeforeAll
-    public static void init() {
-        FastImmutableMapDefiner.GOOGLE_ACCESS_PREFIX = "/";
-        FastImmutableMapDefiner.GOOGLE_ACCESS_SUFFIX = ".class";
-    }
 
     @TestFactory
     public Stream<DynamicTest> basicMapping() {
@@ -120,7 +114,7 @@ public class FastMapTest {
             for (Map<Property<?>, Comparable<?>> e : values.keySet()) {
                 int index = map.getIndexOf(e);
                 FastMapStateHolder<Map<Property<?>, Comparable<?>>> holder = new MockFMStateHolder<>(map, index);
-                Map<Property<?>, Comparable<?>> map = FastImmutableMapDefiner.makeMap(holder);
+                Map<Property<?>, Comparable<?>> map = new FastMapEntryMap(holder);
                 Assertions.assertEquals(new HashMap<>(e), new HashMap<>(map));
             }
         }

@@ -17,4 +17,18 @@ public class PlatformHooks implements IPlatformHooks {
                         "Lnet/minecraft/class_4970$class_4971$class_3752;"
                 );
     }
+
+    @Override
+    public String computeStateHolderValuesName() {
+        return FabricLoader.getInstance()
+                .getMappingResolver()
+                .mapFieldName(
+                        "intermediary",
+                        // StateHolder
+                        "net.minecraft.class_2688",
+                        // values
+                        "field_24738",
+                        "Lit/unimi/dsi/fastutil/objects/Reference2ObjectArrayMap;"
+                );
+    }
 }

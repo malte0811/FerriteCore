@@ -1,9 +1,7 @@
 package malte0811.ferritecore.fastmap;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,15 +18,19 @@ public class FastMap<Value> {
     // It might be possible to get rid of this (and the equivalent map for values) by sorting the key vectors by
     // property name (natural order for values) and using a binary search above a given size, but choosing that size
     // would likely be more effort than it's worth
-    private final Object2IntMap<Property<?>> toKeyIndex;
-    private final ImmutableSet<Property<?>> propertySet;
+    private final Reference2IntMap<Property<?>> toKeyIndex;
+    private final ReferenceSet<Property<?>> propertySet;
 
     public FastMap(
             Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap, boolean compact
     ) {
         List<FastMapKey<?>> keys = new ArrayList<>(properties.size());
         int factorUpTo = 1;
-        this.toKeyIndex = new Object2IntOpenHashMap<>();
+        if (useArrayMapForSize(properties.size())) {
+            this.toKeyIndex = new Reference2IntArrayMap<>();
+        } else {
+            this.toKeyIndex = new Reference2IntOpenHashMap<>();
+        }
         this.toKeyIndex.defaultReturnValue(INVALID_INDEX);
         for (Property<?> prop : properties) {
             this.toKeyIndex.put(prop, keys.size());
@@ -51,7 +53,11 @@ public class FastMap<Value> {
             valuesList.set(getIndexOf(state.getKey()), state.getValue());
         }
         this.valueMatrix = Collections.unmodifiableList(valuesList);
-        this.propertySet = ImmutableSet.copyOf(properties);
+        if (useArrayMapForSize(properties.size())) {
+            this.propertySet = new ReferenceArraySet<>(properties);
+        } else {
+            this.propertySet = new ReferenceOpenHashSet<>(properties);
+        }
     }
 
     /**
@@ -157,7 +163,11 @@ public class FastMap<Value> {
         return valueMatrix.size() == 1;
     }
 
-    public ImmutableSet<Property<?>> getPropertySet() {
+    public ReferenceSet<Property<?>> getPropertySet() {
         return propertySet;
+    }
+
+    private static boolean useArrayMapForSize(int numElements) {
+        return numElements < 5;
     }
 }
