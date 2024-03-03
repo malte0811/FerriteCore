@@ -1,4 +1,4 @@
 plugins {
-    // TODO I do not really want this in the root project...
-    id 'net.neoforged.gradle.vanilla' version "${neogradle_version}"
+    id 'net.neoforged.gradle.userdev' version "${neogradle_version}" apply false
+    id 'fabric-loom' version '1.5-SNAPSHOT' apply false
 }

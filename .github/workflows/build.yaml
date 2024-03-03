@@ -29,5 +29,5 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            Forge/build/libs/ferritecore-*-forge.jar
+            NeoForge/build/libs/ferritecore-*-neoforge.jar
             Fabric/build/libs/ferritecore-*-fabric.jar

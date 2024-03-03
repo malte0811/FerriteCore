@@ -2,14 +2,8 @@ import java.util.stream.Collectors
 
 plugins {
     id 'ferritecore.loader-conventions'
-    id 'net.neoforged.gradle.userdev' version "${neogradle_version}"
-}
-
-// Work around what I consider a bug in FG: Common:googleimpl source set is specified as mod source, but FG tries to
-// compile it in this project
-// TODO remove old hacks and add new ones for NG
-sourceSets {
-    googleimpl
+    id 'net.neoforged.gradle.userdev'
+    id 'net.neoforged.gradle.mixin' version "${neogradle_version}"
 }
 
 runs {
@@ -18,9 +12,7 @@ runs {
         systemProperty 'forge.logging.console.level', 'debug'
 
         modSource project.sourceSets.main
-        //modSource project(":Common").sourceSets.main
-        //modSource project(":Common").sourceSets.googleimpl
-        // TODO do I need mixin configs as args
+        modSource project(":Common").sourceSets.googleimpl
     }
     client
     server
@@ -28,6 +20,13 @@ runs {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
+    // TODO this is a hack and breaks the intentional isolation of these source sets. However, since they are going away
+    // in 20.5 anyway it does not need to last for long.
+    compileOnly files(project(":Common").sourceSets.googleaccess.java.destinationDirectory)
+}
+
+compileJava {
+    source(project(":Common").sourceSets.googleimpl.allSource)
 }
 
 jar {

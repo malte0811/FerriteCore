@@ -33,7 +33,7 @@ task signJar(description: "Sign jar") {
     doLast {
         if (project.hasProperty('keyStore')) {
             def path;
-            if (project.name == "Forge") {
+            if (project.name == "NeoForge") {
                 path = jar.archivePath
             } else {
                 path = remapJar.archivePath
@@ -58,24 +58,21 @@ compileJava.doFirst {
     System.clearProperty("mixin.target.mapid")
 }
 
-jar {
-    from project(":Common").sourceSets.googleimpl.java.destinationDirectory
+// Technically only relevant on the Neo subproject, but does not hurt elsewhere
+Spec<Task> notNeoTask = { Task it -> !it.name.startsWith("neo") } as Spec<Task>
+
+tasks.withType(JavaCompile).matching(notNeoTask).configureEach {
+    source(project(":Common").sourceSets.main.allSource)
 }
 
-tasks.withType(JavaCompile) {
-    // This really isn't ideal, but without it refmaps aren't generated correctly
-    source(project(":Common").sourceSets.main.allSource)
-    dependsOn project(":Common").compileGoogleimplJava
+tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
+    from project(":Common").sourceSets.main.output.resourcesDir
+    dependsOn project(":Common").processResources
 }
 
 dependencies {
     implementation project(":Common")
     runtimeOnly files(project(":Common").sourceSets.googleimpl.java.destinationDirectory)
-}
-
-processResources {
-    from project(":Common").sourceSets.main.output.resourcesDir
-    dependsOn project(":Common").processResources
 }
 
 // Loader-specific projects should not have any unit tests

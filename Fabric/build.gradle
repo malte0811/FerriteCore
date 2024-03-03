@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom'
     id 'ferritecore.loader-conventions'
 }
 
@@ -47,6 +47,7 @@ processResources {
 }
 
 jar {
+    from project(":Common").sourceSets.googleimpl.java.destinationDirectory
     filesMatching("*.mixin.json") {
         expand "refmap_target": "${archivesBaseName}-"
     }
