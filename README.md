@@ -11,4 +11,4 @@ For a high-level description of the improvements implemented by this mod see [he
 
 This mod currently uses official/Mojmap names for everything, some of the history is in MCP names. If you don't know
 what this means it most likely isn't relevant to you, this information is mostly for people who do not want to see names
-in these mappings for legel reasons.
+in these mappings for legal reasons.
