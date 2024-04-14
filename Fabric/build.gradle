@@ -48,6 +48,7 @@ processResources {
 
 jar {
     from project(":Common").sourceSets.googleimpl.java.destinationDirectory
+    dependsOn project(":Common").getTasksByName("compileGoogleimplJava", false)
     filesMatching("*.mixin.json") {
         expand "refmap_target": "${archivesBaseName}-"
     }
