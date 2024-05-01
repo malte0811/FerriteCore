@@ -1,6 +1,8 @@
 package malte0811.ferritecore.impl;
 
 import com.google.common.base.Splitter;
+import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import malte0811.ferritecore.util.PredicateHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -8,16 +10,13 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class KeyValueConditionImpl {
-    private static final Map<Pair<Property<?>, Comparable<?>>, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Pair<Property<?>, Comparable<?>>, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE =
+            Collections.synchronizedMap(new Object2ObjectOpenCustomHashMap<>(new HashStrategy()));
 
     /**
      * A copy of {@link net.minecraft.client.renderer.block.model.multipart.KeyValueCondition#getPredicate(StateDefinition)}
@@ -87,6 +86,30 @@ public class KeyValueConditionImpl {
                         return state -> state.getValue(propInt).equals(valueInt);
                     }
             );
+        }
+    }
+
+    /**
+     * This needs to match the vanilla behavior, i.e. properties are always compared as references (see StateHolder)
+     * while the values are "properly" compared.
+     */
+    private static class HashStrategy implements Hash.Strategy<Pair<Property<?>, Comparable<?>>> {
+        @Override
+        public int hashCode(Pair<Property<?>, Comparable<?>> pair) {
+            if (pair == null) {
+                return 0;
+            } else {
+                return 31 * System.identityHashCode(pair.getLeft()) + Objects.hashCode(pair.getRight());
+            }
+        }
+
+        @Override
+        public boolean equals(Pair<Property<?>, Comparable<?>> p1, Pair<Property<?>, Comparable<?>> p2) {
+            if (p1 == null || p2 == null) {
+                return p1 == p2;
+            } else {
+                return p1.getLeft() == p2.getLeft() && Objects.equals(p1.getRight(), p2.getRight());
+            }
         }
     }
 }
