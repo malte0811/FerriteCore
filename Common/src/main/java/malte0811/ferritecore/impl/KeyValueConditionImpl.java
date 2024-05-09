@@ -11,12 +11,12 @@ import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class KeyValueConditionImpl {
-    private static final Map<Pair<Property<?>, Comparable<?>>, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE =
-            Collections.synchronizedMap(new Object2ObjectOpenCustomHashMap<>(new HashStrategy()));
+    private static final Map<KeyValuePair, Predicate<BlockState>> STATE_HAS_PROPERTY_CACHE = new ConcurrentHashMap<>();
 
     /**
      * A copy of {@link net.minecraft.client.renderer.block.model.multipart.KeyValueCondition#getPredicate(StateDefinition)}
@@ -79,10 +79,10 @@ public class KeyValueConditionImpl {
         } else {
             T unwrapped = optional.get();
             return STATE_HAS_PROPERTY_CACHE.computeIfAbsent(
-                    Pair.of(property, unwrapped),
+                    new KeyValuePair(property, unwrapped),
                     pair -> {
-                        Comparable<?> valueInt = pair.getRight();
-                        Property<?> propInt = pair.getLeft();
+                        Comparable<?> valueInt = pair.value();
+                        Property<?> propInt = pair.key();
                         return state -> state.getValue(propInt).equals(valueInt);
                     }
             );
@@ -90,26 +90,21 @@ public class KeyValueConditionImpl {
     }
 
     /**
-     * This needs to match the vanilla behavior, i.e. properties are always compared as references (see StateHolder)
-     * while the values are "properly" compared.
+     * The equals/hashCode semantics here need to match the vanilla behavior, i.e. properties are always compared as
+     * references (see StateHolder) while the values are "properly" compared.
      */
-    private static class HashStrategy implements Hash.Strategy<Pair<Property<?>, Comparable<?>>> {
+    private record KeyValuePair(Property<?> key, Comparable<?> value) {
         @Override
-        public int hashCode(Pair<Property<?>, Comparable<?>> pair) {
-            if (pair == null) {
-                return 0;
-            } else {
-                return 31 * System.identityHashCode(pair.getLeft()) + Objects.hashCode(pair.getRight());
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            KeyValuePair that = (KeyValuePair) o;
+            return key == that.key && Objects.equals(value, that.value);
         }
 
         @Override
-        public boolean equals(Pair<Property<?>, Comparable<?>> p1, Pair<Property<?>, Comparable<?>> p2) {
-            if (p1 == null || p2 == null) {
-                return p1 == p2;
-            } else {
-                return p1.getLeft() == p2.getLeft() && Objects.equals(p1.getRight(), p2.getRight());
-            }
+        public int hashCode() {
+            return 31 * System.identityHashCode(key) + Objects.hashCode(value);
         }
     }
 }
