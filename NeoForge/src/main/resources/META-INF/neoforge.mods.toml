@@ -14,13 +14,13 @@ logoFile = "logo.png"
 [[dependencies.ferritecore]]
 modId = "neoforge"
 type = "required"
-versionRange = "[20.5.0-beta,)"
+versionRange = "[21.0.0-beta,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.20.5,1.21)"
+versionRange = "[1.21.0,1.22)"
 ordering = "NONE"
 side = "BOTH"
 

@@ -13,7 +13,6 @@
     "ArrayVSAccess",
     "BitSetDVSAccess",
     "DiscreteVSAccess",
-    "ResourceLocationAccess",
     "SliceShapeAccess",
     "SubShapeAccess",
     "VoxelShapeAccess"
