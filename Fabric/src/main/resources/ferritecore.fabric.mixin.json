@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "malte0811.ferritecore.mixin.fabric",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "client": [
     "MinecraftMixin"
   ],
