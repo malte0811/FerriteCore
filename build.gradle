@@ -1,4 +1,4 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version "${neogradle_version}" apply false
+    id 'net.neoforged.moddev' version "$mdg_version" apply false
     id 'fabric-loom' version '1.5-SNAPSHOT' apply false
 }

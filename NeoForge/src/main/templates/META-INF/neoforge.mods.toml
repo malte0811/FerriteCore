@@ -4,7 +4,7 @@ loaderVersion = "[1,)"
 license = "MIT"
 [[mods]]
 modId = "ferritecore"
-version = "${file.jarVersion}"
+version = "${version}"
 displayName = "Ferrite Core"
 authors = "malte0811"
 description = '''
@@ -14,13 +14,13 @@ logoFile = "logo.png"
 [[dependencies.ferritecore]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0.0-beta,)"
+versionRange = "[${neo_version},)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.ferritecore]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.0,1.22)"
+versionRange = "[${mc_version},${next_major_mc})"
 ordering = "NONE"
 side = "BOTH"
 

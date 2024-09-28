@@ -11,15 +11,14 @@ String makeVersionSuffix() {
 }
 
 archivesBaseName = "${mod_id}-${mod_version}${makeVersionSuffix()}-" + project.name.toLowerCase()
+version = mod_version
 
 jar {
     manifest {
         attributes([
             'Specification-Title'     : mod_name,
             'Specification-Vendor'    : mod_author,
-            'Specification-Version'   : mod_version,
             'Implementation-Title'    : project.name,
-            'Implementation-Version'  : mod_version,
             'Implementation-Vendor'   : mod_author,
             'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
             'Timestampe'              : System.currentTimeMillis(),
@@ -65,7 +64,7 @@ tasks.withType(JavaCompile).matching(notNeoTask).configureEach {
     source(project(":Common").sourceSets.main.allSource)
 }
 
-tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
+tasks.named("processResources") {
     from project(":Common").sourceSets.main.output.resourcesDir
     dependsOn project(":Common").processResources
 }
@@ -77,3 +76,25 @@ dependencies {
 // Loader-specific projects should not have any unit tests
 compileTestJava.enabled = false
 test.enabled = false
+
+def version_replaces = [
+    'version': project.version,
+    'mc_version': minecraft_version,
+    'next_major_mc': next_major_mc,
+    'neo_version': neo_version,
+]
+
+def generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    inputs.properties version_replaces
+    expand version_replaces
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+
+tasks.withType(Task) {
+    if (it.name == "runServer") {
+        it.standardInput = System.in
+    }
+}

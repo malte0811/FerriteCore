@@ -2,33 +2,32 @@ import java.util.stream.Collectors
 
 plugins {
     id 'ferritecore.loader-conventions'
-    id 'net.neoforged.gradle.userdev'
-    id 'net.neoforged.gradle.mixin' version "${neogradle_version}"
+    id 'net.neoforged.moddev' version "$mdg_version"
 }
 
-runs {
-    configureEach {
-        workingDirectory project.file('run')
-        systemProperty 'forge.logging.console.level', 'debug'
+neoForge {
+    version = "$neo_version"
 
-        modSource project.sourceSets.main
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArguments = ["-nogui"]
+        }
     }
-    client
-    server
-}
 
-dependencies {
-    implementation "net.neoforged:neoforge:${neo_version}"
-}
-
-jar {
-    filesMatching("*.mixin.json") {
-        expand "refmap_target": "${mod_id}."
+    mods {
+        ferritecore {
+            sourceSet sourceSets.main
+        }
+    }
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
     }
 }
 
-// For some reason this doesn't work when in the "convention" scripts...
-def customGradle = project.file('custom.gradle');
-if (customGradle.exists()) {
-    apply from: customGradle;
-}
+// Generate mods.toml on IDE import
+neoForge.ideSyncTask generateModMetadata

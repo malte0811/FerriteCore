@@ -35,17 +35,6 @@ loom {
     }
 }
 
-def versionReplacements = [
-    "version": mod_version
-]
-
-processResources {
-    inputs.properties(versionReplacements)
-    filesMatching("fabric.mod.json") {
-        expand versionReplacements
-    }
-}
-
 jar {
     filesMatching("*.mixin.json") {
         expand "refmap_target": "${archivesBaseName}-"
