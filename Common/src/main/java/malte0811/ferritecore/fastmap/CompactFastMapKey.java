@@ -20,7 +20,7 @@ public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     }
 
     @Override
-    public int replaceIn(int mapIndex, T newValue) {
+    public int replaceIn(int mapIndex, Comparable<?> newValue) {
         final int lowerData = mapIndex % mapFactor;
         final int upperFactor = mapFactor * numValues();
         final int upperData = mapIndex - mapIndex % upperFactor;

@@ -2,10 +2,7 @@ package malte0811.ferritecore.fastmap;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.Util;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -76,7 +73,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
     }
 
-    public abstract int toIndex(T value);
+    public abstract int toIndex(Comparable<?> value);
 
     /**
      * Checks if this indexer is valid, i.e. iterates over the correct set of values in the correct order
@@ -101,8 +98,12 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
-        public int toIndex(Boolean value) {
-            return value ? 0 : 1;
+        public int toIndex(Comparable<?> value) {
+            if (value instanceof Boolean bool) {
+                return bool ? 0 : 1;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -115,8 +116,12 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
-        public int toIndex(Integer value) {
-            return value - min;
+        public int toIndex(Comparable<?> value) {
+            if (value instanceof Integer i) {
+                return i - min;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -134,8 +139,12 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
-        public int toIndex(E value) {
-            return value.ordinal() - ordinalOffset;
+        public int toIndex(Comparable<?> value) {
+            if (value instanceof Enum<?> enumValue) {
+                return enumValue.ordinal() - ordinalOffset;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -163,15 +172,19 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
-        public int toIndex(Direction value) {
-            return switch (value) {
-                case NORTH -> 0;
-                case EAST -> 1;
-                case SOUTH -> 2;
-                case WEST -> 3;
-                case UP -> 4;
-                case DOWN -> 5;
-            };
+        public int toIndex(Comparable<?> value) {
+            if (value instanceof Direction d) {
+                return switch (d) {
+                    case NORTH -> 0;
+                    case EAST -> 1;
+                    case SOUTH -> 2;
+                    case WEST -> 3;
+                    case UP -> 4;
+                    case DOWN -> 5;
+                };
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -188,7 +201,7 @@ public abstract class PropertyIndexer<T extends Comparable<T>> {
         }
 
         @Override
-        public int toIndex(T value) {
+        public int toIndex(Comparable<?> value) {
             return toValueIndex.getOrDefault(value, -1);
         }
     }

@@ -87,10 +87,10 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
 
     @Override
     public S get(@Nullable Object rowKey, @Nullable Object columnKey) {
-        if (!(rowKey instanceof Property<?> rowProperty)) {
+        if (!(rowKey instanceof Property<?> rowProperty) || !(columnKey instanceof Comparable<?> colComparable)) {
             return null;
         }
-        return owner.getStateMap().withUnsafe(owner.getStateIndex(), rowProperty, columnKey);
+        return owner.getStateMap().with(owner.getStateIndex(), rowProperty, colComparable);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
         final Comparable<?> contained = owner.getStateMap().getValue(owner.getStateIndex(), rowKey);
         for (Comparable<?> val : rowKey.getPossibleValues()) {
             if (!val.equals(contained)) {
-                rowMap.put(val, owner.getStateMap().withUnsafe(owner.getStateIndex(), rowKey, val));
+                rowMap.put(val, owner.getStateMap().with(owner.getStateIndex(), rowKey, val));
             }
         }
         return rowMap;
@@ -129,7 +129,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
             final Comparable<?> contained = map.getValue(index, rowKey);
             for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained) && val.equals(columnKey)) {
-                    rowMap.put(rowKey, map.withUnsafe(index, rowKey, val));
+                    rowMap.put(rowKey, map.with(index, rowKey, val));
                 }
             }
         }
@@ -146,7 +146,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
             final Comparable<?> contained = map.getValue(index, rowKey);
             for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained)) {
-                    rowMap.add(Tables.immutableCell(rowKey, val, map.withUnsafe(index, rowKey, val)));
+                    rowMap.add(Tables.immutableCell(rowKey, val, map.with(index, rowKey, val)));
                 }
             }
         }
@@ -184,7 +184,7 @@ public class FastmapNeighborTable<S> extends NeighborTableBase<S> {
             final Comparable<?> contained = map.getValue(index, rowKey);
             for (Comparable<?> val : rowKey.getPossibleValues()) {
                 if (!val.equals(contained)) {
-                    rowMap.add(map.withUnsafe(index, rowKey, val));
+                    rowMap.add(map.with(index, rowKey, val));
                 }
             }
         }

@@ -32,7 +32,7 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     }
 
     @Override
-    public int replaceIn(int mapIndex, T newValue) {
+    public int replaceIn(int mapIndex, Comparable<?> newValue) {
         final int newPartialIndex = toPartialMapIndex(newValue);
         if (newPartialIndex < 0) {
             return -1;

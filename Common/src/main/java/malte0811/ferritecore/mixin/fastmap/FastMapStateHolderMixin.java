@@ -35,7 +35,7 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
             )
     )
     public Object getNeighborFromFastMap(Table<?, ?, ?> ignore, Object rowKey, Object columnKey) {
-        return this.ferritecore_globalTable.withUnsafe(
+        return this.ferritecore_globalTable.with(
                 this.ferritecore_globalTableIndex,
                 (Property<?>) rowKey,
                 columnKey

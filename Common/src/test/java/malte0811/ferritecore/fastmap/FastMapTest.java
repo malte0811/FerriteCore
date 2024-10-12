@@ -83,6 +83,11 @@ public class FastMapTest {
         }
     }
 
+    @Test
+    public void testInvalidKeys() {
+        forEachType(TestData::testBadType);
+    }
+
     private static class TestData {
         private final FastMap<Map<Property<?>, Comparable<?>>> map;
         private final ImmutableMap<Map<Property<?>, Comparable<?>>, Map<Property<?>, Comparable<?>>> values;
@@ -143,6 +148,12 @@ public class FastMapTest {
                 expected.put(toSwap, newValue);
                 Assertions.assertEquals(expected, newMap);
             }
+        }
+
+        private void testBadType() {
+            Assertions.assertNull(map.with(0, BOOL, ""));
+            Assertions.assertNull(map.with(0, INT, ""));
+            Assertions.assertNull(map.with(0, DIR, ""));
         }
     }
 }

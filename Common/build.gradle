@@ -19,6 +19,10 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
 }
 
+test {
+    useJUnitPlatform()
+}
+
 processResources {
     def buildProps = project.properties.clone()
 

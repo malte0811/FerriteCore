@@ -69,13 +69,15 @@ public class FastMap<Value> {
      * @return The value corresponding to the specified neighbor, or null if value is not a valid value for prop
      */
     @Nullable
-    public <T extends Comparable<T>>
-    Value with(int oldIndex, Property<T> prop, T value) {
-        final FastMapKey<T> keyToChange = getKeyFor(prop);
+    public Value with(int oldIndex, Property<?> prop, Object value) {
+        if (!(value instanceof Comparable<?> valueComparable)) {
+            return null;
+        }
+        final FastMapKey<?> keyToChange = getKeyFor(prop);
         if (keyToChange == null) {
             return null;
         }
-        int newIndex = keyToChange.replaceIn(oldIndex, value);
+        int newIndex = keyToChange.replaceIn(oldIndex, valueComparable);
         if (newIndex < 0) {
             return null;
         }
@@ -129,15 +131,6 @@ public class FastMap<Value> {
         return new AbstractMap.SimpleImmutableEntry<>(
                 getKey(propertyIndex).getProperty(), getKey(propertyIndex).getValue(stateIndex)
         );
-    }
-
-    /**
-     * Same as {@link FastMap#with(int, Property, Comparable)}, but usable when the type of the value to set is not
-     * correctly typed
-     */
-    public <T extends Comparable<T>>
-    Value withUnsafe(int globalTableIndex, Property<T> property, Object newValue) {
-        return with(globalTableIndex, property, (T) newValue);
     }
 
     public int numProperties() {

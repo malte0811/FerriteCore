@@ -27,7 +27,7 @@ public abstract class FastMapKey<T extends Comparable<T>> {
      * @return The index in the value matrix corresponding to the input state with only the value of this property
      * replaced by <code>newValue</code>
      */
-    abstract int replaceIn(int mapIndex, T newValue);
+    abstract int replaceIn(int mapIndex, Comparable<?> newValue);
 
     /**
      * @param value A possible value of this property
