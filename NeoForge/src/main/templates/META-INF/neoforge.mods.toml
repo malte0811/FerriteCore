@@ -11,6 +11,7 @@ description = '''
 Reduces memory usage.
 '''
 logoFile = "logo.png"
+"lithium:options" = { "mixin.alloc.blockstate" = false }
 [[dependencies.ferritecore]]
 modId = "neoforge"
 type = "required"
