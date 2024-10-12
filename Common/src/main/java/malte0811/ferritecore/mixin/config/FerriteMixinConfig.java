@@ -19,11 +19,9 @@ import java.util.Set;
 public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
     protected static final Logger LOGGER = LogManager.getLogger("ferritecore-mixin");
     private static final boolean HAS_LITHIUM;
-    private static final boolean HAS_ROADRUNNER;
 
     static {
-        HAS_LITHIUM = hasClass("me.jellysquid.mods.lithium.common.LithiumMod");
-        HAS_ROADRUNNER = hasClass("me.jellysquid.mods.lithium.common.RoadRunner");
+        HAS_LITHIUM = hasClass("net.caffeinemc.mods.lithium.common.LithiumMod");
     }
 
     private String prefix = null;
@@ -143,19 +141,13 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
 
     protected enum LithiumSupportState {
         NO_CONFLICT,
-        INCOMPATIBLE,
-        APPLY_IF_ROADRUNNER;
+        INCOMPATIBLE;
 
         private boolean shouldApply() {
             return switch (this) {
                 case NO_CONFLICT -> true;
                 case INCOMPATIBLE -> !HAS_LITHIUM;
-                case APPLY_IF_ROADRUNNER -> !HAS_LITHIUM || HAS_ROADRUNNER;
             };
         }
-    }
-
-    static String test(Map<String, String> m, String k) {
-        return m.get(k);
     }
 }
