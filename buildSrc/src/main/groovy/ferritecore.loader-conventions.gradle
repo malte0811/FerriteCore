@@ -11,7 +11,6 @@ String makeVersionSuffix() {
 }
 
 archivesBaseName = "${mod_id}-${mod_version}${makeVersionSuffix()}-" + project.name.toLowerCase()
-version = mod_version
 
 jar {
     manifest {
@@ -78,7 +77,7 @@ compileTestJava.enabled = false
 test.enabled = false
 
 def version_replaces = [
-    'version': project.version,
+    'version': mod_version,
     'mc_version': minecraft_version,
     'next_major_mc': next_major_mc,
     'neo_version': neo_version,
