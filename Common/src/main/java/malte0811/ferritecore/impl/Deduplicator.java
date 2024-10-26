@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 public class Deduplicator {
     private static final Map<String, String> VARIANT_IDENTITIES = new ConcurrentHashMap<>();
     // Typedefs would be a nice thing to have
-    private static final Map<List<Pair<Predicate<BlockState>, BakedModel>>, MultiPartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
+    private static final Map<List<MultiPartBakedModel.Selector>, MultiPartBakedModel> KNOWN_MULTIPART_MODELS = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> OR_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final Map<List<Predicate<BlockState>>, Predicate<BlockState>> AND_PREDICATE_CACHE = new ConcurrentHashMap<>();
     private static final ObjectOpenCustomHashSet<int[]> BAKED_QUAD_CACHE = new ObjectOpenCustomHashSet<>(
@@ -39,7 +39,7 @@ public class Deduplicator {
         return VARIANT_IDENTITIES.computeIfAbsent(variant, Function.identity());
     }
 
-    public static MultiPartBakedModel makeMultipartModel(List<Pair<Predicate<BlockState>, BakedModel>> selectors) {
+    public static MultiPartBakedModel makeMultipartModel(List<MultiPartBakedModel.Selector> selectors) {
         return KNOWN_MULTIPART_MODELS.computeIfAbsent(selectors, MultiPartBakedModel::new);
     }
 

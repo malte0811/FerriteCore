@@ -20,21 +20,16 @@ public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     }
 
     @Override
-    public int replaceIn(int mapIndex, Comparable<?> newValue) {
+    public int replaceIn(int mapIndex, int newPartialIndex) {
         final int lowerData = mapIndex % mapFactor;
         final int upperFactor = mapFactor * numValues();
         final int upperData = mapIndex - mapIndex % upperFactor;
-        int internalIndex = getInternalIndex(newValue);
-        if (internalIndex < 0 || internalIndex >= numValues()) {
-            return -1;
-        } else {
-            return lowerData + mapFactor * internalIndex + upperData;
-        }
+        return lowerData + newPartialIndex + upperData;
     }
 
     @Override
-    public int toPartialMapIndex(Comparable<?> value) {
-        return mapFactor * getInternalIndex(value);
+    public int toPartialMapIndex(int internalIndex) {
+        return mapFactor * internalIndex;
     }
 
     @Override

@@ -32,23 +32,14 @@ public class BinaryFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
     }
 
     @Override
-    public int replaceIn(int mapIndex, Comparable<?> newValue) {
-        final int newPartialIndex = toPartialMapIndex(newValue);
-        if (newPartialIndex < 0) {
-            return -1;
-        }
+    public int replaceIn(int mapIndex, int newPartialIndex) {
         final int keepMask = ~lowestNBits(firstBitAfterValue) | lowestNBits(firstBitInValue);
         return (keepMask & mapIndex) | newPartialIndex;
     }
 
     @Override
-    public int toPartialMapIndex(Comparable<?> value) {
-        final int internalIndex = getInternalIndex(value);
-        if (internalIndex < 0 || internalIndex >= numValues()) {
-            return -1;
-        } else {
-            return internalIndex << firstBitInValue;
-        }
+    public int toPartialMapIndex(int internalIndex) {
+        return internalIndex << firstBitInValue;
     }
 
     @Override

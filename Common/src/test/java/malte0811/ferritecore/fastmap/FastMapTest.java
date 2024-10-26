@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class FastMapTest {
     private static final BooleanProperty BOOL = BooleanProperty.create("A");
     private static final IntegerProperty INT = IntegerProperty.create("B", 0, 7);
-    private static final EnumProperty<Direction> DIR = DirectionProperty.create("C", Direction.class);
+    private static final EnumProperty<Direction> DIR = EnumProperty.create("C", Direction.class);
     private static final BooleanList BOOLS = new BooleanArrayList(new boolean[]{false, true});
 
     @TestFactory
@@ -42,8 +42,9 @@ public class FastMapTest {
     }
 
     private Stream<DynamicTest> forEachType(Consumer<TestData> test) {
-        return BOOLS.stream().map(
-                b -> DynamicTest.dynamicTest("Compact: " + b, () -> test.accept(new TestData(b)))
+        return Stream.of(
+                DynamicTest.dynamicTest("Compact", () -> test.accept(new TestData(true))),
+                DynamicTest.dynamicTest("Binary", () -> test.accept(new TestData(false)))
         );
     }
 
@@ -146,7 +147,7 @@ public class FastMapTest {
             for (T newValue : toSwap.getPossibleValues()) {
                 Map<Property<?>, Comparable<?>> newMap = map.with(baseIndex, toSwap, newValue);
                 expected.put(toSwap, newValue);
-                Assertions.assertEquals(expected, newMap);
+                Assertions.assertEquals(expected, newMap, "Setting " + toSwap + " to " + newValue + " from " + baseMap);
             }
         }
 

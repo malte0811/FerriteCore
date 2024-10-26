@@ -1,11 +1,12 @@
-package malte0811.ferritecore.fastmap.table;
+package malte0811.ferritecore.fastmap.neighbormap;
 
-import com.google.common.collect.Table;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class NeighborTableBase<S> implements Table<Property<?>, Comparable<?>, S> {
+import java.util.*;
+
+public abstract class NeighborMapBase<S> implements Map<Property<?>, S[]> {
     protected static final String ISSUES_URL = "https://github.com/malte0811/FerriteCore/issues";
 
     @Override
@@ -14,18 +15,18 @@ public abstract class NeighborTableBase<S> implements Table<Property<?>, Compara
     }
 
     @Override
-    public final S put(@NotNull Property<?> rowKey, @NotNull Comparable<?> columnKey, @NotNull S value) {
+    public @Nullable S[] put(Property<?> key, S[] value) {
         return crashOnModify();
     }
 
     @Override
-    public final void putAll(@NotNull Table<? extends Property<?>, ? extends Comparable<?>, ? extends S> table) {
+    public S[] remove(Object key) {
+        return crashOnModify();
+    }
+
+    @Override
+    public void putAll(@NotNull Map<? extends Property<?>, ? extends S[]> m) {
         crashOnModify();
-    }
-
-    @Override
-    public final S remove(@Nullable Object rowKey, @Nullable Object columnKey) {
-        return crashOnModify();
     }
 
     private static <T> T crashOnModify() {

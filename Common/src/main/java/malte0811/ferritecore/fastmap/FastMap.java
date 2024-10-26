@@ -121,18 +121,6 @@ public class FastMap<Value> {
         }
     }
 
-    /**
-     * Returns the given property and its value in the given state
-     *
-     * @param propertyIndex The index of the property to retrieve
-     * @param stateIndex    The index of the state to use for the value
-     */
-    public Map.Entry<Property<?>, Comparable<?>> getEntry(int propertyIndex, int stateIndex) {
-        return new AbstractMap.SimpleImmutableEntry<>(
-                getKey(propertyIndex).getProperty(), getKey(propertyIndex).getValue(stateIndex)
-        );
-    }
-
     public int numProperties() {
         return keys.size();
     }
@@ -142,7 +130,7 @@ public class FastMap<Value> {
     }
 
     @Nullable
-    private <T extends Comparable<T>>
+    public <T extends Comparable<T>>
     FastMapKey<T> getKeyFor(Property<T> prop) {
         int index = toKeyIndex.getInt(prop);
         if (index == INVALID_INDEX) {
@@ -152,12 +140,12 @@ public class FastMap<Value> {
         }
     }
 
-    public boolean isSingleState() {
-        return valueMatrix.size() == 1;
-    }
-
     public ReferenceSet<Property<?>> getPropertySet() {
         return propertySet;
+    }
+
+    public Value getStateByIndex(int neighborIndex) {
+        return valueMatrix.get(neighborIndex);
     }
 
     private static boolean useArrayMapForSize(int numElements) {

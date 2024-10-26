@@ -6,13 +6,10 @@ import net.minecraft.world.level.block.state.properties.Property;
  * Defines the indexing strategy for a single property in a FastMap
  */
 public abstract class FastMapKey<T extends Comparable<T>> {
-    /**
-     * Maps values of the property to indices in [0, numValues()) and vice versa
-     */
-    private final PropertyIndexer<T> indexer;
+    private final Property<T> property;
 
     protected FastMapKey(Property<T> property) {
-        this.indexer = PropertyIndexer.makeIndexer(property);
+        this.property = property;
     }
 
     /**
@@ -27,14 +24,32 @@ public abstract class FastMapKey<T extends Comparable<T>> {
      * @return The index in the value matrix corresponding to the input state with only the value of this property
      * replaced by <code>newValue</code>
      */
-    abstract int replaceIn(int mapIndex, Comparable<?> newValue);
+    public final int replaceIn(int mapIndex, Comparable<?> newValue) {
+        final int newPartialIndex = toPartialMapIndex(newValue);
+        if (newPartialIndex < 0) {
+            return -1;
+        } else {
+            return replaceIn(mapIndex, newPartialIndex);
+        }
+    }
+
+    public abstract int replaceIn(int mapIndex, int newPartialIndex);
 
     /**
      * @param value A possible value of this property
      * @return An integer such that the sum over the returned values for all properties is the state corresponding to
      * the arguments
      */
-    abstract int toPartialMapIndex(Comparable<?> value);
+    public final int toPartialMapIndex(Comparable<?> value) {
+        final int internalIndex = property.getInternalIndex((T) value);
+        if (internalIndex < 0 || internalIndex >= numValues()) {
+            return -1;
+        } else {
+            return toPartialMapIndex(internalIndex);
+        }
+    }
+
+    public abstract int toPartialMapIndex(int valueIndex);
 
     /**
      * @return An integer such that adding multiples of this value does not change the result of getValue
@@ -42,18 +57,14 @@ public abstract class FastMapKey<T extends Comparable<T>> {
     abstract int getFactorToNext();
 
     public final int numValues() {
-        return indexer.numValues();
+        return property.getPossibleValues().size();
     }
 
     public final Property<T> getProperty() {
-        return indexer.getProperty();
-    }
-
-    protected final int getInternalIndex(Comparable<?> value) {
-        return indexer.toIndex((T) value);
+        return property;
     }
 
     protected final T byInternalIndex(int internalIndex) {
-        return indexer.byIndex(internalIndex);
+        return property.getPossibleValues().get(internalIndex);
     }
 }

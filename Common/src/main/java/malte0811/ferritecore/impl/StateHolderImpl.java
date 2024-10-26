@@ -1,13 +1,11 @@
 package malte0811.ferritecore.impl;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableTable;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMaps;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import malte0811.ferritecore.fastmap.table.CrashNeighborTable;
-import malte0811.ferritecore.fastmap.table.FastmapNeighborTable;
+import malte0811.ferritecore.fastmap.neighbormap.CrashNeighborMap;
+import malte0811.ferritecore.fastmap.neighbormap.FastmapNeighborMap;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
 import net.minecraft.world.level.block.state.properties.Property;
 
@@ -30,11 +28,11 @@ public class StateHolderImpl {
             // can never be queried. Additionally, the state map is already initialized to an empty "official"
             // ImmutableMap, which is a singleton and as such does not need to be replaced. Instead, we just initialize
             // the neighbor table as a singleton empty table as there are no neighbor blockstates.
-            holder.setNeighborTable(ImmutableTable.of());
+            holder.setNeighborMap(ImmutableMap.of());
             holder.replacePropertyMap(Reference2ObjectMaps.emptyMap());
             return;
         }
-        if (holder.getNeighborTable() != null) {
+        if (holder.getNeighborMap() != null) {
             throw new IllegalStateException();
         } else if (states == LAST_STATE_MAP.get()) {
             // Use threadlocal state to use the same fast map for all states of one block
@@ -53,9 +51,9 @@ public class StateHolderImpl {
             holder.replacePropertyMap(new FastMapEntryMap(holder));
         }
         if (FerriteConfig.POPULATE_NEIGHBOR_TABLE.isEnabled()) {
-            holder.setNeighborTable(new FastmapNeighborTable<>(holder));
+            holder.setNeighborMap(new FastmapNeighborMap<>(holder));
         } else {
-            holder.setNeighborTable(CrashNeighborTable.getInstance());
+            holder.setNeighborMap(CrashNeighborMap.getInstance());
         }
     }
 }

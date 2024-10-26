@@ -11,10 +11,6 @@ public interface BlockStateCacheAccess {
 
     void setCollisionShape(VoxelShape newShape);
 
-    VoxelShape[] getOcclusionShapes();
-
-    void setOcclusionShapes(@Nullable VoxelShape[] newShapes);
-
     boolean[] getFaceSturdy();
 
     void setFaceSturdy(boolean[] newFaceSturdyArray);

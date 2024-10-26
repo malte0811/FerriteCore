@@ -1,6 +1,7 @@
 package malte0811.ferritecore.mixin.dedupmultipart;
 
 import malte0811.ferritecore.impl.Deduplicator;
+import net.minecraft.client.renderer.block.model.multipart.MultiPart;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -12,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.List;
 import java.util.function.Predicate;
 
-@Mixin(MultiPartBakedModel.Builder.class)
+@Mixin(MultiPart.class)
 public class MixinMultipartBuilder {
     @Redirect(
-            method = "build",
+            method = "bake",
             at = @At(value = "NEW", target = "(Ljava/util/List;)Lnet/minecraft/client/resources/model/MultiPartBakedModel;")
     )
-    public MultiPartBakedModel build(List<Pair<Predicate<BlockState>, BakedModel>> selectors) {
+    public MultiPartBakedModel build(List<MultiPartBakedModel.Selector> selectors) {
         return Deduplicator.makeMultipartModel(selectors);
     }
 }

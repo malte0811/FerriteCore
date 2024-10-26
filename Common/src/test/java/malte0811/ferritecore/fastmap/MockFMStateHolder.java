@@ -47,12 +47,12 @@ public class MockFMStateHolder<T> implements FastMapStateHolder<T> {
     }
 
     @Override
-    public void setNeighborTable(Table<Property<?>, Comparable<?>, T> table) {
+    public void setNeighborMap(Map<Property<?>, T[]> table) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Table<Property<?>, Comparable<?>, T> getNeighborTable() {
+    public Map<Property<?>, T[]> getNeighborMap() {
         return null;
     }
 }

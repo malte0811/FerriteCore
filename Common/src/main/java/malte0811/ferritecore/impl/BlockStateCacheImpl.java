@@ -12,7 +12,6 @@ import malte0811.ferritecore.util.Constants;
 import net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase;
 import net.minecraft.world.phys.shapes.ArrayVoxelShape;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.MethodHandle;
@@ -27,9 +26,6 @@ public class BlockStateCacheImpl {
     public static final Map<ArrayVSAccess, ArrayVSAccess> CACHE_COLLIDE = new Object2ObjectOpenCustomHashMap<>(
             ArrayVoxelShapeHash.INSTANCE
     );
-    // Maps a shape to the "canonical instance" of that shape and its side projections
-    public static final Map<VoxelShape, Pair<VoxelShape, VoxelShape[]>> CACHE_PROJECT =
-            new Object2ObjectOpenCustomHashMap<>(VoxelShapeHash.INSTANCE);
     public static final Map<boolean[], boolean[]> CACHE_FACE_STURDY = new Object2ObjectOpenCustomHashMap<>(
             BooleanArrays.HASH_STRATEGY
     );
@@ -68,9 +64,8 @@ public class BlockStateCacheImpl {
         if (newCache != null) {
             final BlockStateCacheAccess oldCache = LAST_CACHE.get();
             deduplicateCollisionShape(newCache, oldCache);
-            deduplicateRenderShapes(newCache, oldCache);
             deduplicateFaceSturdyArray(newCache, oldCache);
-            LAST_CACHE.set(null);
+            LAST_CACHE.remove();
         }
     }
 
@@ -90,32 +85,6 @@ public class BlockStateCacheImpl {
         }
         replaceInternals(dedupedCollisionShape, newCache.getCollisionShape());
         newCache.setCollisionShape(dedupedCollisionShape);
-    }
-
-    private static void deduplicateRenderShapes(
-            BlockStateCacheAccess newCache, @Nullable BlockStateCacheAccess oldCache
-    ) {
-        final VoxelShape newRenderShape = getRenderShape(newCache.getOcclusionShapes());
-        if (newRenderShape == null) {
-            return;
-        }
-        Pair<VoxelShape, VoxelShape[]> dedupedRenderShapes = null;
-        if (oldCache != null) {
-            final VoxelShape oldRenderShape = getRenderShape(oldCache.getOcclusionShapes());
-            if (VoxelShapeHash.INSTANCE.equals(newRenderShape, oldRenderShape)) {
-                dedupedRenderShapes = Pair.of(oldRenderShape, oldCache.getOcclusionShapes());
-            }
-        }
-        if (dedupedRenderShapes == null) {
-            // Who thought that this was a good interface for putIfAbsent…
-            Pair<VoxelShape, VoxelShape[]> newPair = Pair.of(newRenderShape, newCache.getOcclusionShapes());
-            dedupedRenderShapes = CACHE_PROJECT.putIfAbsent(newRenderShape, newPair);
-            if (dedupedRenderShapes == null) {
-                dedupedRenderShapes = newPair;
-            }
-        }
-        replaceInternals(dedupedRenderShapes.getLeft(), newRenderShape);
-        newCache.setOcclusionShapes(dedupedRenderShapes.getRight());
     }
 
     private static void deduplicateFaceSturdyArray(

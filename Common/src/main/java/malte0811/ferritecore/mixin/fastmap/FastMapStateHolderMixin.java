@@ -21,25 +21,33 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     @Final
     private Reference2ObjectArrayMap<Property<?>, Comparable<?>> values;
     @Shadow
-    private Table<Property<?>, Comparable<?>, S> neighbours;
+    private Map<Property<?>, S[]> neighbours;
 
+    @Shadow @Final protected O owner;
     private int ferritecore_globalTableIndex;
     private FastMap<S> ferritecore_globalTable;
 
-    @Redirect(
-            method = {"setValue", "trySetValue"},
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/google/common/collect/Table;get(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
-                    remap = false
-            )
-    )
-    public Object getNeighborFromFastMap(Table<?, ?, ?> ignore, Object rowKey, Object columnKey) {
-        return this.ferritecore_globalTable.with(
-                this.ferritecore_globalTableIndex,
-                (Property<?>) rowKey,
-                columnKey
-        );
+    /**
+     * @author malte0811
+     * @reason Use alternative implementation. Near impossible to do with anything less intrusive without performance
+     * issues.
+     */
+    @Overwrite
+    private <T extends Comparable<T>, V extends T> S setValueInternal(
+            Property<T> property, V newValue, Comparable<?> oldValue
+    ) {
+        if (oldValue.equals(newValue)) {
+            return (S)this;
+        } else {
+            S newState = ferritecore_globalTable.with(ferritecore_globalTableIndex, property, newValue);
+            if (newState == null) {
+                throw new IllegalArgumentException(
+                        "Cannot set property " + property + " to " + newValue + " on " + this.owner + ", it is not an allowed value"
+                );
+            } else {
+                return newState;
+            }
+        }
     }
 
     /**
@@ -85,12 +93,12 @@ public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolde
     }
 
     @Override
-    public void setNeighborTable(Table<Property<?>, Comparable<?>, S> table) {
+    public void setNeighborMap(Map<Property<?>, S[]> table) {
         neighbours = table;
     }
 
     @Override
-    public Table<Property<?>, Comparable<?>, S> getNeighborTable() {
+    public Map<Property<?>, S[]> getNeighborMap() {
         return neighbours;
     }
 }
