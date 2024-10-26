@@ -3,20 +3,22 @@ package malte0811.ferritecore.mixin.platform;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import malte0811.ferritecore.mixin.config.FerriteConfig;
+import malte0811.ferritecore.mixin.config.IPlatformConfigHooks;
 import malte0811.ferritecore.util.Constants;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.CustomValue;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
-public class ConfigFileHandler {
-    // Called reflectively from FerriteConfig
-    public static void finish(List<FerriteConfig.Option> options) throws IOException {
+// Instantiated reflectively in FerriteConfig
+public class ConfigFileHandler implements IPlatformConfigHooks {
+    @Override
+    public void readAndUpdateConfig(List<FerriteConfig.Option> options) throws IOException {
         Path configDir = FabricLoader.getInstance().getConfigDir();
         Path config = configDir.resolve(Constants.MODID + ".mixin.properties");
         if (!Files.exists(config)) {
@@ -49,5 +51,18 @@ public class ConfigFileHandler {
             o.set(actualOptions::getBoolean);
         }
         Files.write(config, newLines);
+    }
+
+    @Override
+    public void collectDisabledOverrides(OverrideCallback disableOption) {
+        for (ModContainer mod : FabricLoader.getInstance().getAllMods()) {
+            CustomValue customValue = mod.getMetadata().getCustomValues().get(Constants.DISABLED_OVERRIDES_KEY);
+            if (customValue != null) {
+                String modId = mod.getMetadata().getId();
+                for (CustomValue disabledOptionValue : customValue.getAsArray()) {
+                    disableOption.addOverride(disabledOptionValue.getAsString(), modId);
+                }
+            }
+        }
     }
 }

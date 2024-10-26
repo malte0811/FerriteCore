@@ -5,6 +5,7 @@ import malte0811.ferritecore.IPlatformHooks;
 public class Constants {
     public static final String MODID = "ferritecore";
     public static final IPlatformHooks PLATFORM_HOOKS;
+    public static final String DISABLED_OVERRIDES_KEY = MODID + ":disabled_options";
 
     static {
         try {

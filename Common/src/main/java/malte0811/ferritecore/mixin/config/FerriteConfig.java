@@ -1,15 +1,17 @@
 package malte0811.ferritecore.mixin.config;
 
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FerriteConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FerriteConfig.class);
+
     public static final Option NEIGHBOR_LOOKUP;
     public static final Option PROPERTY_MAP;
     public static final Option PREDICATES;
@@ -91,13 +93,31 @@ public class FerriteConfig {
         }
 
         private void finish() {
+            IPlatformConfigHooks platformHooks = IPlatformConfigHooks.loadHooks();
             try {
-                // This runs too early for arch's ExpectPlatform, so reflection it is
-                Class<?> handler = Class.forName("malte0811.ferritecore.mixin.platform.ConfigFileHandler");
-                Method finish = handler.getMethod("finish", List.class);
-                finish.invoke(null, options);
-            } catch (Exception e) {
+                platformHooks.readAndUpdateConfig(options);
+            } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+
+            Set<String> allOptions = options.stream().map(FerriteConfig.Option::getName).collect(Collectors.toSet());
+            Set<String> disabledOptions = new HashSet<>();
+            platformHooks.collectDisabledOverrides((disabledOption, modId) -> {
+                if (!allOptions.contains(disabledOption)) {
+                    LOGGER.warn(
+                            "Mod {} tried to disabled FerriteCore option {}, which does not exist",
+                            modId,
+                            disabledOption
+                    );
+                } else {
+                    LOGGER.warn("Mod {} disabled FerriteCore option {}", modId, disabledOption);
+                    disabledOptions.add(disabledOption);
+                }
+            });
+            for (FerriteConfig.Option option : options) {
+                if (disabledOptions.contains(option.getName())) {
+                    option.set($ -> false);
+                }
             }
         }
     }
