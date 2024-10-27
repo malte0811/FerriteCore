@@ -1,5 +1,6 @@
 plugins {
     id 'ferritecore.subproject-conventions'
+    id "me.modmuss50.mod-publish-plugin"
 }
 
 String makeVersionSuffix() {
@@ -10,7 +11,8 @@ String makeVersionSuffix() {
     }
 }
 
-archivesBaseName = "${mod_id}-${mod_version}${makeVersionSuffix()}-" + project.name.toLowerCase()
+def full_version = "${mod_version}${makeVersionSuffix()}";
+archivesBaseName = "${mod_id}-${full_version}-" + project.name.toLowerCase(Locale.ROOT)
 
 jar {
     manifest {
@@ -30,14 +32,8 @@ jar {
 task signJar(description: "Sign jar") {
     doLast {
         if (project.hasProperty('keyStore')) {
-            def path;
-            if (project.name == "NeoForge") {
-                path = jar.archivePath
-            } else {
-                path = remapJar.archivePath
-            }
-            logger.warn("Signing " + path + "\n")
-            ant.signjar(jar: path,
+            logger.warn("Signing " + jar.archivePath + "\n")
+            ant.signjar(jar: jar.archivePath,
                     alias: project.storeAlias,
                     keystore: project.keyStore,
                     storepass: project.storePass,
@@ -50,6 +46,7 @@ task signJar(description: "Sign jar") {
 }
 
 build.finalizedBy signJar
+signJar.dependsOn build
 
 compileJava.doFirst {
     // This is set by Mixin during annotation processing, but should not persist between subprobjects
@@ -96,4 +93,31 @@ tasks.withType(Task) {
     if (it.name == "runServer") {
         it.standardInput = System.in
     }
+}
+
+def changelogFile = new File("changelog/${mod_version}.md");
+
+if (changelogFile.exists()) {
+    publishMods {
+        file = jar.archivePath
+        changelog = changelogFile.text
+        type = STABLE
+        modLoaders.add(name.toLowerCase(Locale.ROOT))
+        displayName = archivesBaseName
+        version = "${full_version}-${name.toLowerCase(Locale.ROOT)}"
+
+        curseforge {
+            accessToken = providers.gradleProperty("CURSEFORGE_API_KEY").orElse("invalid-key-dry-run")
+            projectId = project.name == "Fabric" ? "459857" : "429235"
+            minecraftVersions.add(minecraft_version)
+        }
+        modrinth {
+            accessToken = providers.gradleProperty("MODRINTH_API_KEY").orElse('invalid-key-dry-run')
+            projectId = "uXXizFIs"
+            minecraftVersions.add(minecraft_version)
+        }
+    }
+
+    tasks.getByName("publishCurseforge").dependsOn signJar
+    tasks.getByName("publishModrinth").dependsOn signJar
 }
