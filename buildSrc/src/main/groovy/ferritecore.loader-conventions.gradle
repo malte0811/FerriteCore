@@ -29,11 +29,13 @@ jar {
     }
 }
 
+def mainArtifact = name == "Fabric" ? remapJar.archivePath : jar.archivePath
+
 task signJar(description: "Sign jar") {
     doLast {
         if (project.hasProperty('keyStore')) {
-            logger.warn("Signing " + jar.archivePath + "\n")
-            ant.signjar(jar: jar.archivePath,
+            logger.warn("Signing " + mainArtifact + "\n")
+            ant.signjar(jar: mainArtifact,
                     alias: project.storeAlias,
                     keystore: project.keyStore,
                     storepass: project.storePass,
@@ -99,7 +101,7 @@ def changelogFile = new File("changelog/${mod_version}.md");
 
 if (changelogFile.exists()) {
     publishMods {
-        file = jar.archivePath
+        file = mainArtifact
         changelog = changelogFile.text
         type = STABLE
         modLoaders.add(name.toLowerCase(Locale.ROOT))
