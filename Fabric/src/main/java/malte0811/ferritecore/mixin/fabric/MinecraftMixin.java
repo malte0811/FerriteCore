@@ -3,6 +3,7 @@ package malte0811.ferritecore.mixin.fabric;
 import malte0811.ferritecore.impl.Deduplicator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.main.GameConfig;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,6 +19,7 @@ public class MinecraftMixin {
             )
     )
     private void injectAfterModels(GameConfig gameConfig, CallbackInfo ci) {
-        Deduplicator.registerReloadListener();
+        ((ReloadableResourceManager) Minecraft.getInstance().getResourceManager())
+                .registerReloadListener(Deduplicator.createReloadListener());
     }
 }

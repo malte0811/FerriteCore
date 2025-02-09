@@ -6,16 +6,13 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import malte0811.ferritecore.hash.LambdaBasedHash;
 import malte0811.ferritecore.mixin.accessors.BakedQuadAccess;
 import malte0811.ferritecore.util.PredicateHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -58,9 +55,9 @@ public class Deduplicator {
         }
     }
 
-    public static void registerReloadListener() {
+    public static PreparableReloadListener createReloadListener() {
         // Register the reload listener s.t. its "sync" part runs after the model loader reload
-        ((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(new SimplePreparableReloadListener<Unit>() {
+        return new SimplePreparableReloadListener<Unit>() {
             @Override
             protected Unit prepare(@NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
                 return Unit.INSTANCE;
@@ -77,7 +74,7 @@ public class Deduplicator {
                 BAKED_QUAD_CACHE.clear();
                 BAKED_QUAD_CACHE.trim();
             }
-        });
+        };
     }
 
     /**
