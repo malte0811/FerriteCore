@@ -26,20 +26,10 @@ ordering = "NONE"
 side = "BOTH"
 
 [[mixins]]
-config="ferritecore.predicates.mixin.json"
-[[mixins]]
 config="ferritecore.fastmap.mixin.json"
-[[mixins]]
-config="ferritecore.mrl.mixin.json"
-[[mixins]]
-config="ferritecore.dedupmultipart.mixin.json"
 [[mixins]]
 config="ferritecore.blockstatecache.mixin.json"
 [[mixins]]
-config="ferritecore.dedupbakedquad.mixin.json"
-[[mixins]]
 config="ferritecore.threaddetec.mixin.json"
-[[mixins]]
-config="ferritecore.modelsides.mixin.json"
 [[mixins]]
 config="ferritecore.accessors.mixin.json"

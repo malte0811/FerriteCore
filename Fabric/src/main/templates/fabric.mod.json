@@ -25,14 +25,8 @@
   "mixins": [
     "ferritecore.accessors.mixin.json",
     "ferritecore.blockstatecache.mixin.json",
-    "ferritecore.dedupmultipart.mixin.json",
     "ferritecore.fastmap.mixin.json",
-    "ferritecore.mrl.mixin.json",
-    "ferritecore.predicates.mixin.json",
-    "ferritecore.dedupbakedquad.mixin.json",
-    "ferritecore.threaddetec.mixin.json",
-    "ferritecore.modelsides.mixin.json",
-    "ferritecore.fabric.mixin.json"
+    "ferritecore.threaddetec.mixin.json"
   ],
   "custom": {
     "lithium:options": {
