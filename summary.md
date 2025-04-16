@@ -11,11 +11,11 @@ This change is made obsolete by the 4th point, it is only included in this list 
 The vanilla implementation contains code along these lines:
 
 ```java
-Optional<T> opt=newlyCreatedOptional();
-if(!opt.isPresent()){
+Optional<T> opt = newlyCreatedOptional();
+if (!opt.isPresent()) {
     // Something
-}else{
-    return()->doThing(opt.get());
+} else {
+    return () -> doThing(opt.get());
 }
 ```
 
@@ -67,7 +67,7 @@ new `getValues` method returning a `map` rather than an `ImmutableMap` should be
 ### 4. Multipart model predicate caching
 
 Each multipart model stores a number of predicates to determine which parts to show under what conditions. These
-predicates take up 300-400 MB. However in many cases these predicates are checking the same thing, they are just newly
+predicates take up 300-400 MB. However, in many cases these predicates are checking the same thing, they are just newly
 created every time. For
 `KeyValueCondition` the predicates can be cached by using the property and its value as a key, for `And/OrCondition` (
 and multi-value `KeyValueCondition`s) the key is the list of input predicates sorted by hash value.  
@@ -79,7 +79,7 @@ usages of multipart models is pipes, where the states are nearly always boolean 
 result the number of predicates is reduced from between 10s of thousands and millions to a few ten or hundred instances.
 
 Saved memory: 300-400 MB (relative to the state after the first change, so 100 MB more compared to a "clean" instance)  
-CPU impact: Some impact in model loading (but less allocations), zero while playing  
+CPU impact: Some impact in model loading (but fewer allocations), zero while playing  
 Side: client  
 Mixin subpackage: `predicates`
 
@@ -101,7 +101,7 @@ first part would require changing what constructor the constructor in question r
 
 ### 6. Multipart model instances
 
-By default every blockstate using a multipart model gets its own instance of that multipart model. Since multipart
+By default, every blockstate using a multipart model gets its own instance of that multipart model. Since multipart
 models are generally used for blocks with a lot of states this means a lot of instances, and a lot of wasted memory. The
 only input data for a multipart model is a `List<Pair<Predicate<BlockState>, IBakedModel>>`. The predicate is already
 deduplicated by point 4, so it is very easy to use the same instance for equivalent lists. This reduces the number of

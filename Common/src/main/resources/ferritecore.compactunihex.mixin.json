@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.compactunihex",
+  "compatibilityLevel": "JAVA_17",
+  "client": ["UnihexByteContentsMixin", "UnihexShortContentsMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.compactunihex.Config",
+  "refmap": "${refmap_target}refmap.json"
+}

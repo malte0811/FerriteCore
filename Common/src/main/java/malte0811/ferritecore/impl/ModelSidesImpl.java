@@ -1,5 +1,6 @@
 package malte0811.ferritecore.impl;
 
+import malte0811.ferritecore.util.CollectionUtil;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.Direction;
@@ -22,7 +23,7 @@ public class ModelSidesImpl {
     });
 
     public static List<BakedQuad> minimizeUnculled(List<BakedQuad> quads) {
-        return List.copyOf(quads);
+        return CollectionUtil.minimize(quads);
     }
 
     public static Map<Direction, List<BakedQuad>> minimizeCulled(Map<Direction, List<BakedQuad>> quadsBySide) {
