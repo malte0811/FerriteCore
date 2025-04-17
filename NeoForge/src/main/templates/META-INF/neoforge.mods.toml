@@ -43,3 +43,7 @@ config="ferritecore.threaddetec.mixin.json"
 config="ferritecore.modelsides.mixin.json"
 [[mixins]]
 config="ferritecore.accessors.mixin.json"
+[[mixins]]
+config="ferritecore.blockmodellists.mixin.json"
+[[mixins]]
+config="ferritecore.compactunihex.mixin.json"

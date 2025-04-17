@@ -12,13 +12,6 @@ public class CompactShortContents implements LineData {
     private final long shorts3;
     private final long shorts4;
 
-    public CompactShortContents(long shorts1, long shorts2, long shorts3, long shorts4) {
-        this.shorts1 = shorts1;
-        this.shorts2 = shorts2;
-        this.shorts3 = shorts3;
-        this.shorts4 = shorts4;
-    }
-
     public CompactShortContents(short[] shorts) {
         if (shorts.length != 16)
             throw new IllegalArgumentException();

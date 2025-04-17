@@ -11,7 +11,6 @@ public class CompactByteContents implements LineData {
     private final long lowerBytes;
 
     public CompactByteContents(long upperBytes, long lowerBytes) {
-
         this.upperBytes = upperBytes;
         this.lowerBytes = lowerBytes;
     }
