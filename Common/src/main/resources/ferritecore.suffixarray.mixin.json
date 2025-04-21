@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "malte0811.ferritecore.mixin.suffixarray",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "SuffixArrayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8",
+  "plugin": "malte0811.ferritecore.mixin.suffixarray.Config",
+  "refmap": "${refmap_target}refmap.json"
+}

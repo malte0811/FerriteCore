@@ -47,3 +47,5 @@ config="ferritecore.accessors.mixin.json"
 config="ferritecore.blockmodellists.mixin.json"
 [[mixins]]
 config="ferritecore.compactunihex.mixin.json"
+[[mixins]]
+config="ferritecore.suffixarray.mixin.json"

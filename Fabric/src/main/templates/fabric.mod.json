@@ -34,6 +34,7 @@
     "ferritecore.modelsides.mixin.json",
     "ferritecore.blockmodellists.mixin.json",
     "ferritecore.compactunihex.mixin.json",
+    "ferritecore.suffixarray.mixin.json",
     "ferritecore.fabric.mixin.json"
   ],
   "custom": {

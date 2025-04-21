@@ -25,6 +25,7 @@ public class FerriteConfig {
     public static final Option MODEL_SIDES;
     public static final Option BLOCK_MODEL_LISTS;
     public static final Option COMPACT_UNIHEX;
+    public static final Option SUFFIX_ARRAY;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -83,6 +84,10 @@ public class FerriteConfig {
         COMPACT_UNIHEX = builder.createOption(
             "compactUnihex",
             "Compacts unihex font glyphs into longs instead of using short and byte arrays, saving some memory."
+        );
+        SUFFIX_ARRAY = builder.createOption(
+            "suffixArray",
+            "Replaces the int list in SuffixArray with a char list, halving the memory usage."
         );
         builder.finish();
     }
