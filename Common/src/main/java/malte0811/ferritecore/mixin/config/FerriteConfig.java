@@ -23,6 +23,9 @@ public class FerriteConfig {
     public static final Option POPULATE_NEIGHBOR_TABLE;
     public static final Option THREADING_DETECTOR;
     public static final Option MODEL_SIDES;
+    public static final Option BLOCK_MODEL_LISTS;
+    public static final Option COMPACT_UNIHEX;
+    public static final Option SUFFIX_ARRAY;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -73,6 +76,18 @@ public class FerriteConfig {
                 "populateNeighborTable",
                 "Populate the neighbor table used by vanilla. Enabling this slightly increases memory usage, but" +
                         " can help with issues in the rare case where mods access it directly."
+        );
+        BLOCK_MODEL_LISTS = builder.createOption(
+            "blockModelLists",
+            "Use smaller data structures in BlockModel, reducing the amount of empty ArrayLists."
+        );
+        COMPACT_UNIHEX = builder.createOption(
+            "compactUnihex",
+            "Compacts unihex font glyphs into longs instead of using short and byte arrays, saving some memory."
+        );
+        SUFFIX_ARRAY = builder.createOption(
+            "suffixArray",
+            "Replaces the int list in SuffixArray with a char list, halving the memory usage."
         );
         builder.finish();
     }
