@@ -2,13 +2,16 @@ package malte0811.ferritecore.util;
 
 import malte0811.ferritecore.ducks.SmallThreadDetectable;
 import net.minecraft.SharedConstants;
+import net.minecraft.WorldVersion;
 import net.minecraft.util.ThreadingDetector;
+import net.minecraft.world.level.storage.DataVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +20,7 @@ import java.util.function.Consumer;
 class SmallThreadingDetectorTest {
     @BeforeAll
     static void setup() {
-        SharedConstants.setVersion(new FakeGameVersion());
+        SharedConstants.setVersion(new WorldVersion.Simple("test", "test", new DataVersion(0, "dev"), 0, 0, 0, new Date(0), false));
     }
 
     @Test
