@@ -6,10 +6,10 @@ plugins {
 neoForge {
     neoFormVersion = neo_form_version
     addModdingDependenciesTo sourceSets.test
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
+    // parchment {
+    //     minecraftVersion = parchment_minecraft
+    //     mappingsVersion = parchment_version
+    // }
 }
 
 dependencies {

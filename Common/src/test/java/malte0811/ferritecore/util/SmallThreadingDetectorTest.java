@@ -3,6 +3,7 @@ package malte0811.ferritecore.util;
 import malte0811.ferritecore.ducks.SmallThreadDetectable;
 import net.minecraft.SharedConstants;
 import net.minecraft.WorldVersion;
+import net.minecraft.server.packs.metadata.pack.PackFormat;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.level.storage.DataVersion;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +21,8 @@ import java.util.function.Consumer;
 class SmallThreadingDetectorTest {
     @BeforeAll
     static void setup() {
-        SharedConstants.setVersion(new WorldVersion.Simple("test", "test", new DataVersion(0, "dev"), 0, 0, 0, new Date(0), false));
+        var packFormat = new PackFormat(0, 0);
+        SharedConstants.setVersion(new WorldVersion.Simple("test", "test", new DataVersion(0, "dev"), 0, packFormat, packFormat, new Date(0), false));
     }
 
     @Test

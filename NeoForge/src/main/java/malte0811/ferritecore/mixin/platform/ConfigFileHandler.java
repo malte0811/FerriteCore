@@ -39,7 +39,7 @@ public class ConfigFileHandler implements IPlatformConfigHooks {
 
     @Override
     public void collectDisabledOverrides(OverrideCallback disableOption) {
-        for (var mod : FMLLoader.getLoadingModList().getMods()) {
+        for (var mod : FMLLoader.getCurrent().getLoadingModList().getMods()) {
             var maybeOverrides = mod.getConfigElement(Constants.DISABLED_OVERRIDES_KEY);
             if (maybeOverrides.isEmpty()) { continue; }
             if (maybeOverrides.get() instanceof List<?> overrides) {
