@@ -16,13 +16,14 @@ public class PalettedContainerMixin implements SmallThreadDetectable {
     @Mutable
     private ThreadingDetector threadingDetector;
 
+    @Unique
     private byte ferritecore$threadingState = UNLOCKED;
 
     @Inject(
             method = {
-                    "<init>(Lnet/minecraft/core/IdMap;Ljava/lang/Object;Lnet/minecraft/world/level/chunk/PalettedContainer$Strategy;)V",
-                    "<init>(Lnet/minecraft/core/IdMap;Lnet/minecraft/world/level/chunk/PalettedContainer$Strategy;Lnet/minecraft/world/level/chunk/PalettedContainer$Data;)V",
-                    "<init>(Lnet/minecraft/core/IdMap;Lnet/minecraft/world/level/chunk/PalettedContainer$Strategy;Lnet/minecraft/world/level/chunk/PalettedContainer$Configuration;Lnet/minecraft/util/BitStorage;Ljava/util/List;)V",
+                    "<init>(Ljava/lang/Object;Lnet/minecraft/world/level/chunk/Strategy;)V",
+                    "<init>(Lnet/minecraft/world/level/chunk/PalettedContainer;)V",
+                    "<init>(Lnet/minecraft/world/level/chunk/Strategy;Lnet/minecraft/world/level/chunk/Configuration;Lnet/minecraft/util/BitStorage;Lnet/minecraft/world/level/chunk/Palette;)V",
             },
             at = @At("TAIL")
     )
