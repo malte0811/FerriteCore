@@ -34,10 +34,5 @@
     "ferritecore.modelsides.mixin.json",
     "ferritecore.datacomponents.mixin.json",
     "ferritecore.fabric.mixin.json"
-  ],
-  "custom": {
-    "lithium:options": {
-      "mixin.alloc.blockstate": false
-    }
-  }
+  ]
 }
