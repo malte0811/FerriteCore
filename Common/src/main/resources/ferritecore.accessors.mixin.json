@@ -2,9 +2,7 @@
   "required": true,
   "package": "malte0811.ferritecore.mixin.accessors",
   "compatibilityLevel": "JAVA_17",
-  "client": [
-    "BakedQuadAccess"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   },
