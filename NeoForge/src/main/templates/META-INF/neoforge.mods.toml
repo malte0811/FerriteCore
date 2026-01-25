@@ -32,3 +32,5 @@ config="ferritecore.blockstatecache.mixin.json"
 config="ferritecore.threaddetec.mixin.json"
 [[mixins]]
 config="ferritecore.accessors.mixin.json"
+[[mixins]]
+config="ferritecore.datacomponents.mixin.json"

@@ -56,7 +56,7 @@ public class FastMap<Value> {
         if (useArrayMapForSize(properties.size())) {
             this.propertySet = new ReferenceArraySet<>(properties);
         } else {
-            this.propertySet = new ReferenceOpenHashSet<>(properties);
+            this.propertySet = new ReferenceLinkedOpenHashSet<>(properties);
         }
     }
 
