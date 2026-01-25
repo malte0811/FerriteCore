@@ -42,4 +42,6 @@ config="ferritecore.threaddetec.mixin.json"
 [[mixins]]
 config="ferritecore.modelsides.mixin.json"
 [[mixins]]
+config="ferritecore.datacomponents.mixin.json"
+[[mixins]]
 config="ferritecore.accessors.mixin.json"

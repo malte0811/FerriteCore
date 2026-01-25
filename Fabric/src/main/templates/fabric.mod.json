@@ -32,6 +32,7 @@
     "ferritecore.dedupbakedquad.mixin.json",
     "ferritecore.threaddetec.mixin.json",
     "ferritecore.modelsides.mixin.json",
+    "ferritecore.datacomponents.mixin.json",
     "ferritecore.fabric.mixin.json"
   ],
   "custom": {
