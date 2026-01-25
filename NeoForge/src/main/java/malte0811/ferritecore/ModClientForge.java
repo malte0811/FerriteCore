@@ -9,7 +9,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import org.apache.http.impl.client.RedirectLocations;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = Constants.MODID)
 public class ModClientForge {
     @SubscribeEvent
     public static void registerReloadListener(AddClientReloadListenersEvent ev) {
