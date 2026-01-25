@@ -26,11 +26,7 @@
     "ferritecore.accessors.mixin.json",
     "ferritecore.blockstatecache.mixin.json",
     "ferritecore.fastmap.mixin.json",
+    "ferritecore.datacomponents.mixin.json",
     "ferritecore.threaddetec.mixin.json"
-  ],
-  "custom": {
-    "lithium:options": {
-      "mixin.alloc.blockstate": false
-    }
-  }
+  ]
 }

@@ -11,7 +11,6 @@ description = '''
 Reduces memory usage.
 '''
 logoFile = "logo.png"
-"lithium:options" = { "mixin.alloc.blockstate" = false }
 [[dependencies.ferritecore]]
 modId = "neoforge"
 type = "required"
@@ -33,3 +32,5 @@ config="ferritecore.blockstatecache.mixin.json"
 config="ferritecore.threaddetec.mixin.json"
 [[mixins]]
 config="ferritecore.accessors.mixin.json"
+[[mixins]]
+config="ferritecore.datacomponents.mixin.json"

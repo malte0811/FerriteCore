@@ -23,6 +23,7 @@ public class FerriteConfig {
     public static final Option POPULATE_NEIGHBOR_TABLE;
     public static final Option THREADING_DETECTOR;
     public static final Option MODEL_SIDES;
+    public static final Option DATACOMPONENTS;
 
     static {
         ConfigBuilder builder = new ConfigBuilder();
@@ -58,6 +59,10 @@ public class FerriteConfig {
         MODEL_SIDES = builder.createOption(
                 "modelSides",
                 "Use smaller data structures for \"simple\" models, especially models with few side-specific faces"
+        );
+        DATACOMPONENTS = builder.createOption(
+                "dataComponentPatch",
+                "Save memory overhead from empty data component maps/patched"
         );
         THREADING_DETECTOR = builder.createOptInOption(
                 "useSmallThreadingDetector",
