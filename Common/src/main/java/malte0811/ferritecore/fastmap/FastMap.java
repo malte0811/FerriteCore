@@ -1,7 +1,7 @@
 package malte0811.ferritecore.fastmap;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,34 +11,25 @@ import java.util.*;
  * Maps a Property->Value assignment to a value, while allowing fast access to "neighbor" states
  */
 public class FastMap<Value> {
-    private static final int INVALID_INDEX = -1;
-
-    private final List<FastMapKey<?>> keys;
+    private final Property<?>[] properties;
+    private final List<FastMapKey> keys;
     private final List<Value> valueMatrix;
-    // It might be possible to get rid of this (and the equivalent map for values) by sorting the key vectors by
-    // property name (natural order for values) and using a binary search above a given size, but choosing that size
-    // would likely be more effort than it's worth
-    private final Reference2IntMap<Property<?>> toKeyIndex;
-    private final ReferenceSet<Property<?>> propertySet;
 
-    public FastMap(
-            Collection<Property<?>> properties, Map<Map<Property<?>, Comparable<?>>, Value> valuesMap, boolean compact
-    ) {
-        List<FastMapKey<?>> keys = new ArrayList<>(properties.size());
-        int factorUpTo = 1;
-        if (useArrayMapForSize(properties.size())) {
-            this.toKeyIndex = new Reference2IntArrayMap<>();
-        } else {
-            this.toKeyIndex = new Reference2IntOpenHashMap<>();
+    public FastMap(Property<?>[] properties, boolean compact) {
+        this.properties = properties;
+        for (var prop : properties) {
+            for (int i = 0; i < prop.getPossibleValues().size(); ++i) {
+                Preconditions.checkState(getIndexUnsafe(prop, prop.getPossibleValues().get(i)) == i);
+            }
         }
-        this.toKeyIndex.defaultReturnValue(INVALID_INDEX);
-        for (Property<?> prop : properties) {
-            this.toKeyIndex.put(prop, keys.size());
-            FastMapKey<?> nextKey;
+        List<FastMapKey> keys = new ArrayList<>(properties.length);
+        int factorUpTo = 1;
+        for (int propIndex = 0; propIndex < properties.length; ++propIndex) {
+            FastMapKey nextKey;
             if (compact) {
-                nextKey = new CompactFastMapKey<>(prop, factorUpTo);
+                nextKey = new CompactFastMapKey(factorUpTo, properties[propIndex].getPossibleValues().size());
             } else {
-                nextKey = new BinaryFastMapKey<>(prop, factorUpTo);
+                nextKey = BinaryFastMapKey.create(factorUpTo, properties[propIndex].getPossibleValues().size());
             }
             keys.add(nextKey);
             factorUpTo *= nextKey.getFactorToNext();
@@ -49,106 +40,58 @@ public class FastMap<Value> {
         for (int i = 0; i < factorUpTo; ++i) {
             valuesList.add(null);
         }
-        for (Map.Entry<Map<Property<?>, Comparable<?>>, Value> state : valuesMap.entrySet()) {
-            valuesList.set(getIndexOf(state.getKey()), state.getValue());
-        }
-        this.valueMatrix = Collections.unmodifiableList(valuesList);
-        if (useArrayMapForSize(properties.size())) {
-            this.propertySet = new ReferenceArraySet<>(properties);
-        } else {
-            this.propertySet = new ReferenceLinkedOpenHashSet<>(properties);
-        }
+        this.valueMatrix = valuesList;
     }
 
     /**
      * Computes the value for a neighbor state
      *
-     * @param oldIndex The original state index
-     * @param prop     The property to be replaced
-     * @param value    The new value of this property
+     * @param oldIndex      The original state index
+     * @param propertyIndex The property to be replaced
+     * @param valueIndex    The new value of this property
      * @return The value corresponding to the specified neighbor, or null if value is not a valid value for prop
      */
     @Nullable
-    public Value with(int oldIndex, Property<?> prop, Object value) {
-        if (!(value instanceof Comparable<?> valueComparable)) {
-            return null;
-        }
-        final FastMapKey<?> keyToChange = getKeyFor(prop);
-        if (keyToChange == null) {
-            return null;
-        }
-        int newIndex = keyToChange.replaceIn(oldIndex, valueComparable);
-        if (newIndex < 0) {
-            return null;
+    public Value with(int oldIndex, int propertyIndex, int valueIndex) {
+        int newIndex = keys.get(propertyIndex).replaceIn(oldIndex, valueIndex);
+        if (newIndex < 0 || valueMatrix.get(newIndex) == null) {
+            throw new RuntimeException(
+                    "Invalid access to FastMap: Replacing " + propertyIndex + " to " + valueIndex + " in " + oldIndex +
+                            " with properties " + Arrays.toString(this.properties)
+            );
         }
         return valueMatrix.get(newIndex);
     }
 
-    /**
-     * @return The map index corresponding to the given property-value assignment
-     */
-    public int getIndexOf(Map<Property<?>, Comparable<?>> state) {
+    public int getIndexOf(Value state, PropertyValueGetter<Value> getValue) {
         int id = 0;
-        for (FastMapKey<?> k : keys) {
-            id += k.toPartialMapIndex(state.get(k.getProperty()));
+        for (int i = 0; i < this.properties.length; ++i) {
+            int valueIndex = getIndexUnsafe(this.properties[i], getValue.getValue(state, this.properties[i]));
+            id += keys.get(i).toPartialMapIndex(valueIndex);
         }
         return id;
     }
 
-    /**
-     * Returns the value assigned to a property at a given map index
-     *
-     * @param stateIndex The map index for the assignment to check
-     * @param property   The property to retrieve
-     * @return The value of the property or null if the state if not present
-     */
-    @Nullable
-    public <T extends Comparable<T>>
-    T getValue(int stateIndex, Property<T> property) {
-        final FastMapKey<T> propId = getKeyFor(property);
-        if (propId == null) {
-            return null;
-        }
-        return propId.getValue(stateIndex);
+    public int insertAtIndex(Value state, PropertyValueGetter<Value> getValue) {
+        final int index = getIndexOf(state, getValue);
+        Preconditions.checkState(this.valueMatrix.get(index) == null);
+        this.valueMatrix.set(index, state);
+        return index;
     }
 
-    @Nullable
-    public Comparable<?> getValue(int stateIndex, Object key) {
-        if (key instanceof Property<?>) {
-            return getValue(stateIndex, (Property<?>) key);
-        } else {
-            return null;
-        }
+    public int getValueIndex(int stateIndex, int propertyIndex) {
+        return this.keys.get(propertyIndex).getIndexIn(stateIndex);
     }
 
-    public int numProperties() {
-        return keys.size();
+    public Property<?>[] getProperties() {
+        return properties;
     }
 
-    public FastMapKey<?> getKey(int keyIndex) {
-        return keys.get(keyIndex);
+    private static <T extends Comparable<T>> int getIndexUnsafe(Property<T> property, Comparable<?> value) {
+        return property.getInternalIndex((T) value);
     }
 
-    @Nullable
-    public <T extends Comparable<T>>
-    FastMapKey<T> getKeyFor(Property<T> prop) {
-        int index = toKeyIndex.getInt(prop);
-        if (index == INVALID_INDEX) {
-            return null;
-        } else {
-            return (FastMapKey<T>) getKey(index);
-        }
-    }
-
-    public ReferenceSet<Property<?>> getPropertySet() {
-        return propertySet;
-    }
-
-    public Value getStateByIndex(int neighborIndex) {
-        return valueMatrix.get(neighborIndex);
-    }
-
-    private static boolean useArrayMapForSize(int numElements) {
-        return numElements < 5;
+    public interface PropertyValueGetter<Owner> {
+        Comparable<?> getValue(Owner state, Property<?> property);
     }
 }

@@ -4,10 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
-import it.unimi.dsi.fastutil.booleans.BooleanList;
-import malte0811.ferritecore.ducks.FastMapStateHolder;
-import malte0811.ferritecore.impl.FastMapEntryMap;
+import malte0811.ferritecore.impl.FastMapStateHolderImpl;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.*;
 import org.junit.jupiter.api.*;
@@ -24,7 +21,6 @@ public class FastMapTest {
     private static final BooleanProperty BOOL = BooleanProperty.create("A");
     private static final IntegerProperty INT = IntegerProperty.create("B", 0, 7);
     private static final EnumProperty<Direction> DIR = EnumProperty.create("C", Direction.class);
-    private static final BooleanList BOOLS = new BooleanArrayList(new boolean[]{false, true});
 
     @TestFactory
     public Stream<DynamicTest> basicMapping() {
@@ -49,8 +45,7 @@ public class FastMapTest {
     }
 
     private void assertBinaryKeySize(int numElements, int expectedFactor) {
-        Property<?> temp = IntegerProperty.create("", 1, numElements);
-        BinaryFastMapKey<?> key = new BinaryFastMapKey<>(temp, 1);
+        BinaryFastMapKey key = BinaryFastMapKey.create(1, numElements);
         Assertions.assertEquals(expectedFactor, key.getFactorToNext());
     }
 
@@ -64,29 +59,21 @@ public class FastMapTest {
 
     @Test
     public void testOversizedBinaryKey() {
-        new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 29);
-        Assertions.assertThrows(
-                IllegalStateException.class,
-                () -> new BinaryFastMapKey<>(IntegerProperty.create("", 1, 4), 1 << 30)
-        );
+        BinaryFastMapKey.create(1 << 29, 4);
+        Assertions.assertThrows(IllegalStateException.class, () -> BinaryFastMapKey.create(1 << 30, 4));
     }
 
     @Test
     public void testBinaryKey32Bits() {
         int factor = 1;
         for (int i = 0; i < 31; ++i) {
-            BinaryFastMapKey<Boolean> k = new BinaryFastMapKey<>(BOOL, factor);
-            Assertions.assertEquals(true, k.getValue(factor / 2));
-            Assertions.assertEquals(false, k.getValue(factor));
+            BinaryFastMapKey k = BinaryFastMapKey.create(factor, 2);
+            Assertions.assertEquals(0, k.getIndexIn(factor / 2));
+            Assertions.assertEquals(1, k.getIndexIn(factor));
             Assertions.assertTrue(factor > 0);
-            Assertions.assertEquals(true, k.getValue(factor << 2));
+            Assertions.assertEquals(0, k.getIndexIn(factor << 2));
             factor *= k.getFactorToNext();
         }
-    }
-
-    @Test
-    public void testInvalidKeys() {
-        forEachType(TestData::testBadType);
     }
 
     private static class TestData {
@@ -113,48 +100,48 @@ public class FastMapTest {
                 values.put(entry, entry);
             });
             this.values = values.build();
-            map = new FastMap<>(properties, this.values, compact);
+            map = new FastMap<>(properties.toArray(Property<?>[]::new), compact);
+            for (var entry : this.values.values()) {
+                map.insertAtIndex(entry, Map::get);
+            }
         }
 
         private void testBasic() {
             for (Map<Property<?>, Comparable<?>> e : values.keySet()) {
-                int index = map.getIndexOf(e);
-                FastMapStateHolder<Map<Property<?>, Comparable<?>>> holder = new MockFMStateHolder<>(map, index);
-                Map<Property<?>, Comparable<?>> map = new FastMapEntryMap(holder);
-                Assertions.assertEquals(new HashMap<>(e), new HashMap<>(map));
+                int stateIndex = map.getIndexOf(e, Map::get);
+                Map<Property<?>, Comparable<?>> reversedMap = new HashMap<>();
+                for (int i = 0; i < map.getProperties().length; i++) {
+                    reversedMap.put(map.getProperties()[i], FastMapStateHolderImpl.getPropertyValue(map, stateIndex, i));
+                }
+                Assertions.assertEquals(new HashMap<>(e), reversedMap);
             }
         }
 
         private void testWith() {
             for (Map<Property<?>, Comparable<?>> baseMap : values.keySet()) {
-                final int baseIndex = map.getIndexOf(baseMap);
-                for (Property<?> toSwap : baseMap.keySet()) {
-                    testSwaps(baseIndex, toSwap, baseMap);
+                final int baseIndex = map.getIndexOf(baseMap, Map::get);
+                for (int i = 0; i < baseMap.size(); ++i) {
+                    testSwaps(baseIndex, i, baseMap);
                 }
             }
         }
 
         private void testWithInvalid() {
             for (Map<Property<?>, Comparable<?>> baseMap : values.keySet()) {
-                final int baseIndex = map.getIndexOf(baseMap);
-                Assertions.assertNull(map.with(baseIndex, INT, 8));
+                final int baseIndex = map.getIndexOf(baseMap, Map::get);
+                Assertions.assertThrows(RuntimeException.class, () -> map.with(baseIndex, 1, 8));
             }
         }
 
-        private <T extends Comparable<T>>
-        void testSwaps(int baseIndex, Property<T> toSwap, Map<Property<?>, Comparable<?>> baseMap) {
+        private void testSwaps(int baseIndex, int propertyIndex, Map<Property<?>, Comparable<?>> baseMap) {
             Map<Property<?>, Comparable<?>> expected = new HashMap<>(baseMap);
-            for (T newValue : toSwap.getPossibleValues()) {
-                Map<Property<?>, Comparable<?>> newMap = map.with(baseIndex, toSwap, newValue);
-                expected.put(toSwap, newValue);
-                Assertions.assertEquals(expected, newMap, "Setting " + toSwap + " to " + newValue + " from " + baseMap);
+            Property<?> property = map.getProperties()[propertyIndex];
+            List<?> values = property.getPossibleValues();
+            for (int valueIndex = 0; valueIndex < values.size(); valueIndex++) {
+                Map<Property<?>, Comparable<?>> newMap = map.with(baseIndex, propertyIndex, valueIndex);
+                expected.put(property, (Comparable<?>) values.get(valueIndex));
+                Assertions.assertEquals(expected, newMap, "Setting " + propertyIndex + " to " + valueIndex + " from " + baseMap);
             }
-        }
-
-        private void testBadType() {
-            Assertions.assertNull(map.with(0, BOOL, ""));
-            Assertions.assertNull(map.with(0, INT, ""));
-            Assertions.assertNull(map.with(0, DIR, ""));
         }
     }
 }

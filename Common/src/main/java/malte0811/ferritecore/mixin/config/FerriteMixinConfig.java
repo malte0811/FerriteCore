@@ -79,54 +79,6 @@ public abstract class FerriteMixinConfig implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        if (mixinClassName.equals("malte0811.ferritecore.mixin.fastmap.FastMapStateHolderMixin")) {
-            replaceStateHolderValuesType(targetClass);
-        }
-    }
-
-    private void replaceStateHolderValuesType(ClassNode targetClass) {
-        // Vanilla currently uses Reference2ObjectArrayMap as the field type, when Reference2ObjectMap would be more
-        // sensible. Until that changes we need to change the type manually.
-        final String oldType = "it/unimi/dsi/fastutil/objects/Reference2ObjectArrayMap";
-        final String newType = "it/unimi/dsi/fastutil/objects/Reference2ObjectMap";
-        final String fieldNameToReplace = Constants.PLATFORM_HOOKS.computeStateHolderValuesName();
-        final var valuesFieldNode = getFieldNode(targetClass, fieldNameToReplace);
-        valuesFieldNode.desc = valuesFieldNode.desc.replace(oldType, newType);
-        if (valuesFieldNode.signature != null) {
-            valuesFieldNode.signature = valuesFieldNode.signature.replace(oldType, newType);
-        }
-        for (final var method : targetClass.methods) {
-            for (AbstractInsnNode insn : method.instructions) {
-                if (insn instanceof FieldInsnNode fieldInsn && fieldInsn.name.equals(fieldNameToReplace)) {
-                    fieldInsn.desc = fieldInsn.desc.replace(oldType, newType);
-                } else if (insn.getOpcode() == Opcodes.INVOKEVIRTUAL && insn instanceof MethodInsnNode call) {
-                    // TODO this is less specific than I'd like, but anything more specific is hard and it is unlikely
-                    //  that anyone will Mixin into StateHolder and add more code involving this specific class.
-                    if (call.owner.contains(oldType)) {
-                        call.owner = call.owner.replace(oldType, newType);
-                        call.setOpcode(Opcodes.INVOKEINTERFACE);
-                        call.itf = true;
-                    }
-                } else if (insn.getOpcode() == Opcodes.CHECKCAST && insn instanceof TypeInsnNode cast) {
-                    cast.desc = cast.desc.replace(oldType, newType);
-                }
-            }
-        }
-    }
-
-    private FieldNode getFieldNode(ClassNode clazz, String fieldName) {
-        for (final var field : clazz.fields) {
-            if (field.name.equals(fieldName)) {
-                return field;
-            }
-        }
-        final var fields = clazz.fields.stream()
-                .map(n -> n.name)
-                .reduce((s1, s2) -> s1 + ", " + s2)
-                .orElse("[None]");
-        throw new RuntimeException(
-                "Failed to find field with name " + fieldName + " in " + clazz.name + ", available fields are " + fields
-        );
     }
 
     private static boolean hasClass(String name) {

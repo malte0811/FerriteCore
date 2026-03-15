@@ -1,30 +1,18 @@
 package malte0811.ferritecore.fastmap;
 
-import net.minecraft.world.level.block.state.properties.Property;
-
 /**
  * A "compact" implementation of a FastMapKey, i.e. one which completely fills the value matrix
  */
-public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
-    private final int mapFactor;
-
-    CompactFastMapKey(Property<T> property, int mapFactor) {
-        super(property);
-        this.mapFactor = mapFactor;
-    }
-
+public record CompactFastMapKey(int mapFactor, int numValues) implements FastMapKey {
     @Override
-    public T getValue(int mapIndex) {
-        int index = (mapIndex / mapFactor) % numValues();
-        return byInternalIndex(index);
-    }
-
-    @Override
-    public int replaceIn(int mapIndex, int newPartialIndex) {
+    public int replaceIn(int mapIndex, int valueIndex) {
+        if (valueIndex >= numValues) {
+            return -1;
+        }
         final int lowerData = mapIndex % mapFactor;
-        final int upperFactor = mapFactor * numValues();
+        final int upperFactor = mapFactor * numValues;
         final int upperData = mapIndex - mapIndex % upperFactor;
-        return lowerData + newPartialIndex + upperData;
+        return lowerData + toPartialMapIndex(valueIndex) + upperData;
     }
 
     @Override
@@ -34,6 +22,11 @@ public class CompactFastMapKey<T extends Comparable<T>> extends FastMapKey<T> {
 
     @Override
     public int getFactorToNext() {
-        return numValues();
+        return numValues;
+    }
+
+    @Override
+    public int getIndexIn(int mapIndex) {
+        return (mapIndex / mapFactor) % numValues;
     }
 }

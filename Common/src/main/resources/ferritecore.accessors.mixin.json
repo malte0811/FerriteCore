@@ -12,6 +12,7 @@
     "BitSetDVSAccess",
     "DiscreteVSAccess",
     "SliceShapeAccess",
+    "StateHolderAccess",
     "SubShapeAccess",
     "VoxelShapeAccess"
   ],

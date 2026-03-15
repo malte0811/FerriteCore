@@ -1,104 +1,82 @@
 package malte0811.ferritecore.mixin.fastmap;
 
-import com.google.common.collect.Table;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import malte0811.ferritecore.ducks.FastMapStateHolder;
 import malte0811.ferritecore.fastmap.FastMap;
-import malte0811.ferritecore.impl.StateHolderImpl;
+import malte0811.ferritecore.impl.FastMapStateHolderImpl;
+import malte0811.ferritecore.mixin.config.FerriteConfig;
 import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.Map;
-
-@Mixin(StateHolder.class)
+// Applied before other Mixins to avoid overwriting injected code
+@Mixin(value = StateHolder.class, priority = 900)
 public abstract class FastMapStateHolderMixin<O, S> implements FastMapStateHolder<S> {
-    @Mutable
     @Shadow
     @Final
-    private Reference2ObjectArrayMap<Property<?>, Comparable<?>> values;
+    @Mutable
+    private Comparable<?>[] propertyValues;
     @Shadow
-    private Map<Property<?>, S[]> neighbours;
+    @Final
+    protected O owner;
 
-    @Shadow @Final protected O owner;
+    @Shadow
+    public abstract boolean isSingletonState();
+
+    @Unique
     private int ferritecore_globalTableIndex;
+    @Unique
     private FastMap<S> ferritecore_globalTable;
 
     /**
-     * @author malte0811
-     * @reason Use alternative implementation. Near impossible to do with anything less intrusive without performance
-     * issues.
+     * @author malte811
+     * @reason We need to replace the "else" branch, the rest stays the same. Ideally, this would be a multidimensional
+     * array access redirect, but those seem to be broken (result in bytecode verifier errors).
      */
     @Overwrite
-    private <T extends Comparable<T>, V extends T> S setValueInternal(
-            Property<T> property, V newValue, Comparable<?> oldValue
-    ) {
-        if (oldValue.equals(newValue)) {
-            return (S)this;
+    private <T extends Comparable<T>, V extends T> S setValueInternal(Property<T> property, int propertyIndex, V value) {
+        int valueIndex = property.getInternalIndex(value);
+        if (valueIndex < 0) {
+            throw new IllegalArgumentException("Cannot set property " + property + " to " + value + " on " + this.owner + ", it is not an allowed value");
         } else {
-            S newState = ferritecore_globalTable.with(ferritecore_globalTableIndex, property, newValue);
-            if (newState == null) {
-                throw new IllegalArgumentException(
-                        "Cannot set property " + property + " to " + newValue + " on " + this.owner + ", it is not an allowed value"
-                );
-            } else {
-                return newState;
-            }
+            return ferritecore_globalTable.with(this.ferritecore_globalTableIndex, propertyIndex, valueIndex);
         }
     }
 
     /**
-     * @reason This Mixin completely replaces the data structures initialized by this method, as the original ones waste
-     * a lot of memory
+     * @reason This Mixin completely replaces the neighbor data structure to reduce memory usage
      * @author malte0811
      */
     @Overwrite
-    public void populateNeighbours(Map<Map<Property<?>, Comparable<?>>, S> states) {
-        StateHolderImpl.populateNeighbors(states, this);
+    void initializeNeighbors(S[][] neighbors) {
+        if (!this.isSingletonState()) {
+            throw new UnsupportedOperationException("Neighbor arrays are replaced by FerriteCore. This function should only be called for singleton states.");
+        }
+    }
+
+    @Redirect(
+            method = {"getNullableValue", "lambda$getValues$0"},
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/world/level/block/state/StateHolder;propertyValues:[Ljava/lang/Comparable;",
+                    opcode = Opcodes.GETFIELD,
+                    args = "array=get"
+            )
+    )
+    private Comparable<?> redirectPropertyValueAccess(Comparable<?>[] values, int index) {
+        return FastMapStateHolderImpl.getPropertyValue(
+                values, ferritecore_globalTable, ferritecore_globalTableIndex, index
+        );
     }
 
     @Override
-    public FastMap<S> getStateMap() {
-        return ferritecore_globalTable;
-    }
-
-    @Override
-    public int getStateIndex() {
-        return ferritecore_globalTableIndex;
-    }
-
-    @Override
-    public Reference2ObjectMap<Property<?>, Comparable<?>> getVanillaPropertyMap() {
-        return values;
-    }
-
-    @Override
-    public void replacePropertyMap(Reference2ObjectMap<Property<?>, Comparable<?>> newMap) {
-        // This cast is incorrect and will be removed by FerriteMixinConfig#postApply when the field type is changed to
-        // Reference2ObjectMap
-        values = (Reference2ObjectArrayMap<Property<?>, Comparable<?>>) newMap;
-    }
-
-    @Override
-    public void setStateMap(FastMap<S> newValue) {
-        ferritecore_globalTable = newValue;
-    }
-
-    @Override
-    public void setStateIndex(int newValue) {
-        ferritecore_globalTableIndex = newValue;
-    }
-
-    @Override
-    public void setNeighborMap(Map<Property<?>, S[]> table) {
-        neighbours = table;
-    }
-
-    @Override
-    public Map<Property<?>, S[]> getNeighborMap() {
-        return neighbours;
+    public void ferritecore_setStateMap(FastMap<S> stateMap, int tableIndex) {
+        ferritecore_globalTable = stateMap;
+        ferritecore_globalTableIndex = tableIndex;
+        if (FerriteConfig.PROPERTY_MAP.isEnabled()) {
+            this.propertyValues = null;
+        }
     }
 }
