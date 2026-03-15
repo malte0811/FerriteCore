@@ -14,15 +14,9 @@ public class FerriteConfig {
 
     public static final Option NEIGHBOR_LOOKUP;
     public static final Option PROPERTY_MAP;
-    public static final Option PREDICATES;
-    public static final Option MRL_CACHE;
-    public static final Option DEDUP_MULTIPART;
     public static final Option DEDUP_BLOCKSTATE_CACHE;
-    public static final Option DEDUP_QUADS;
     public static final Option COMPACT_FAST_MAP;
-    public static final Option POPULATE_NEIGHBOR_TABLE;
     public static final Option THREADING_DETECTOR;
-    public static final Option MODEL_SIDES;
     public static final Option DATACOMPONENTS;
 
     static {
@@ -34,31 +28,9 @@ public class FerriteConfig {
                         "from the replace neighbor table instead. Requires " + NEIGHBOR_LOOKUP.getName() + " to be enabled",
                 NEIGHBOR_LOOKUP
         );
-        PREDICATES = builder.createOption(
-                "cacheMultipartPredicates",
-                "Cache the predicate instances used in multipart models"
-        );
-        MRL_CACHE = builder.createOption(
-                "modelResourceLocations",
-                "Avoid creation of new strings when creating ModelResourceLocations"
-        );
-        DEDUP_MULTIPART = builder.createOption(
-                "multipartDeduplication",
-                "Do not create a new MultipartBakedModel instance for each block state using the same multipart" +
-                        "model. Requires " + PREDICATES.getName() + " to be enabled",
-                PREDICATES
-        );
         DEDUP_BLOCKSTATE_CACHE = builder.createOption(
                 "blockstateCacheDeduplication",
                 "Deduplicate cached data for blockstates, most importantly collision and render shapes"
-        );
-        DEDUP_QUADS = builder.createOption(
-                "bakedQuadDeduplication",
-                "Deduplicate vertex data of baked quads in the basic model implementations"
-        );
-        MODEL_SIDES = builder.createOption(
-                "modelSides",
-                "Use smaller data structures for \"simple\" models, especially models with few side-specific faces"
         );
         DATACOMPONENTS = builder.createOption(
                 "dataComponentPatch",
@@ -73,11 +45,6 @@ public class FerriteConfig {
         COMPACT_FAST_MAP = builder.createOptInOption(
                 "compactFastMap",
                 "Use a slightly more compact, but also slightly slower representation for block states"
-        );
-        POPULATE_NEIGHBOR_TABLE = builder.createOptInOption(
-                "populateNeighborTable",
-                "Populate the neighbor table used by vanilla. Enabling this slightly increases memory usage, but" +
-                        " can help with issues in the rare case where mods access it directly."
         );
         builder.finish();
     }
