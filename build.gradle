@@ -1,5 +1,5 @@
 plugins {
     id 'net.neoforged.moddev' version "$mdg_version" apply false
-    id 'fabric-loom' version '1.5-SNAPSHOT' apply false
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT' apply false
     id "me.modmuss50.mod-publish-plugin" version "0.7.4" apply false
 }

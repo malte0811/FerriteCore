@@ -21,10 +21,6 @@ neoForge {
             sourceSet sourceSets.main
         }
     }
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 }
 
 // Generate mods.toml on IDE import

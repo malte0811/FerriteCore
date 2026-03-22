@@ -3,17 +3,16 @@ plugins {
     id 'idea'
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.parchmentmc.org' }
 }
 
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
-    it.options.release = 21
+    it.options.release = 25
 }
 
 // Disables Gradle's custom module metadata from being published to maven. The

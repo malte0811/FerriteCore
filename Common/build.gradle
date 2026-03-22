@@ -6,17 +6,15 @@ plugins {
 neoForge {
     neoFormVersion = neo_form_version
     addModdingDependenciesTo sourceSets.test
-    // parchment {
-    //     minecraftVersion = parchment_minecraft
-    //     mappingsVersion = parchment_version
-    // }
 }
 
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
     implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.3'
-    testImplementation(platform group: 'org.junit', name: 'junit-bom', version: '5.7.1')
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
+    testImplementation(platform('org.junit:junit-bom:6.0.3'))
+    testImplementation('org.junit.jupiter:junit-jupiter')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 }
 
 test {

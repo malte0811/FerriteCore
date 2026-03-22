@@ -8,13 +8,12 @@ public class PlatformHooks implements IPlatformHooks {
         return FabricLoader.getInstance()
                 .getMappingResolver()
                 .mapFieldName(
-                        "intermediary",
-                        // AbstractBlockState
-                        "net.minecraft.class_4970$class_4971",
+                        "official",
+                        "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase",
                         // cache
-                        "field_23166",
+                        "cache",
                         // AbstractBlockState.Cache
-                        "Lnet/minecraft/class_4970$class_4971$class_3752;"
+                        "Lnet.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase$Cache;"
                 );
     }
 
