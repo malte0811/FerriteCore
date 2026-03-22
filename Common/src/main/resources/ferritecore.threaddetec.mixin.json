@@ -11,6 +11,5 @@
   "plugin": "malte0811.ferritecore.mixin.threaddetec.Config",
   "mixins": [
     "PalettedContainerMixin"
-  ],
-  "refmap": "${refmap_target}refmap.json"
+  ]
 }

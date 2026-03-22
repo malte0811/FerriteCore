@@ -15,6 +15,5 @@
     "StateHolderAccess",
     "SubShapeAccess",
     "VoxelShapeAccess"
-  ],
-  "refmap": "${refmap_target}refmap.json"
+  ]
 }

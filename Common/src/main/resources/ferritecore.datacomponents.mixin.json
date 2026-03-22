@@ -7,7 +7,6 @@
   },
   "minVersion": "0.8",
   "plugin": "malte0811.ferritecore.mixin.datacomponents.Config",
-  "refmap": "${refmap_target}refmap.json",
   "mixins": [
     "PatchedDataComponentMapMixin"
   ]

@@ -12,6 +12,5 @@
   "mixins": [
     "BlockStateBaseMixin",
     "BlockStateCacheMixin"
-  ],
-  "refmap": "${refmap_target}refmap.json"
+  ]
 }
