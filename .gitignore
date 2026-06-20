@@ -1,5 +1,6 @@
 # eclipse
 bin
+eclipse
 *.launch
 .settings
 .metadata
@@ -20,5 +21,6 @@ build
 custom.gradle
 
 # other
-eclipse
 run
+logs
+.vscode
