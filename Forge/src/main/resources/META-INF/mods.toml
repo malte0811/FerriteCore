@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[65,)"
+license = "MIT"
+
+[[mods]]
+modId = "ferritecore"
+version = "${version}"
+displayName = "Ferrite Core"
+authors = "malte0811"
+description = '''
+Reduces memory usage.
+'''
+logoFile = "logo.png"
+
+[[dependencies.ferritecore]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "[${forge_version},)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.ferritecore]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[${mc_version},${next_major_mc})"
+    ordering = "NONE"
+    side = "BOTH"
+
+# Forge reads mixin configs from the jar manifest's MixinConfigs attribute, not from this file.

@@ -1,0 +1,93 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[7.0.17,8)'
+}
+
+evaluationDependsOn(':Common')
+
+// The upstream loader-conventions plugin is not reused here: it pulls in the publishing and jar
+// signing plumbing, which this module has no use for.
+def commonProject = project(':Common')
+
+base {
+    archivesName = "${mod_id}-${mod_version}-forge"
+}
+
+// archivesName already carries the version; leaving this unset avoids doubling it in the file name.
+version = ''
+group = project.group
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 25
+}
+
+minecraft {
+    runs {
+        register('client') {
+            workingDir = layout.projectDirectory.dir('run')
+            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+        }
+        register('server') {
+            workingDir = layout.projectDirectory.dir('run-server')
+            args '--nogui'
+        }
+    }
+}
+
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${forge_mc_version}-${forge_version}")
+
+    // Provided at runtime by Forge / ModLauncher, needed to compile Common's sources.
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
+    compileOnly group: 'org.ow2.asm', name: 'asm-tree', version: '9.3'
+}
+
+// Same approach as the upstream loader modules: the shared sources are compiled into the platform
+// module rather than consumed as a jar.
+tasks.named('compileJava', JavaCompile) {
+    source commonProject.sourceSets.main.allSource
+}
+
+tasks.named('processResources', ProcessResources) {
+    from commonProject.sourceSets.main.resources
+
+    inputs.property 'version', mod_version
+
+    filesMatching('META-INF/mods.toml') {
+        expand([
+            'version'      : mod_version,
+            'mc_version'   : forge_mc_version,
+            'next_major_mc': next_major_mc,
+            'forge_version': forge_version,
+        ])
+    }
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest.attributes([
+        // Forge discovers mixin configs through the manifest rather than mods.toml.
+        'MixinConfigs'         : 'ferritecore.fastmap.mixin.json,ferritecore.blockstatecache.mixin.json,' +
+                                 'ferritecore.threaddetec.mixin.json,ferritecore.accessors.mixin.json,' +
+                                 'ferritecore.datacomponents.mixin.json',
+        'Specification-Title'  : mod_name,
+        'Specification-Vendor' : mod_author,
+        'Implementation-Title' : project.name,
+        'Implementation-Vendor': mod_author,
+    ])
+
+    destinationDirectory = file(rootProject.layout.buildDirectory).toPath().resolve('mods').toFile()
+}
